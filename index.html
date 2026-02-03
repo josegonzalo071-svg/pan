@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trifusion Technologies — Catálogo</title>
+    <title>Trifusion Technologies — Catálogo Profesional</title>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -28,6 +28,7 @@
             --gray: #6c757d;
             --card-bg: #101624;
             --border: #1f2940;
+            --accent-gradient: linear-gradient(135deg, #00c3ff, #007bff);
         }
 
         * {
@@ -73,17 +74,22 @@
         }
 
         .logo {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 2px 10px rgba(0, 195, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .logo-icon {
             font-size: 2.5rem;
-            color: var(--secondary);
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .contact-info {
@@ -168,7 +174,7 @@
             width: 100%;
             padding: 14px;
             background: rgba(5, 8, 21, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.);
             border-radius: 12px;
             color: var(--light);
             font-size: 1rem;
@@ -204,15 +210,15 @@
         }
 
         .btn-primary {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            background: var(--accent-gradient);
             color: #02030a;
             width: 100%;
-            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 195, 255, 0.4);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.6);
+            box-shadow: 0 8px 25px rgba(0, 195, 255, 0.6);
         }
 
         .btn-secondary {
@@ -265,6 +271,9 @@
             font-size: 1.8rem;
             color: var(--secondary);
             font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .categories-grid {
@@ -359,6 +368,9 @@
             font-size: 1.8rem;
             color: var(--primary);
             font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .products-toolbar {
@@ -413,6 +425,7 @@
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
+            height: 100%;
         }
 
         .product-card:hover {
@@ -513,7 +526,7 @@
         .admin-panel {
             background: rgba(8, 12, 26, 0.98);
             border-radius: 20px;
-            padding: 35px;
+            padding: px;
             margin: 40px auto;
             max-width: 1300px;
             display: none;
@@ -573,7 +586,7 @@
         }
 
         .admin-tab.active {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            background: var(--accent-gradient);
             color: #02030a;
             box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
         }
@@ -766,6 +779,131 @@
                 padding: 30px 20px;
             }
         }
+
+        /* Store Info */
+        .store-info {
+            background: rgba(8, 12, 26, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 30px auto;
+            max-width: 1200px;
+            border: 1px solid rgba(0, 123, 255, 0.2);
+        }
+
+        .store-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .store-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .store-icon {
+            font-size: 2.2rem;
+            color: var(--secondary);
+        }
+
+        .store-text h3 {
+            font-size: 1.3rem;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+
+        .store-text p {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        /* Product Details */
+        .product-details {
+            background: rgba(8, 12, 26, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 1200px;
+            border: 1px solid rgba(0, 123, 255, 0.2);
+        }
+
+        .product-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .product-images {
+            display: flex;
+            gap: 15px;
+            flex-direction: column;
+        }
+
+        .product-image-large {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(45deg, var(--dark), #0d1b35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image-thumb-small {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(45deg, var(--dark), #0d1b35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .product-image-thumb-small img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image-thumb-small.active {
+            border: 2px solid var(--secondary);
+            box-shadow: 0 0 0 2px rgba(0, 195, 255, 0.3);
+        }
+
+        .product-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .feature-item {
+            background: rgba(5, 8, 21, 0.9);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-item h4 {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .feature-item p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
     </style>
 </head>
 <body>
@@ -774,14 +912,23 @@
         <div class="header-container">
             <div class="logo-section">
                 <div class="logo-icon">
-                    <i class="fas fa-microchip"></i>
+                    <svg viewBox="0 0 100 100" width="60" height="60">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#00c3ff" />
+                                <stop offset="100%" stop-color="#007bff" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M50 10 L80 40 L50 70 L20 40 Z" fill="url(#grad1)" stroke="url(#grad1)" stroke-width="2" />
+                        <text x="50" y="55" font-family="Arial, sans-serif" font-size="28" fill="url(#grad1)" text-anchor="middle" font-weight="bold">TE</text>
+                    </svg>
                 </div>
                 <div class="logo">TRIFUSION TECHNOLOGIES</div>
             </div>
             <div class="contact-info">
                 <div class="contact-item">
                     <i class="fas fa-map-marker-alt"></i>
-                    <span>Santo Domingo, RD</span>
+                    <span>Autopista de San Isidro, Santo Domingo, RD</span>
                 </div>
                 <div class="contact-item">
                     <i class="fab fa-whatsapp"></i>
@@ -790,6 +937,39 @@
             </div>
         </div>
     </header>
+
+    <!-- Store Info -->
+    <section class="store-info">
+        <div class="store-info-grid">
+            <div class="store-item">
+                <div class="store-icon">
+                    <i class="fas fa-store"></i>
+                </div>
+                <div class="store-text">
+                    <h3>Horario de Atención</h3>
+                    <p>Lunes a Viernes: 9:00 AM - 6:00 PM<br>Sábados: 9:00 AM - 2:00 PM</p>
+                </div>
+            </div>
+            <div class="store-item">
+                <div class="store-icon">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <div class="store-text">
+                    <h3>Envíos</h3>
+                    <p>Envíos a todo el país<br>Entrega en 24-48 horas</p>
+                </div>
+            </div>
+            <div class="store-item">
+                <div class="store-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="store-text">
+                    <h3>Garantía</h3>
+                    <p>Garantía oficial de fabricante<br>Soporte técnico incluido</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Login Modal -->
     <div class="modal" id="loginModal">
@@ -836,6 +1016,9 @@
             <button class="admin-tab" data-tab="inventory">
                 <i class="fas fa-clipboard-list"></i> Inventario
             </button>
+            <button class="admin-tab" data-tab="categories">
+                <i class="fas fa-th-large"></i> Categorías
+            </button>
         </div>
 
         <div id="adminMessage"></div>
@@ -853,18 +1036,30 @@
                     <input type="text" id="productName" placeholder="Ej: iPhone 14 Pro 128GB" required>
                 </div>
                 <div class="form-group">
+                    <label for="productCategory">
+                        <i class="fas fa-folder"></i> Categoría *
+                    </label>
+                    <select id="productCategory" required>
+                        <option value="telefonos">Teléfonos</option>
+                        <option value="monitores">Monitores</option>
+                        <option value="impresoras">Impresoras</option>
+                        <option value="ups">UPS</option>
+                        <option value="accesorios">Accesorios</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="productPrice">
                         <i class="fas fa-dollar-sign"></i> Precio Base (RD$) *
                     </label>
                     <input type="number" id="productPrice" placeholder="0.00" min="0" step="0.01" required>
-                    <small style="color: var(--gray); display: block; margin-top: 5px;">Precio sin margen (para teléfonos se suma 20%)</small>
+                    <small style="color: var(--gray); display: block; margin-top: 5px;">Precio sin margen (teléfonos: +20%, otros: +15%)</small>
                 </div>
                 <div class="form-group">
                     <label for="productImageUpload">
                         <i class="fas fa-image"></i> Imagen del Producto
                     </label>
                     <input type="file" id="productImageUpload" accept="image/*">
-                    <small style="color: var(--gray); display: block; margin-top: 5px;">Máx. 5MB</small>
+                    <small style="color: var(--gray); display: block; margin-top: 5px;">Máx. 5MB (JPEG, PNG, WebP)</small>
                 </div>
                 <div class="form-group">
                     <label for="productImageUrl">
@@ -908,6 +1103,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Producto</th>
+                            <th>Categoría</th>
                             <th>Precio Base</th>
                             <th>Precio Final</th>
                             <th>Acciones</th>
@@ -915,13 +1111,79 @@
                     </thead>
                     <tbody id="inventoryTableBody">
                         <tr>
-                            <td colspan="5" style="text-align: center; padding: 40px;">
+                            <td colspan="6" style="text-align: center; padding: 40px;">
                                 <div class="spinner"></div>
                                 <p>Cargando inventario...</p>
                             </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Categories Tab -->
+        <div class="admin-content" id="tab-categories">
+            <h3 style="margin-bottom: 25px; color: var(--primary);">
+                <i class="fas fa-th-large"></i> Gestión de Categorías
+            </h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="categoryName">
+                        <i class="fas fa-tag"></i> Nombre de la Categoría *
+                    </label>
+                    <input type="text" id="categoryName" placeholder="Ej: Teléfonos, Monitores, etc." required>
+                </div>
+                <div class="form-group">
+                    <label for="categoryIcon">
+                        <i class="fas fa-icons"></i> Icono (Font Awesome)
+                    </label>
+                    <input type="text" id="categoryIcon" placeholder="mobile-alt, desktop, print, etc." required>
+                    <small style="color: var(--gray); display: block; margin-top: 5px;">Ver iconos en fontawesome.com</small>
+                </div>
+                <div class="form-group">
+                    <label for="categorySheet">
+                        <i class="fas fa-link"></i> Google Sheets ID (opcional)
+                    </label>
+                    <input type="text" id="categorySheet" placeholder="ID del documento de Google Sheets">
+                    <small style="color: var(--gray); display: block; margin-top: 5px;">Deja vacío para productos manuales</small>
+                </div>
+                <div class="form-group">
+                    <label for="categoryMargin">
+                        <i class="fas fa-percentage"></i> Margen (%)
+                    </label>
+                    <input type="number" id="categoryMargin" placeholder="20" min="0" max="100" step="0.1" required>
+                    <small style="color: var(--gray); display: block; margin-top: 5px;">Margen aplicado a precios de base (teléfonos: 20%, otros: 15%)</small>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="saveCategoryBtn" style="width: 100%; padding: 15px; font-size: 1.1rem;">
+                <i class="fas fa-save"></i> Guardar Categoría
+            </button>
+
+            <div style="margin-top: 40px;">
+                <h3 style="margin-bottom: 20px; color: var(--primary);">
+                    <i class="fas fa-list"></i> Categorías Existentes
+                </h3>
+                <div class="table-container">
+                    <table id="categoriesTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Icono</th>
+                                <th>Google Sheets</th>
+                                <th>Margen</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px;">
+                                    <div class="spinner"></div>
+                                    <p>Cargando categorías...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -967,6 +1229,77 @@
         <div id="productsGrid" class="products-grid"></div>
     </section>
 
+    <!-- Product Details Section (Example) -->
+    <section class="product-details">
+        <div class="product-details-grid">
+            <div class="product-images">
+                <div class="product-image-large">
+                    <img src="https://via.placeholder.com/600x400/0a0f2c/ffffff?text=Producto+Principal" alt="Producto Principal">
+                </div>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div class="product-image-thumb-small active">
+                        <img src="https://via.placeholder.com/150x100/0a0f2c/ffffff?text=Vista+1" alt="Vista 1">
+                    </div>
+                    <div class="product-image-thumb-small">
+                        <img src="https://via.placeholder.com/150x100/0a0f2c/ffffff?text=Vista+2" alt="Vista 2">
+                    </div>
+                    <div class="product-image-thumb-small">
+                        <img src="https://via.placeholder.com/150x100/0a0f2c/ffffff?text=Vista+3" alt="Vista 3">
+                    </div>
+                    <div class="product-image-thumb-small">
+                        <img src="https://via.placeholder.com/150x100/0a0f2c/ffffff?text=Vista+4" alt="Vista 4">
+                    </div>
+                </div>
+            </div>
+            <div class="product-info">
+                <h2 style="font-size: 2.2rem; margin-bottom: 15px; color: var(--secondary);">iPhone 14 Pro 128GB</h2>
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <span style="background: rgba(0, 195, 255, 0.15); padding: 8px 15px; border-radius: 20px; color: var(--secondary); font-weight: 600;">Teléfonos</span>
+                    <span style="background: rgba(40, 167, 69, 0.15); padding: 8px 15px; border-radius: 20px; color: var(--success); font-weight: 600;">En Stock</span>
+                </div>
+                <p style="font-size: 1.1rem; color: var(--gray); margin-bottom: 25px; line-height: 1.6;">
+                    El iPhone 14 Pro es el teléfono inteligente de última generación con cámara profesional, pantalla Super Retina XDR y el potente chip A16 Bionic. Perfecto para profesionales y amantes de la tecnología.
+                </p>
+                <div style="display: flex; gap: 20px; margin-bottom: 25px;">
+                    <div>
+                        <h3 style="font-size: 1.4rem; color: var(--warning); margin-bottom: 10px;">RD$ 85,490.00</h3>
+                        <p style="color: var(--gray); font-size: 0.9rem;">Precio final con 20% de margen</p>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.1rem; color: var(--gray); margin-bottom: 5px;">Precio base</h3>
+                        <p style="color: var(--gray); font-size: 1rem;">RD$ 71,241.67</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+                    <button class="btn btn-primary" style="flex: 1; padding: 15px;">
+                        <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+                    </button>
+                    <button class="btn btn-success" style="flex: 1; padding: 15px;">
+                        <i class="fab fa-whatsapp"></i> Cotizar
+                    </button>
+                </div>
+                <div class="product-features">
+                    <div class="feature-item">
+                        <h4><i class="fas fa-microchip" style="color: var(--secondary); margin-right: 8px;"></i>Procesador</h4>
+                        <p>A16 Bionic chip con Neural Engine de 16 núcleos</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4><i class="fas fa-camera" style="color: var(--secondary); margin-right: 8px;"></i>Cámaras</h4>
+                        <p>Sistema triple de 48MP + 12MP + 12MP</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4><i class="fas fa-battery-full" style="color: var(--secondary); margin-right: 8px;"></i>Batería</h4>
+                        <p>Hasta 26 horas de reproducción de video</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4><i class="fas fa-sync-alt" style="color: var(--secondary); margin-right: 8px;"></i>Conectividad</h4>
+                        <p>5G, Wi-Fi 6, Bluetooth 5.3</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- WhatsApp Button -->
     <a href="https://wa.me/18298725163" class="whatsapp-float" target="_blank" aria-label="WhatsApp">
         <i class="fab fa-whatsapp"></i>
@@ -993,23 +1326,64 @@
         const storage = firebase.storage();
 
         // ==========================================
-        // GLOBAL VARIABLES
+        // GLOBAL STATE
         // ==========================================
-        let currentUser = null;
-        let allProducts = [];
-        let currentSearch = '';
-        let editingProductId = null;
+        const state = {
+            currentUser: null,
+            currentCategory: 'all',
+            currentSearch: '',
+            allProducts: [],
+            editingProduct: null,
+            categories: [
+                { 
+                    id: 'telefonos', 
+                    name: 'Teléfonos', 
+                    icon: 'mobile-alt', 
+                    sheetId: '1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc', 
+                    margin: 20 
+                },
+                { 
+                    id: 'monitores', 
+                    name: 'Monitores', 
+                    icon: 'desktop', 
+                    sheetId: '1dJ6IGB75oVPaWcWrQjzwjrCeZEmXwlw7', 
+                    margin: 15 
+                },
+                { 
+                    id: 'impresoras', 
+                    name: 'Impresoras', 
+                    icon: 'print', 
+                    sheetId: '1rl15lecq23hYfE9z0Q-Vyi7kOR8CI9dl', 
+                    margin: 15 
+                },
+                { 
+                    id: 'ups', 
+                    name: 'UPS', 
+                    icon: 'battery-full', 
+                    sheetId: '1bnyTbEHd170zPEDs9UexYEvLylR5h4n7', 
+                    margin: 15 
+                },
+                { 
+                    id: 'accesorios', 
+                    name: 'Accesorios', 
+                    icon: 'plug', 
+                    sheetId: null, 
+                    margin: 15 
+                }
+            ]
+        };
 
         // ==========================================
         // AUTHENTICATION
         // ==========================================
         auth.onAuthStateChanged(user => {
-            currentUser = user;
+            state.currentUser = user;
             if (user) {
                 document.getElementById('loginModal').classList.remove('active');
                 document.getElementById('adminPanel').classList.add('active');
                 document.getElementById('adminEmail').textContent = user.email;
                 loadInventory();
+                loadCategories();
             } else {
                 document.getElementById('adminPanel').classList.remove('active');
             }
@@ -1042,7 +1416,7 @@
         });
 
         document.getElementById('adminAccessBtn').addEventListener('click', () => {
-            if (currentUser) {
+            if (state.currentUser) {
                 document.getElementById('adminPanel').classList.add('active');
             } else {
                 document.getElementById('loginModal').classList.add('active');
@@ -1050,27 +1424,43 @@
         });
 
         // ==========================================
-        // CATEGORIES - FIXED CATEGORIES
+        // CATEGORIES MANAGEMENT
         // ==========================================
-        const CATEGORIES = [
-            { id: 'telefonos', name: 'Teléfonos', icon: 'mobile-alt', sheetId: '1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc', margin: 20 },
-            { id: 'monitores', name: 'Monitores', icon: 'desktop', sheetId: '1dJ6IGB75oVPaWcWrQjzwjrCeZEmXwlw7', margin: 15 },
-            { id: 'impresoras', name: 'Impresoras', icon: 'print', sheetId: '1rl15lecq23hYfE9z0Q-Vyi7kOR8CI9dl', margin: 15 },
-            { id: 'ups', name: 'UPS', icon: 'battery-full', sheetId: '1bnyTbEHd170zPEDs9UexYEvLylR5h4n7', margin: 15 }
-        ];
+        function loadCategories() {
+            const tbody = document.getElementById('categoriesTableBody');
+            tbody.innerHTML = '';
+            
+            state.categories.forEach(category => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${category.name}</strong></td>
+                    <td><i class="fas fa-${category.icon}" style="font-size:1.5rem;color:var(--secondary)"></i></td>
+                    <td>${category.sheetId ? 
+                        `<a href="https://docs.google.com/spreadsheets/d/${category.sheetId}" target="_blank" style="color:var(--primary)">Ver Sheet</a>` : 
+                        'Manual'}</td>
+                    <td><strong>${category.margin}%</strong></td>
+                    <td>
+                        <button class="btn btn-danger" style="padding:8px 15px;font-size:0.9rem;">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
 
         function displayCategories() {
             const grid = document.getElementById('categoriesGrid');
             const loading = document.getElementById('categoriesLoading');
             
             loading.style.display = 'none';
-            grid.innerHTML = CATEGORIES.map(cat => `
+            grid.innerHTML = state.categories.map(cat => `
                 <div class="category-card" onclick="filterByCategory('${cat.id}')">
                     <div class="category-icon">
                         <i class="fas fa-${cat.icon}"></i>
                     </div>
                     <h3>${cat.name}</h3>
-                    <p>${cat.name} con precios actualizados</p>
+                    <p>${cat.sheetId ? 'Conectado a Google Sheets' : 'Productos manuales'}</p>
                     <button class="btn btn-primary">
                         <i class="fas fa-eye"></i> Ver Productos
                     </button>
@@ -1089,12 +1479,13 @@
                 // Cargar productos de Google Sheets
                 const sheetProducts = await loadProductsFromSheets();
                 
-                // Cargar productos de Firebase (solo los visibles)
+                // Cargar productos de Firebase
                 const firebaseProducts = await loadFirebaseProducts();
                 
                 // Combinar ambos
-                allProducts = [...sheetProducts, ...firebaseProducts];
+                state.allProducts = [...sheetProducts, ...firebaseProducts];
                 
+                // Aplicar filtro y mostrar
                 filterAndDisplayProducts();
                 
             } catch (error) {
@@ -1113,7 +1504,7 @@
         async function loadProductsFromSheets() {
             const products = [];
             
-            for (const category of CATEGORIES) {
+            for (const category of state.categories) {
                 if (!category.sheetId) continue;
                 
                 try {
@@ -1121,40 +1512,47 @@
                     const response = await fetch(csvUrl);
                     const csv = await response.text();
                     
-                    Papa.parse(csv, {
-                        header: false,
-                        skipEmptyLines: true,
-                        complete: (result) => {
-                            result.data.forEach(row => {
-                                const description = (row[2] || "").trim();
-                                const priceRaw = (row[3] || "").trim();
-                                
-                                if (!description || !priceRaw) return;
-                                
-                                let isTransit = false;
-                                let basePrice = null;
-                                
-                                if (priceRaw.toUpperCase().includes("TRANSITO")) {
-                                    isTransit = true;
-                                } else {
-                                    const numbersOnly = priceRaw.replace(/[^0-9.]/g, "");
-                                    basePrice = parseFloat(numbersOnly) || null;
-                                }
-                                
-                                if (basePrice || isTransit) {
-                                    products.push({
-                                        id: `sheet_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                                        name: description,
-                                        description: description,
-                                        categoryId: category.id,
-                                        categoryName: category.name,
-                                        basePrice: basePrice,
-                                        margin: category.margin,
-                                        isTransit: isTransit,
-                                        imageUrl: '',
-                                        source: 'google_sheet'
-                                    });
-                                }
+                    // Parse CSV with PapaParse
+                    const parsed = await new Promise((resolve) => {
+                        Papa.parse(csv, {
+                            header: false,
+                            skipEmptyLines: true,
+                            complete: resolve
+                        });
+                    });
+                    
+                    // Process each row
+                    parsed.data.forEach(row => {
+                        const description = (row[2] || "").trim();
+                        const priceRaw = (row[3] || "").trim();
+                        
+                        if (!description || !priceRaw) return;
+                        
+                        let isTransit = false;
+                        let basePrice = null;
+                        
+                        if (priceRaw.toUpperCase().includes("TRANSITO")) {
+                            isTransit = true;
+                        } else {
+                            const numbersOnly = priceRaw.replace(/[^0-9.]/g, "");
+                            basePrice = parseFloat(numbersOnly) || null;
+                        }
+                        
+                        if (basePrice || isTransit) {
+                            // Generate stable ID based on category and description
+                            const stableId = generateStableId(category.id, description);
+                            
+                            products.push({
+                                id: stableId,
+                                name: description,
+                                description: description,
+                                categoryId: category.id,
+                                categoryName: category.name,
+                                basePrice: basePrice,
+                                margin: category.margin,
+                                isTransit: isTransit,
+                                imageUrl: '',
+                                source: 'google_sheet'
                             });
                         }
                     });
@@ -1185,7 +1583,8 @@
                         basePrice: data.basePrice || data.price,
                         margin: data.categoryId === 'telefonos' ? 20 : 15,
                         imageUrl: data.imageUrl || '',
-                        source: 'firebase'
+                        source: 'firebase',
+                        isTransit: false
                     });
                 });
                 
@@ -1196,196 +1595,55 @@
             }
         }
 
-        async function saveProduct() {
-            const name = document.getElementById('productName').value.trim();
-            const basePrice = parseFloat(document.getElementById('productPrice').value);
-            const description = document.getElementById('productDescription').value.trim();
-            const imageFile = document.getElementById('productImageUpload').files[0];
-            const imageUrlInput = document.getElementById('productImageUrl').value.trim();
-
-            if (!name || isNaN(basePrice)) {
-                showMessage('adminMessage', 'Por favor, completa todos los campos obligatorios', 'error');
-                return;
+        function generateStableId(categoryId, description) {
+            // Simple hash function for stable ID
+            let hash = 0;
+            for (let i = 0; i < description.length; i++) {
+                const char = description.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
             }
-
-            let imageUrl = '';
-            
-            // Subir imagen si se seleccionó archivo
-            if (imageFile) {
-                try {
-                    showMessage('adminMessage', 'Subiendo imagen...', 'info');
-                    const storageRef = storage.ref('products/' + Date.now() + '_' + imageFile.name);
-                    await storageRef.put(imageFile);
-                    imageUrl = await storageRef.getDownloadURL();
-                } catch (error) {
-                    console.error('Error subiendo imagen:', error);
-                    showMessage('adminMessage', 'Error al subir la imagen', 'error');
-                    return;
-                }
-            } else if (imageUrlInput) {
-                // Usar URL directa si se proporcionó
-                imageUrl = imageUrlInput;
-            }
-
-            try {
-                if (editingProductId) {
-                    // Editar producto existente
-                    await db.collection('products').doc(editingProductId).update({
-                        name: name,
-                        description: description,
-                        basePrice: basePrice,
-                        imageUrl: imageUrl,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    showMessage('adminMessage', 'Producto actualizado exitosamente', 'success');
-                    editingProductId = null;
-                } else {
-                    // Crear nuevo producto (no visible por defecto)
-                    await db.collection('products').add({
-                        name: name,
-                        description: description,
-                        categoryId: 'telefonos',
-                        categoryName: 'Teléfonos',
-                        basePrice: basePrice,
-                        imageUrl: imageUrl,
-                        visible: false, // No visible hasta que el admin lo active
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    showMessage('adminMessage', 'Producto guardado. Actívalo desde Inventario para mostrarlo en el catálogo.', 'success');
-                }
-                
-                // Limpiar formulario
-                document.getElementById('productName').value = '';
-                document.getElementById('productPrice').value = '';
-                document.getElementById('productDescription').value = '';
-                document.getElementById('productImageUpload').value = '';
-                document.getElementById('productImageUrl').value = '';
-                
-                await loadInventory();
-                await loadProducts();
-            } catch (error) {
-                console.error('Error guardando producto:', error);
-                showMessage('adminMessage', 'Error al guardar el producto', 'error');
-            }
+            return `sheet_${categoryId}_${Math.abs(hash)}`;
         }
 
-        async function toggleProductVisibility(productId, visible) {
-            try {
-                await db.collection('products').doc(productId).update({
-                    visible: visible
-                });
-                showMessage('adminMessage', `Producto ${visible ? 'mostrado' : 'ocultado'} exitosamente`, 'success');
-                await loadInventory();
-                await loadProducts();
-            } catch (error) {
-                console.error('Error cambiando visibilidad:', error);
-                showMessage('adminMessage', 'Error al cambiar visibilidad', 'error');
+        function calculateFinalPrice(product) {
+            if (product.isTransit) return 'TRÁNSITO';
+            if (product.basePrice) {
+                const margin = product.margin / 100;
+                return product.basePrice * (1 + margin);
             }
+            return null;
         }
 
-        async function deleteProduct(productId) {
-            if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
-
-            try {
-                await db.collection('products').doc(productId).delete();
-                showMessage('adminMessage', 'Producto eliminado exitosamente', 'success');
-                await loadInventory();
-                await loadProducts();
-            } catch (error) {
-                console.error('Error eliminando producto:', error);
-                showMessage('adminMessage', 'Error al eliminar el producto', 'error');
-            }
+        function formatPrice(amount) {
+            if (amount === null || amount === undefined) return 'SIN PRECIO';
+            return "$" + amount.toLocaleString("es-DO", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        async function editProduct(productId) {
-            try {
-                const doc = await db.collection('products').doc(productId).get();
-                const data = doc.data();
-                
-                document.getElementById('productName').value = data.name;
-                document.getElementById('productPrice').value = data.basePrice || data.price;
-                document.getElementById('productDescription').value = data.description || '';
-                document.getElementById('productImageUrl').value = data.imageUrl || '';
-                
-                editingProductId = productId;
-                document.querySelector('.admin-tab[data-tab="products"]').click();
-                
-                showMessage('adminMessage', 'Producto cargado para edición. Modifica y guarda los cambios.', 'info');
-            } catch (error) {
-                console.error('Error cargando producto para edición:', error);
-            }
-        }
-
-        async function loadInventory() {
-            const tbody = document.getElementById('inventoryTableBody');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px"><div class="spinner"></div><p>Cargando...</p></td></tr>';
-            
-            try {
-                const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
-                
-                if (snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray)">No hay productos en Firebase</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const finalPrice = data.basePrice ? data.basePrice * 1.20 : (data.price ? data.price * 1.20 : 0);
-                    
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${doc.id.substring(0, 8)}...</td>
-                        <td>
-                            ${data.imageUrl ? `<img src="${data.imageUrl}" class="product-image-thumb" alt="${data.name}">` : ''}
-                            <strong>${data.name}</strong>
-                            <br><small style="color:var(--gray)">${data.description?.substring(0, 50) || ''}</small>
-                        </td>
-                        <td>${formatPrice(data.basePrice || data.price)}</td>
-                        <td><strong>${formatPrice(finalPrice)}</strong></td>
-                        <td>
-                            <button class="btn btn-success" style="padding:6px 10px;font-size:0.85rem;margin:2px;" onclick="toggleProductVisibility('${doc.id}', ${!data.visible})">
-                                <i class="fas fa-${data.visible ? 'eye-slash' : 'eye'}"></i> ${data.visible ? 'Ocultar' : 'Mostrar'}
-                            </button>
-                            <button class="btn btn-secondary" style="padding:6px 10px;font-size:0.85rem;margin:2px;" onclick="editProduct('${doc.id}')">
-                                <i class="fas fa-edit"></i> Editar
-                            </button>
-                            <button class="btn btn-danger" style="padding:6px 10px;font-size:0.85rem;margin:2px;" onclick="deleteProduct('${doc.id}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-                
-            } catch (error) {
-                console.error('Error cargando inventario:', error);
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--danger)">Error al cargar inventario</td></tr>';
-            }
-        }
-
-        // ==========================================
-        // DISPLAY FUNCTIONS
-        // ==========================================
         function filterAndDisplayProducts() {
             document.getElementById('productsLoading').style.display = 'none';
             
-            let filtered = [...allProducts];
+            let filtered = [...state.allProducts];
             
-            // Filtrar por búsqueda
-            if (currentSearch.trim()) {
-                const searchLower = currentSearch.toLowerCase();
+            // Filter by category
+            if (state.currentCategory !== 'all') {
+                filtered = filtered.filter(p => p.categoryId === state.currentCategory);
+            }
+            
+            // Filter by search
+            if (state.currentSearch.trim()) {
+                const searchLower = state.currentSearch.toLowerCase();
                 filtered = filtered.filter(p => 
                     p.name.toLowerCase().includes(searchLower) ||
                     (p.description && p.description.toLowerCase().includes(searchLower))
                 );
             }
             
-            // Mostrar u ocultar mensaje vacío
+            // Show/hide empty state
             document.getElementById('productsEmpty').style.display = 
                 filtered.length === 0 ? 'block' : 'none';
             
-            // Renderizar productos
+            // Render products
             displayProducts(filtered);
         }
 
@@ -1402,21 +1660,9 @@
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 
-                // Calcular precio final con margen
-                let finalPrice = '';
-                let priceClass = '';
-                let margin = product.margin || (product.categoryId === 'telefonos' ? 20 : 15);
-                
-                if (product.isTransit) {
-                    finalPrice = 'TRÁNSITO';
-                    priceClass = 'transit';
-                } else if (product.basePrice) {
-                    const calculatedPrice = product.basePrice * (1 + margin / 100);
-                    finalPrice = formatPrice(calculatedPrice);
-                } else {
-                    finalPrice = 'SIN PRECIO';
-                    priceClass = 'transit';
-                }
+                // Calcular precio final
+                const finalPrice = calculateFinalPrice(product);
+                const priceClass = product.isTransit ? 'transit' : '';
                 
                 // Imagen
                 const imageHtml = product.imageUrl 
@@ -1438,7 +1684,7 @@
                     <div class="product-info">
                         <h3 class="product-name">${product.name}</h3>
                         <p class="product-description">${product.description || 'Sin descripción'}</p>
-                        <div class="product-price ${priceClass}">${finalPrice}</div>
+                        <div class="product-price ${priceClass}">${formatPrice(finalPrice)}</div>
                         <div class="product-actions">
                             <button class="btn btn-whatsapp" onclick="openWhatsApp('${product.name}')">
                                 <i class="fab fa-whatsapp"></i> Cotizar
@@ -1452,20 +1698,150 @@
         }
 
         function filterByCategory(categoryId) {
-            currentCategoryFilter = categoryId;
+            state.currentCategory = categoryId;
             document.getElementById('productsTitle').innerHTML = `
-                <i class="fas fa-filter"></i> Productos - ${CATEGORIES.find(c => c.id === categoryId)?.name || 'Todos'}
+                <i class="fas fa-filter"></i> Productos - ${state.categories.find(c => c.id === categoryId)?.name || 'Todos'}
             `;
             filterAndDisplayProducts();
+        }
+
+        async function saveProduct() {
+            const name = document.getElementById('productName').value.trim();
+            const categoryId = document.getElementById('productCategory').value;
+            const basePrice = parseFloat(document.getElementById('productPrice').value);
+            const description = document.getElementById('productDescription').value.trim();
+            const imageFile = document.getElementById('productImageUpload').files[0];
+            const imageUrlInput = document.getElementById('productImageUrl').value.trim();
+            const category = state.categories.find(c => c.id === categoryId);
+
+            if (!name || isNaN(basePrice)) {
+                showMessage('adminMessage', 'Por favor, completa todos los campos obligatorios', 'error');
+                return;
+            }
+
+            let imageUrl = '';
+            
+            // Subir imagen si se seleccionó archivo
+            if (imageFile) {
+                try {
+                    // Validar imagen
+                    if (imageFile.size > 5 * 1024 * 1024) {
+                        throw new Error('El archivo es demasiado grande (máximo 5MB)');
+                    }
+                    if (!['image/jpeg', 'image/png', 'image/webp'].includes(imageFile.type)) {
+                        throw new Error('Tipo de archivo no permitido (solo JPEG, PNG, WebP)');
+                    }
+                    
+                    showMessage('adminMessage', 'Subiendo imagen...', 'info');
+                    const storageRef = storage.ref('products/' + Date.now() + '_' + imageFile.name);
+                    await storageRef.put(imageFile);
+                    imageUrl = await storageRef.getDownloadURL();
+                } catch (error) {
+                    console.error('Error subiendo imagen:', error);
+                    showMessage('adminMessage', error.message, 'error');
+                    return;
+                }
+            } else if (imageUrlInput) {
+                // Usar URL directa si se proporcionó
+                imageUrl = imageUrlInput;
+            }
+
+            try {
+                // Guardar en Firebase
+                await db.collection('products').add({
+                    name: name,
+                    description: description,
+                    categoryId: categoryId,
+                    categoryName: category.name,
+                    basePrice: basePrice,
+                    imageUrl: imageUrl,
+                    visible: true,
+                    margin: category.margin,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                showMessage('adminMessage', 'Producto agregado exitosamente', 'success');
+                
+                // Limpiar formulario
+                document.getElementById('productName').value = '';
+                document.getElementById('productCategory').value = 'telefonos';
+                document.getElementById('productPrice').value = '';
+                document.getElementById('productDescription').value = '';
+                document.getElementById('productImageUpload').value = '';
+                document.getElementById('productImageUrl').value = '';
+                
+                // Actualizar productos
+                await loadProducts();
+                await loadInventory();
+            } catch (error) {
+                console.error('Error guardando producto:', error);
+                showMessage('adminMessage', 'Error al guardar el producto', 'error');
+            }
+        }
+
+        async function loadInventory() {
+            const tbody = document.getElementById('inventoryTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px"><div class="spinner"></div><p>Cargando...</p></td></tr>';
+            
+            try {
+                const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
+                
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray)">No hay productos en Firebase</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const finalPrice = calculateFinalPrice({
+                        basePrice: data.basePrice,
+                        margin: data.margin
+                    });
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${doc.id.substring(0, 8)}...</td>
+                        <td>
+                            ${data.imageUrl ? `<img src="${data.imageUrl}" class="product-image-thumb" alt="${data.name}">` : ''}
+                            <strong>${data.name}</strong>
+                            <br><small style="color:var(--gray)">${data.description?.substring(0, 50) || ''}</small>
+                        </td>
+                        <td>${data.categoryName || 'N/A'}</td>
+                        <td>${formatPrice(data.basePrice)}</td>
+                        <td><strong>${formatPrice(finalPrice)}</strong></td>
+                        <td>
+                            <button class="btn btn-danger" style="padding:6px 10px;font-size:0.85rem;margin:2px;" onclick="deleteProduct('${doc.id}')">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+            } catch (error) {
+                console.error('Error cargando inventario:', error);
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--danger)">Error al cargar inventario</td></tr>';
+            }
+        }
+
+        async function deleteProduct(productId) {
+            if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
+
+            try {
+                await db.collection('products').doc(productId).delete();
+                showMessage('adminMessage', 'Producto eliminado exitosamente', 'success');
+                await loadInventory();
+                await loadProducts();
+            } catch (error) {
+                console.error('Error eliminando producto:', error);
+                showMessage('adminMessage', 'Error al eliminar el producto', 'error');
+            }
         }
 
         // ==========================================
         // UTILITY FUNCTIONS
         // ==========================================
-        function formatPrice(amount) {
-            return "$" + amount.toLocaleString("es-DO", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
         function showMessage(elementId, message, type) {
             const container = document.getElementById(elementId);
             const messageDiv = document.createElement('div');
@@ -1500,7 +1876,7 @@
             document.getElementById('refreshInventoryBtn').addEventListener('click', loadInventory);
             
             document.getElementById('searchProducts').addEventListener('input', (e) => {
-                currentSearch = e.target.value;
+                state.currentSearch = e.target.value;
                 filterAndDisplayProducts();
             });
             
@@ -1524,6 +1900,7 @@
                     document.getElementById(`tab-${tabId}`).classList.add('active');
                     
                     if (tabId === 'inventory') loadInventory();
+                    if (tabId === 'categories') loadCategories();
                 });
             });
         });
