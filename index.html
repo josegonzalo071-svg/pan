@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trifusion Technologies — Catálogo Profesional</title>
+    <title>Trifusion Technologies — Catálogo</title>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -162,7 +162,9 @@
             font-size: 0.95rem;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 14px;
             background: rgba(5, 8, 21, 0.9);
@@ -174,9 +176,16 @@
             transition: border-color 0.3s;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
         }
 
         .btn {
@@ -789,14 +798,14 @@
                 <h2><i class="fas fa-user-shield"></i> Acceso Administrador</h2>
                 <p>Solo personal autorizado</p>
             </div>
-            <form id="loginForm">
+            <form id="loginForm" autocomplete="on">
                 <div class="form-group">
                     <label for="email"><i class="fas fa-envelope"></i> Correo Electrónico</label>
-                    <input type="email" id="email" placeholder="admin@trifusion.com" required>
+                    <input type="email" id="email" name="email" placeholder="admin@trifusion.com" required autocomplete="email">
                 </div>
                 <div class="form-group">
                     <label for="password"><i class="fas fa-lock"></i> Contraseña</label>
-                    <input type="password" id="password" placeholder="••••••••" required>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
                 </div>
                 <div id="loginMessage"></div>
                 <button type="submit" class="btn btn-primary">
@@ -821,10 +830,7 @@
         </div>
 
         <div class="admin-tabs">
-            <button class="admin-tab active" data-tab="categories">
-                <i class="fas fa-folder"></i> Categorías
-            </button>
-            <button class="admin-tab" data-tab="products">
+            <button class="admin-tab active" data-tab="products">
                 <i class="fas fa-box"></i> Productos
             </button>
             <button class="admin-tab" data-tab="inventory">
@@ -834,68 +840,10 @@
 
         <div id="adminMessage"></div>
 
-        <!-- Categories Tab -->
-        <div class="admin-content active" id="tab-categories">
-            <h3 style="margin-bottom: 25px; color: var(--primary);">
-                <i class="fas fa-plus-circle"></i> Agregar Nueva Categoría
-            </h3>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="categoryName">
-                        <i class="fas fa-tag"></i> Nombre de la Categoría *
-                    </label>
-                    <input type="text" id="categoryName" placeholder="Ej: Teléfonos, Monitores, etc.">
-                </div>
-                <div class="form-group">
-                    <label for="categoryIcon">
-                        <i class="fas fa-icons"></i> Icono (Font Awesome)
-                    </label>
-                    <input type="text" id="categoryIcon" placeholder="mobile-alt, desktop, print, etc.">
-                    <small style="color: var(--gray); display: block; margin-top: 5px;">Ver iconos en fontawesome.com</small>
-                </div>
-                <div class="form-group">
-                    <label for="categorySheet">
-                        <i class="fas fa-link"></i> Google Sheets ID (opcional)
-                    </label>
-                    <input type="text" id="categorySheet" placeholder="ID del documento de Google Sheets">
-                    <small style="color: var(--gray); display: block; margin-top: 5px;">Deja vacío para productos manuales</small>
-                </div>
-            </div>
-            <button class="btn btn-primary" id="saveCategoryBtn" style="width: 100%; padding: 15px; font-size: 1.1rem;">
-                <i class="fas fa-save"></i> Guardar Categoría
-            </button>
-
-            <div style="margin-top: 40px;">
-                <h3 style="margin-bottom: 20px; color: var(--primary);">
-                    <i class="fas fa-list"></i> Categorías Existentes
-                </h3>
-                <div class="table-container">
-                    <table id="categoriesTable">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Icono</th>
-                                <th>Google Sheets</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="categoriesTableBody">
-                            <tr>
-                                <td colspan="4" style="text-align: center; padding: 40px;">
-                                    <div class="spinner"></div>
-                                    <p>Cargando categorías...</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
         <!-- Products Tab -->
-        <div class="admin-content" id="tab-products">
+        <div class="admin-content active" id="tab-products">
             <h3 style="margin-bottom: 25px; color: var(--primary);">
-                <i class="fas fa-plus"></i> Agregar Nuevo Producto
+                <i class="fas fa-plus"></i> Agregar/Editar Producto
             </h3>
             <div class="form-grid">
                 <div class="form-group">
@@ -905,18 +853,11 @@
                     <input type="text" id="productName" placeholder="Ej: iPhone 14 Pro 128GB" required>
                 </div>
                 <div class="form-group">
-                    <label for="productCategorySelect">
-                        <i class="fas fa-folder"></i> Categoría *
-                    </label>
-                    <select id="productCategorySelect" required>
-                        <option value="">Seleccionar categoría</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label for="productPrice">
-                        <i class="fas fa-dollar-sign"></i> Precio (RD$) *
+                        <i class="fas fa-dollar-sign"></i> Precio Base (RD$) *
                     </label>
                     <input type="number" id="productPrice" placeholder="0.00" min="0" step="0.01" required>
+                    <small style="color: var(--gray); display: block; margin-top: 5px;">Precio sin margen (para teléfonos se suma 20%)</small>
                 </div>
                 <div class="form-group">
                     <label for="productImageUpload">
@@ -925,12 +866,19 @@
                     <input type="file" id="productImageUpload" accept="image/*">
                     <small style="color: var(--gray); display: block; margin-top: 5px;">Máx. 5MB</small>
                 </div>
+                <div class="form-group">
+                    <label for="productImageUrl">
+                        <i class="fas fa-link"></i> URL de Imagen (alternativo)
+                    </label>
+                    <input type="url" id="productImageUrl" placeholder="https://ejemplo.com/imagen.jpg">
+                    <small style="color: var(--gray); display: block; margin-top: 5px;">O pega URL directa de imagen</small>
+                </div>
             </div>
             <div class="form-group">
                 <label for="productDescription">
                     <i class="fas fa-info-circle"></i> Descripción
                 </label>
-                <textarea id="productDescription" placeholder="Descripción detallada del producto..." style="min-height: 120px; resize: vertical;"></textarea>
+                <textarea id="productDescription" placeholder="Descripción detallada del producto..."></textarea>
             </div>
             <button class="btn btn-primary" id="saveProductBtn" style="width: 100%; padding: 15px; font-size: 1.1rem;">
                 <i class="fas fa-save"></i> Guardar Producto
@@ -960,8 +908,8 @@
                         <tr>
                             <th>ID</th>
                             <th>Producto</th>
-                            <th>Categoría</th>
-                            <th>Precio</th>
+                            <th>Precio Base</th>
+                            <th>Precio Final</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -1048,10 +996,9 @@
         // GLOBAL VARIABLES
         // ==========================================
         let currentUser = null;
-        let allCategories = [];
         let allProducts = [];
-        let currentCategoryFilter = 'all';
         let currentSearch = '';
+        let editingProductId = null;
 
         // ==========================================
         // AUTHENTICATION
@@ -1062,8 +1009,7 @@
                 document.getElementById('loginModal').classList.remove('active');
                 document.getElementById('adminPanel').classList.add('active');
                 document.getElementById('adminEmail').textContent = user.email;
-                loadCategories();
-                loadProducts();
+                loadInventory();
             } else {
                 document.getElementById('adminPanel').classList.remove('active');
             }
@@ -1104,140 +1050,31 @@
         });
 
         // ==========================================
-        // CATEGORIES MANAGEMENT
+        // CATEGORIES - FIXED CATEGORIES
         // ==========================================
-        async function loadCategories() {
-            try {
-                const snapshot = await db.collection('categories').orderBy('createdAt', 'desc').get();
-                allCategories = [];
-                
-                snapshot.forEach(doc => {
-                    allCategories.push({ id: doc.id, ...doc.data() });
-                });
-
-                displayCategories();
-                populateCategorySelect();
-                loadCategoriesTable();
-            } catch (error) {
-                console.error('Error cargando categorías:', error);
-            }
-        }
+        const CATEGORIES = [
+            { id: 'telefonos', name: 'Teléfonos', icon: 'mobile-alt', sheetId: '1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc', margin: 20 },
+            { id: 'monitores', name: 'Monitores', icon: 'desktop', sheetId: '1dJ6IGB75oVPaWcWrQjzwjrCeZEmXwlw7', margin: 15 },
+            { id: 'impresoras', name: 'Impresoras', icon: 'print', sheetId: '1rl15lecq23hYfE9z0Q-Vyi7kOR8CI9dl', margin: 15 },
+            { id: 'ups', name: 'UPS', icon: 'battery-full', sheetId: '1bnyTbEHd170zPEDs9UexYEvLylR5h4n7', margin: 15 }
+        ];
 
         function displayCategories() {
             const grid = document.getElementById('categoriesGrid');
             const loading = document.getElementById('categoriesLoading');
             
-            if (allCategories.length === 0) {
-                loading.style.display = 'none';
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-folder-open"></i>
-                        <h3>No hay categorías disponibles</h3>
-                        <p>Inicia sesión como administrador para agregar categorías</p>
-                    </div>
-                `;
-                return;
-            }
-
             loading.style.display = 'none';
-            grid.innerHTML = allCategories.map(cat => `
+            grid.innerHTML = CATEGORIES.map(cat => `
                 <div class="category-card" onclick="filterByCategory('${cat.id}')">
                     <div class="category-icon">
-                        <i class="fas fa-${cat.icon || 'box'}"></i>
+                        <i class="fas fa-${cat.icon}"></i>
                     </div>
                     <h3>${cat.name}</h3>
-                    <p>${cat.sheetId ? 'Conectado a Google Sheets' : 'Productos manuales'}</p>
+                    <p>${cat.name} con precios actualizados</p>
                     <button class="btn btn-primary">
                         <i class="fas fa-eye"></i> Ver Productos
                     </button>
                 </div>
-            `).join('');
-        }
-
-        function populateCategorySelect() {
-            const select = document.getElementById('productCategorySelect');
-            select.innerHTML = '<option value="">Seleccionar categoría</option>';
-            
-            allCategories.forEach(cat => {
-                select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
-            });
-        }
-
-        async function saveCategory() {
-            const name = document.getElementById('categoryName').value.trim();
-            const icon = document.getElementById('categoryIcon').value.trim() || 'box';
-            const sheetId = document.getElementById('categorySheet').value.trim();
-
-            if (!name) {
-                showMessage('adminMessage', 'El nombre de la categoría es obligatorio', 'error');
-                return;
-            }
-
-            try {
-                await db.collection('categories').add({
-                    name: name,
-                    icon: icon,
-                    sheetId: sheetId || null,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                showMessage('adminMessage', 'Categoría agregada exitosamente', 'success');
-                document.getElementById('categoryName').value = '';
-                document.getElementById('categoryIcon').value = '';
-                document.getElementById('categorySheet').value = '';
-                
-                await loadCategories();
-            } catch (error) {
-                console.error('Error guardando categoría:', error);
-                showMessage('adminMessage', 'Error al guardar la categoría', 'error');
-            }
-        }
-
-        async function deleteCategory(id) {
-            if (!confirm('¿Estás seguro? Esto eliminará la categoría y todos sus productos.')) return;
-
-            try {
-                // Eliminar productos de esta categoría
-                const productsSnapshot = await db.collection('products').where('categoryId', '==', id).get();
-                const batch = db.batch();
-                
-                productsSnapshot.forEach(doc => {
-                    batch.delete(doc.ref);
-                });
-                
-                await batch.commit();
-                
-                // Eliminar categoría
-                await db.collection('categories').doc(id).delete();
-                
-                showMessage('adminMessage', 'Categoría eliminada exitosamente', 'success');
-                await loadCategories();
-                await loadProducts();
-            } catch (error) {
-                console.error('Error eliminando categoría:', error);
-                showMessage('adminMessage', 'Error al eliminar la categoría', 'error');
-            }
-        }
-
-        function loadCategoriesTable() {
-            const tbody = document.getElementById('categoriesTableBody');
-            
-            if (allCategories.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--gray)">No hay categorías registradas</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = allCategories.map(cat => `
-                <tr>
-                    <td><strong>${cat.name}</strong></td>
-                    <td><i class="fas fa-${cat.icon || 'box'}" style="font-size:1.5rem;color:var(--primary)"></i></td>
-                    <td>${cat.sheetId ? `<a href="https://docs.google.com/spreadsheets/d/${cat.sheetId}" target="_blank" style="color:var(--primary)">Ver Sheet</a>` : 'Manual'}</td>
-                    <td>
-                        <button class="btn btn-danger" style="padding:8px 15px;font-size:0.9rem;" onclick="deleteCategory('${cat.id}')">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    </td>
-                </tr>
             `).join('');
         }
 
@@ -1246,28 +1083,37 @@
         // ==========================================
         async function loadProducts() {
             try {
-                const productsSnapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
-                allProducts = [];
+                document.getElementById('productsLoading').style.display = 'block';
+                document.getElementById('productsEmpty').style.display = 'none';
                 
-                productsSnapshot.forEach(doc => {
-                    allProducts.push({ id: doc.id, ...doc.data() });
-                });
-
                 // Cargar productos de Google Sheets
                 const sheetProducts = await loadProductsFromSheets();
-                allProducts = [...allProducts, ...sheetProducts];
-
+                
+                // Cargar productos de Firebase (solo los visibles)
+                const firebaseProducts = await loadFirebaseProducts();
+                
+                // Combinar ambos
+                allProducts = [...sheetProducts, ...firebaseProducts];
+                
                 filterAndDisplayProducts();
-                loadInventoryTable();
+                
             } catch (error) {
                 console.error('Error cargando productos:', error);
+                document.getElementById('productsLoading').style.display = 'none';
+                document.getElementById('productsGrid').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error al cargar productos</h3>
+                        <p>Por favor, intenta nuevamente</p>
+                    </div>
+                `;
             }
         }
 
         async function loadProductsFromSheets() {
             const products = [];
             
-            for (const category of allCategories) {
+            for (const category of CATEGORIES) {
                 if (!category.sheetId) continue;
                 
                 try {
@@ -1286,27 +1132,27 @@
                                 if (!description || !priceRaw) return;
                                 
                                 let isTransit = false;
-                                let price = null;
+                                let basePrice = null;
                                 
                                 if (priceRaw.toUpperCase().includes("TRANSITO")) {
                                     isTransit = true;
                                 } else {
                                     const numbersOnly = priceRaw.replace(/[^0-9.]/g, "");
-                                    price = parseFloat(numbersOnly) || null;
+                                    basePrice = parseFloat(numbersOnly) || null;
                                 }
                                 
-                                if (price || isTransit) {
+                                if (basePrice || isTransit) {
                                     products.push({
                                         id: `sheet_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                                         name: description,
                                         description: description,
                                         categoryId: category.id,
                                         categoryName: category.name,
-                                        price: price,
+                                        basePrice: basePrice,
+                                        margin: category.margin,
                                         isTransit: isTransit,
                                         imageUrl: '',
-                                        source: 'google_sheet',
-                                        sheetId: category.sheetId
+                                        source: 'google_sheet'
                                     });
                                 }
                             });
@@ -1320,20 +1166,51 @@
             return products;
         }
 
+        async function loadFirebaseProducts() {
+            try {
+                // Solo cargar productos que el admin ha marcado como visibles
+                const snapshot = await db.collection('products')
+                    .where('visible', '==', true)
+                    .get();
+                
+                const products = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    products.push({
+                        id: doc.id,
+                        name: data.name,
+                        description: data.description || '',
+                        categoryId: data.categoryId || 'telefonos',
+                        categoryName: data.categoryName || 'Teléfonos',
+                        basePrice: data.basePrice || data.price,
+                        margin: data.categoryId === 'telefonos' ? 20 : 15,
+                        imageUrl: data.imageUrl || '',
+                        source: 'firebase'
+                    });
+                });
+                
+                return products;
+            } catch (error) {
+                console.error('Error cargando productos de Firebase:', error);
+                return [];
+            }
+        }
+
         async function saveProduct() {
             const name = document.getElementById('productName').value.trim();
-            const categoryId = document.getElementById('productCategorySelect').value;
-            const price = parseFloat(document.getElementById('productPrice').value);
+            const basePrice = parseFloat(document.getElementById('productPrice').value);
             const description = document.getElementById('productDescription').value.trim();
             const imageFile = document.getElementById('productImageUpload').files[0];
+            const imageUrlInput = document.getElementById('productImageUrl').value.trim();
 
-            if (!name || !categoryId || isNaN(price)) {
+            if (!name || isNaN(basePrice)) {
                 showMessage('adminMessage', 'Por favor, completa todos los campos obligatorios', 'error');
                 return;
             }
 
             let imageUrl = '';
             
+            // Subir imagen si se seleccionó archivo
             if (imageFile) {
                 try {
                     showMessage('adminMessage', 'Subiendo imagen...', 'info');
@@ -1345,28 +1222,46 @@
                     showMessage('adminMessage', 'Error al subir la imagen', 'error');
                     return;
                 }
+            } else if (imageUrlInput) {
+                // Usar URL directa si se proporcionó
+                imageUrl = imageUrlInput;
             }
 
             try {
-                await db.collection('products').add({
-                    name: name,
-                    description: description,
-                    categoryId: categoryId,
-                    price: price,
-                    imageUrl: imageUrl,
-                    isTransit: false,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                showMessage('adminMessage', 'Producto agregado exitosamente', 'success');
+                if (editingProductId) {
+                    // Editar producto existente
+                    await db.collection('products').doc(editingProductId).update({
+                        name: name,
+                        description: description,
+                        basePrice: basePrice,
+                        imageUrl: imageUrl,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showMessage('adminMessage', 'Producto actualizado exitosamente', 'success');
+                    editingProductId = null;
+                } else {
+                    // Crear nuevo producto (no visible por defecto)
+                    await db.collection('products').add({
+                        name: name,
+                        description: description,
+                        categoryId: 'telefonos',
+                        categoryName: 'Teléfonos',
+                        basePrice: basePrice,
+                        imageUrl: imageUrl,
+                        visible: false, // No visible hasta que el admin lo active
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showMessage('adminMessage', 'Producto guardado. Actívalo desde Inventario para mostrarlo en el catálogo.', 'success');
+                }
                 
                 // Limpiar formulario
                 document.getElementById('productName').value = '';
-                document.getElementById('productCategorySelect').value = '';
                 document.getElementById('productPrice').value = '';
                 document.getElementById('productDescription').value = '';
                 document.getElementById('productImageUpload').value = '';
+                document.getElementById('productImageUrl').value = '';
                 
+                await loadInventory();
                 await loadProducts();
             } catch (error) {
                 console.error('Error guardando producto:', error);
@@ -1374,16 +1269,98 @@
             }
         }
 
-        async function deleteProduct(id) {
+        async function toggleProductVisibility(productId, visible) {
+            try {
+                await db.collection('products').doc(productId).update({
+                    visible: visible
+                });
+                showMessage('adminMessage', `Producto ${visible ? 'mostrado' : 'ocultado'} exitosamente`, 'success');
+                await loadInventory();
+                await loadProducts();
+            } catch (error) {
+                console.error('Error cambiando visibilidad:', error);
+                showMessage('adminMessage', 'Error al cambiar visibilidad', 'error');
+            }
+        }
+
+        async function deleteProduct(productId) {
             if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
 
             try {
-                await db.collection('products').doc(id).delete();
+                await db.collection('products').doc(productId).delete();
                 showMessage('adminMessage', 'Producto eliminado exitosamente', 'success');
+                await loadInventory();
                 await loadProducts();
             } catch (error) {
                 console.error('Error eliminando producto:', error);
                 showMessage('adminMessage', 'Error al eliminar el producto', 'error');
+            }
+        }
+
+        async function editProduct(productId) {
+            try {
+                const doc = await db.collection('products').doc(productId).get();
+                const data = doc.data();
+                
+                document.getElementById('productName').value = data.name;
+                document.getElementById('productPrice').value = data.basePrice || data.price;
+                document.getElementById('productDescription').value = data.description || '';
+                document.getElementById('productImageUrl').value = data.imageUrl || '';
+                
+                editingProductId = productId;
+                document.querySelector('.admin-tab[data-tab="products"]').click();
+                
+                showMessage('adminMessage', 'Producto cargado para edición. Modifica y guarda los cambios.', 'info');
+            } catch (error) {
+                console.error('Error cargando producto para edición:', error);
+            }
+        }
+
+        async function loadInventory() {
+            const tbody = document.getElementById('inventoryTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px"><div class="spinner"></div><p>Cargando...</p></td></tr>';
+            
+            try {
+                const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
+                
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray)">No hay productos en Firebase</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const finalPrice = data.basePrice ? data.basePrice * 1.20 : (data.price ? data.price * 1.20 : 0);
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${doc.id.substring(0, 8)}...</td>
+                        <td>
+                            ${data.imageUrl ? `<img src="${data.imageUrl}" class="product-image-thumb" alt="${data.name}">` : ''}
+                            <strong>${data.name}</strong>
+                            <br><small style="color:var(--gray)">${data.description?.substring(0, 50) || ''}</small>
+                        </td>
+                        <td>${formatPrice(data.basePrice || data.price)}</td>
+                        <td><strong>${formatPrice(finalPrice)}</strong></td>
+                        <td>
+                            <button class="btn btn-success" style="padding:6px 10px;font-size:0.85rem;margin:2px;" onclick="toggleProductVisibility('${doc.id}', ${!data.visible})">
+                                <i class="fas fa-${data.visible ? 'eye-slash' : 'eye'}"></i> ${data.visible ? 'Ocultar' : 'Mostrar'}
+                            </button>
+                            <button class="btn btn-secondary" style="padding:6px 10px;font-size:0.85rem;margin:2px;" onclick="editProduct('${doc.id}')">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-danger" style="padding:6px 10px;font-size:0.85rem;margin:2px;" onclick="deleteProduct('${doc.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+            } catch (error) {
+                console.error('Error cargando inventario:', error);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--danger)">Error al cargar inventario</td></tr>';
             }
         }
 
@@ -1394,11 +1371,6 @@
             document.getElementById('productsLoading').style.display = 'none';
             
             let filtered = [...allProducts];
-            
-            // Filtrar por categoría
-            if (currentCategoryFilter !== 'all') {
-                filtered = filtered.filter(p => p.categoryId === currentCategoryFilter);
-            }
             
             // Filtrar por búsqueda
             if (currentSearch.trim()) {
@@ -1430,17 +1402,19 @@
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 
-                // Precio
-                let priceDisplay = '';
+                // Calcular precio final con margen
+                let finalPrice = '';
                 let priceClass = '';
+                let margin = product.margin || (product.categoryId === 'telefonos' ? 20 : 15);
                 
                 if (product.isTransit) {
-                    priceDisplay = 'TRÁNSITO';
+                    finalPrice = 'TRÁNSITO';
                     priceClass = 'transit';
-                } else if (product.price) {
-                    priceDisplay = formatPrice(product.price);
+                } else if (product.basePrice) {
+                    const calculatedPrice = product.basePrice * (1 + margin / 100);
+                    finalPrice = formatPrice(calculatedPrice);
                 } else {
-                    priceDisplay = 'SIN PRECIO';
+                    finalPrice = 'SIN PRECIO';
                     priceClass = 'transit';
                 }
                 
@@ -1454,7 +1428,7 @@
                     ? '<div class="product-badge">Tránsito</div>' 
                     : product.source === 'google_sheet'
                         ? '<div class="product-badge" style="background: linear-gradient(45deg, #28a745, #20c997);">Sheet</div>'
-                        : '';
+                        : '<div class="product-badge" style="background: linear-gradient(45deg, #ffc107, #ff8533);">Local</div>';
                 
                 card.innerHTML = `
                     <div class="product-image">
@@ -1464,16 +1438,11 @@
                     <div class="product-info">
                         <h3 class="product-name">${product.name}</h3>
                         <p class="product-description">${product.description || 'Sin descripción'}</p>
-                        <div class="product-price ${priceClass}">${priceDisplay}</div>
+                        <div class="product-price ${priceClass}">${finalPrice}</div>
                         <div class="product-actions">
                             <button class="btn btn-whatsapp" onclick="openWhatsApp('${product.name}')">
                                 <i class="fab fa-whatsapp"></i> Cotizar
                             </button>
-                            ${currentUser ? `
-                                <button class="btn btn-danger" style="padding:12px;font-size:0.95rem;" onclick="deleteProduct('${product.id}')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -1485,42 +1454,9 @@
         function filterByCategory(categoryId) {
             currentCategoryFilter = categoryId;
             document.getElementById('productsTitle').innerHTML = `
-                <i class="fas fa-filter"></i> Productos - ${allCategories.find(c => c.id === categoryId)?.name || 'Todos'}
+                <i class="fas fa-filter"></i> Productos - ${CATEGORIES.find(c => c.id === categoryId)?.name || 'Todos'}
             `;
             filterAndDisplayProducts();
-        }
-
-        // ==========================================
-        // INVENTORY MANAGEMENT
-        // ==========================================
-        function loadInventoryTable() {
-            const tbody = document.getElementById('inventoryTableBody');
-            
-            if (allProducts.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray)">No hay productos registrados</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = allProducts.filter(p => p.source !== 'google_sheet').map(product => {
-                const category = allCategories.find(c => c.id === product.categoryId);
-                return `
-                    <tr>
-                        <td>${product.id.substring(0, 8)}...</td>
-                        <td>
-                            ${product.imageUrl ? `<img src="${product.imageUrl}" class="product-image-thumb" alt="${product.name}">` : ''}
-                            <strong>${product.name}</strong>
-                            <br><small style="color:var(--gray)">${category?.name || 'Sin categoría'}</small>
-                        </td>
-                        <td>${category?.name || 'N/A'}</td>
-                        <td><strong>${formatPrice(product.price)}</strong></td>
-                        <td>
-                            <button class="btn btn-danger" style="padding:8px 15px;font-size:0.9rem;" onclick="deleteProduct('${product.id}')">
-                                <i class="fas fa-trash"></i> Eliminar
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
         }
 
         // ==========================================
@@ -1555,13 +1491,13 @@
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
             // Load initial data
-            loadCategories();
+            displayCategories();
+            loadProducts();
             
             // Event listeners
-            document.getElementById('saveCategoryBtn').addEventListener('click', saveCategory);
             document.getElementById('saveProductBtn').addEventListener('click', saveProduct);
             document.getElementById('refreshProductsBtn').addEventListener('click', loadProducts);
-            document.getElementById('refreshInventoryBtn').addEventListener('click', loadInventoryTable);
+            document.getElementById('refreshInventoryBtn').addEventListener('click', loadInventory);
             
             document.getElementById('searchProducts').addEventListener('input', (e) => {
                 currentSearch = e.target.value;
@@ -1587,8 +1523,7 @@
                     tab.classList.add('active');
                     document.getElementById(`tab-${tabId}`).classList.add('active');
                     
-                    if (tabId === 'inventory') loadInventoryTable();
-                    if (tabId === 'categories') loadCategoriesTable();
+                    if (tabId === 'inventory') loadInventory();
                 });
             });
         });
