@@ -6,10 +6,9 @@
     <title>Trifusion Technologies — Catálogo</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0b0f19;
@@ -24,7 +23,6 @@
             --success: #4ade80;
             --border-radius: 14px;
             --shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
-            --transition: all 0.3s ease;
         }
         
         * {
@@ -34,16 +32,16 @@
         }
         
         body {
-            font-family: 'Inter', 'Roboto', sans-serif;
+            font-family: 'Inter', sans-serif;
             background: radial-gradient(circle at top, #172239 0, #050712 55%, #02030a 100%);
             margin: 0;
             color: var(--text);
-            min-height: 100vh;
+            line-height: 1.6;
         }
         
         /* Header */
         header {
-            padding: 18px 16px;
+            padding: 20px 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(10px);
@@ -62,33 +60,26 @@
         
         .logo-title h1 {
             margin: 0;
-            font-size: 22px;
+            font-size: 24px;
             letter-spacing: 0.03em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .logo-title h1 svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--accent);
+            font-weight: 700;
         }
         
         .header-contact {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--muted);
             text-align: right;
+            line-height: 1.4;
         }
         
         /* Toolbar */
         .toolbar {
             max-width: 1200px;
-            margin: 18px auto 0;
-            padding: 0 16px 4px;
+            margin: 20px auto 0;
+            padding: 0 16px;
             display: grid;
             grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-            gap: 12px;
+            gap: 15px;
         }
         
         @media (max-width: 800px) {
@@ -100,25 +91,17 @@
         .panel {
             background: rgba(8, 12, 26, 0.9);
             border-radius: var(--border-radius);
-            padding: 10px;
+            padding: 12px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         .panel-title {
             font-size: 13px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: var(--muted);
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .panel-title svg {
-            width: 16px;
-            height: 16px;
-            fill: var(--accent);
+            font-weight: 600;
         }
         
         input[type="text"], input[type="number"], input[type="file"] {
@@ -126,10 +109,11 @@
             background: #050815;
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 8px 10px;
+            padding: 10px 12px;
             color: var(--text);
             font-size: 14px;
             outline: none;
+            font-family: 'Inter', sans-serif;
         }
         
         input[type="text"]:focus, input[type="number"]:focus {
@@ -140,7 +124,7 @@
         button {
             border: none;
             border-radius: 10px;
-            padding: 8px 15px;
+            padding: 10px 18px;
             font-size: 14px;
             font-weight: 600;
             letter-spacing: 0.03em;
@@ -149,11 +133,8 @@
             color: #02030a;
             box-shadow: 0 6px 18px rgba(0, 194, 255, 0.35);
             white-space: nowrap;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
         }
         
         button:hover {
@@ -175,77 +156,81 @@
             background: rgba(255, 255, 255, 0.15);
         }
         
-        button.danger {
-            background: linear-gradient(135deg, var(--danger), #ff6b8a);
-            color: #02030a;
-            box-shadow: 0 6px 18px rgba(255, 75, 106, 0.35);
-        }
-        
         /* Catálogo */
         .catalogo-wrapper {
             max-width: 1200px;
-            margin: 20px auto 40px;
+            margin: 25px auto 40px;
             padding: 0 16px;
         }
         
         .seccion {
-            margin-bottom: 30px;
+            margin-bottom: 35px;
             background: rgba(8, 12, 26, 0.3);
             border-radius: var(--border-radius);
-            padding: 20px;
-            border-left: 4px solid var(--accent);
+            padding: 25px;
+            border-left: 5px solid var(--accent);
         }
         
         .seccion-titulo {
-            font-size: 18px;
+            font-size: 22px;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: var(--accent);
-            padding-left: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            padding-left: 12px;
+            border-left: 3px solid var(--accent);
+            position: relative;
         }
         
         .seccion-titulo::before {
-            content: "📁";
+            content: "";
+            position: absolute;
+            left: -5px;
+            top: -10px;
+            bottom: -10px;
+            width: 3px;
+            background: var(--accent);
+            border-radius: 3px;
         }
         
         .catalogo {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 18px;
+        }
+        
+        @media (max-width: 768px) {
+            .catalogo {
+                grid-template-columns: 1fr;
+            }
         }
         
         .producto {
             background: var(--card);
             border-radius: var(--border-radius);
-            padding: 14px;
+            padding: 20px;
             border: 1px solid var(--card-border);
             box-shadow: var(--shadow);
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            flex-direction: column;
             gap: 15px;
-            transition: var(--transition);
+            transition: all 0.3s ease;
         }
         
         .producto:hover {
-            transform: translateX(5px);
-            border-color: rgba(0, 194, 255, 0.3);
+            transform: translateY(-5px);
+            border-color: rgba(0, 194, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
         
         .producto-image {
-            width: 80px;
-            height: 80px;
+            width: 100%;
+            height: 180px;
             border-radius: 10px;
             background: linear-gradient(45deg, #1f2940, #0f1524);
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            flex-shrink: 0;
-            cursor: pointer;
             position: relative;
         }
         
@@ -253,20 +238,12 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 10px;
         }
         
         .producto-image::after {
             content: "📷";
-            font-size: 24px;
+            font-size: 36px;
             color: var(--muted);
-        }
-        
-        .producto-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
         }
         
         .descripcion {
@@ -274,21 +251,23 @@
             color: var(--accent);
             font-weight: 600;
             word-break: break-word;
+            line-height: 1.4;
         }
         
-        .producto-right {
+        .producto-footer {
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            min-width: 160px;
-            gap: 6px;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         .precio {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 700;
             white-space: nowrap;
             color: var(--danger);
+            font-family: 'Inter', sans-serif;
         }
         
         .precio.transito {
@@ -296,10 +275,16 @@
             text-shadow: 0 0 6px rgba(255, 193, 75, 0.45);
         }
         
+        .precio.sin-precio {
+            color: var(--muted);
+            font-size: 18px;
+        }
+        
         .editor-precio {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             align-items: center;
+            margin-top: 10px;
         }
         
         .btn-image {
@@ -307,8 +292,8 @@
             color: #02030a;
             box-shadow: 0 6px 18px rgba(74, 222, 128, 0.35);
             font-size: 12px;
-            padding: 6px 10px;
-            width: 80px;
+            padding: 8px 12px;
+            width: 90px;
         }
         
         .btn-image:hover {
@@ -317,27 +302,13 @@
         
         #mensajeVacio {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 30px;
             color: var(--muted);
-            padding: 30px;
-            font-size: 16px;
-        }
-        
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
             padding: 40px;
-            text-align: center;
-        }
-        
-        .empty-state svg {
-            width: 60px;
-            height: 60px;
-            fill: var(--muted);
-            opacity: 0.3;
+            font-size: 18px;
+            background: var(--card);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--card-border);
         }
         
         /* Admin panel */
@@ -349,7 +320,7 @@
             transform: translate(-50%, -50%);
             background: var(--card);
             border-radius: var(--border-radius);
-            padding: 25px;
+            padding: 30px;
             border: 1px solid var(--card-border);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             z-index: 1000;
@@ -362,9 +333,10 @@
         }
         
         .admin-panel h3 {
-            margin: 0 0 15px 0;
+            margin: 0 0 20px 0;
             color: var(--accent);
-            font-size: 20px;
+            font-size: 22px;
+            font-weight: 700;
         }
         
         .admin-panel .close {
@@ -374,13 +346,14 @@
             background: rgba(255, 255, 255, 0.1);
             border: none;
             color: var(--text);
-            width: 30px;
-            height: 30px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 18px;
-            line-height: 30px;
+            font-size: 20px;
+            line-height: 35px;
             text-align: center;
+            font-weight: 600;
         }
         
         .admin-panel .close:hover {
@@ -388,14 +361,15 @@
         }
         
         .admin-panel .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .admin-panel label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: var(--muted);
-            font-size: 13px;
+            font-size: 14px;
+            font-weight: 500;
         }
         
         .admin-panel input {
@@ -403,15 +377,18 @@
             background: #050815;
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 8px 10px;
+            padding: 12px 15px;
             color: var(--text);
-            font-size: 14px;
+            font-size: 15px;
             outline: none;
+            font-family: 'Inter', sans-serif;
         }
         
         .admin-panel button {
             width: 100%;
-            margin-top: 10px;
+            margin-top: 15px;
+            padding: 12px;
+            font-size: 16px;
         }
         
         .overlay {
@@ -429,73 +406,27 @@
             display: block;
         }
         
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--muted);
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            border-top-color: var(--accent);
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Toast notifications */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--card);
-            border-radius: 10px;
-            padding: 15px 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .toast.show {
-            transform: translateX(0);
-        }
-        
-        .toast.success {
-            border-left: 4px solid var(--success);
-        }
-        
-        .toast.error {
-            border-left: 4px solid var(--danger);
-        }
-        
-        .toast .icon {
-            font-size: 20px;
-        }
-        
         /* Responsive */
         @media (max-width: 768px) {
-            .producto {
-                flex-direction: column;
-                align-items: stretch;
+            .seccion {
+                padding: 20px 15px;
             }
             
-            .producto-right {
-                align-items: flex-start;
+            .seccion-titulo {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+            
+            .producto {
+                padding: 15px;
             }
             
             .producto-image {
-                width: 100%;
-                height: 120px;
+                height: 150px;
+            }
+            
+            .precio {
+                font-size: 20px;
             }
         }
     </style>
@@ -505,10 +436,6 @@
     <header>
         <div class="header-inner">
             <div class="logo-title">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                    <path d="M12 6v6l4 2v-6l-4-2z"/>
-                </svg>
                 <h1>Trifusion Technologies</h1>
             </div>
             <div class="header-contact">
@@ -522,23 +449,13 @@
     <div class="toolbar">
         <!-- Buscador -->
         <div class="panel">
-            <div class="panel-title">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.31 16 9.9 16 7.14 13.86 5 11 5S6 7.14 6 9.9s2.14 4.9 4.9 4.9c1.41 0 2.69-.59 3.57-1.57L14.2 14h1.3c.55 0 1-.45 1-1v-1.5c0-.55-.45-1-1-1zM9 9.9c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3-3-1.34-3-3z"/>
-                </svg>
-                Buscar artículos
-            </div>
+            <div class="panel-title">Buscar artículos</div>
             <input id="buscadorProductos" type="text" placeholder="Escribe el modelo o parte del nombre...">
         </div>
         
         <!-- Acceso admin -->
         <div class="panel">
-            <div class="panel-title">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                Acceso
-            </div>
+            <div class="panel-title">Acceso Administrador</div>
             <div>
                 <button id="btnLogin">Entrar</button>
                 <button id="btnLogout" style="display:none;">Salir</button>
@@ -550,13 +467,7 @@
     <div class="catalogo-wrapper">
         <div id="catalogoContainer"></div>
         <div id="mensajeVacio" style="display:none;">
-            <div class="empty-state">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                    <path d="M12 6v6l4 2v-6l-4-2z"/>
-                </svg>
-                <p>No se encontraron productos que coincidan con tu búsqueda.</p>
-            </div>
+            No se encontraron productos que coincidan con tu búsqueda.
         </div>
     </div>
     
@@ -566,27 +477,21 @@
         <button class="close" id="closeImagePanel">&times;</button>
         <h3>Subir Imagen del Producto</h3>
         <div class="form-group">
-            <label for="productNameDisplay">Producto:</label>
-            <div id="productNameDisplay" style="color: var(--text); margin-bottom: 10px;"></div>
+            <label>Producto:</label>
+            <div id="productNameDisplay" style="color: var(--text); font-size: 16px; margin-top: 5px;"></div>
         </div>
         <div class="form-group">
-            <label for="productImageInput">Seleccionar imagen:</label>
+            <label>Seleccionar imagen:</label>
             <input type="file" id="productImageInput" accept="image/*" name="productImage">
         </div>
         <div class="form-group">
             <label>Vista previa:</label>
-            <div id="imagePreview" style="width: 100%; height: 150px; background: #1f2940; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--muted);">
-                <span>Selecciona una imagen</span>
+            <div id="imagePreview" style="width: 100%; height: 180px; background: #1f2940; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 36px;">
+                📷
             </div>
         </div>
         <button id="uploadImageButton">Subir Imagen</button>
-        <button class="secondary" id="deleteImageButton" style="margin-top: 8px; display: none;">Eliminar Imagen</button>
-    </div>
-    
-    <!-- Toast notifications -->
-    <div class="toast" id="toastMessage">
-        <span class="icon">✓</span>
-        <span id="toastText">Operación completada</span>
+        <button class="secondary" id="deleteImageButton" style="margin-top: 12px; display: none;">Eliminar Imagen</button>
     </div>
     
     <script>
@@ -603,11 +508,10 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const db = firebase.firestore();
         const storage = firebase.storage();
         
         // Constants
-        const MARGEN = 1.20; // Margen configurable
+        const MARGEN = 1.20; // Margen del 20%
         const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
         const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
         
@@ -616,10 +520,6 @@
         let productos = [];
         let secciones = [];
         let currentProductId = null;
-        
-        // DOM elements
-        const toastMessage = document.getElementById('toastMessage');
-        const toastText = document.getElementById('toastText');
         
         // Initialize app
         function initApp() {
@@ -663,10 +563,10 @@
                 if (!password) return;
                 
                 await auth.signInWithEmailAndPassword(email, password);
-                mostrarToast("Acceso administrativo activado", "success");
+                alert("¡Acceso administrativo activado!");
             } catch (error) {
                 console.error("Error de autenticación:", error);
-                mostrarToast("Acceso denegado. Verifica tus credenciales.", "error");
+                alert("Acceso denegado. Verifica tus credenciales.");
             }
         }
         
@@ -674,11 +574,10 @@
         function cerrarSesion() {
             auth.signOut()
                 .then(() => {
-                    mostrarToast("Sesión cerrada.", "success");
+                    alert("Sesión cerrada.");
                 })
                 .catch(error => {
                     console.error("Error al cerrar sesión:", error);
-                    mostrarToast("Error al cerrar sesión", "error");
                 });
         }
         
@@ -699,15 +598,14 @@
             } catch (error) {
                 console.error("Error cargando catálogo:", error);
                 document.getElementById('catalogoContainer').innerHTML = `
-                    <div class="loading">
-                        <div class="spinner"></div>
+                    <div style="text-align:center;padding:40px;color:var(--muted);">
                         <p>Error cargando el catálogo. Intenta nuevamente.</p>
                     </div>
                 `;
             }
         }
         
-        // Process data from Google Sheets - CORREGIDO
+        // Process data from Google Sheets
         function procesarDatos(data) {
             productos = [];
             secciones = [];
@@ -721,6 +619,7 @@
                 const precioRaw = (fila[3] || "").trim();
                 
                 // Detectar secciones (filas con categoría pero sin descripción)
+                // Estas son las filas azules que quieres mostrar como divisiones
                 if (categoria && !descripcion) {
                     seccionActual = categoria;
                     secciones.push({
@@ -741,8 +640,8 @@
                         basePrecio = parseFloat(soloNum) || null;
                     }
                     
-                    // Generar ID estable
-                    const id = generarIdProducto(categoria, descripcion);
+                    // Generar ID estable basado en la sección y descripción
+                    const id = generarIdProducto(seccionActual, descripcion);
                     
                     const producto = {
                         id,
@@ -755,7 +654,7 @@
                     
                     productos.push(producto);
                     
-                    // Agregar a la sección actual - CORREGIDO
+                    // Agregar a la sección actual
                     if (seccionActual) {
                         const seccion = secciones.find(s => s.nombre === seccionActual);
                         if (seccion) {
@@ -765,20 +664,19 @@
                 }
             });
             
-            // Cargar imágenes desde Firebase Storage - CORREGIDO (público)
+            // Cargar imágenes desde Firebase Storage (público)
             cargarImagenes();
         }
         
         // Generar ID estable para productos
         function generarIdProducto(categoria, descripcion) {
-            const cleanCategoria = categoria.toLowerCase().replace(/\s+/g, "-");
+            const cleanCategoria = categoria ? categoria.toLowerCase().replace(/\s+/g, "-") : "sin-categoria";
             const cleanDescripcion = descripcion.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
             return `${cleanCategoria}-${cleanDescripcion}`;
         }
         
-        // Load images from Firebase Storage - CORREGIDO (público)
+        // Load images from Firebase Storage (público para todos)
         async function cargarImagenes() {
-            // Cargar imágenes para TODOS los usuarios, no solo admin
             for (let producto of productos) {
                 try {
                     const imageRef = storage.ref(`productos/${producto.id}.jpg`);
@@ -789,6 +687,7 @@
                     producto.imagen = null;
                 }
             }
+            renderProductos();
         }
         
         // Render products with sections
@@ -824,7 +723,10 @@
             // Renderizar secciones
             let html = '';
             
-            Object.keys(productosPorSeccion).sort().forEach(seccionNombre => {
+            // Ordenar secciones alfabéticamente
+            const seccionesOrdenadas = Object.keys(productosPorSeccion).sort();
+            
+            seccionesOrdenadas.forEach(seccionNombre => {
                 const productosSeccion = productosPorSeccion[seccionNombre];
                 
                 // Si la sección es "Otros" y no tiene productos, no mostrar
@@ -849,7 +751,7 @@
                         precioFinal = formatearPrecio(Math.round(producto.basePrecio * MARGEN));
                     } else {
                         precioFinal = "SIN PRECIO";
-                        clasePrecio = "transito";
+                        clasePrecio = "sin-precio";
                     }
                     
                     const tieneImagen = producto.imagen;
@@ -861,17 +763,9 @@
                                     <img src="${producto.imagen}" alt="${producto.descripcion}">
                                 </div>
                             ` : ''}
-                            <div class="producto-content">
-                                <div class="descripcion">${producto.descripcion}</div>
-                            </div>
-                            <div class="producto-right">
+                            <div class="descripcion">${producto.descripcion}</div>
+                            <div class="producto-footer">
                                 <div class="precio ${clasePrecio}">${precioFinal}</div>
-                                ${esAdmin && !producto.esTransito ? `
-                                    <div class="editor-precio">
-                                        <input type="number" value="${producto.basePrecio || ''}" min="0" data-id="${producto.id}" class="input-precio">
-                                        <button data-id="${producto.id}" class="btn-aplicar">OK</button>
-                                    </div>
-                                ` : ''}
                                 ${esAdmin ? `
                                     <button class="btn-image" data-id="${producto.id}">
                                         ${tieneImagen ? 'Cambiar' : 'Imagen'}
@@ -890,33 +784,8 @@
             
             container.innerHTML = html;
             
-            // Add event listeners
+            // Add event listeners solo si es admin
             if (esAdmin) {
-                // Edit price
-                container.querySelectorAll('.btn-aplicar').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const id = e.target.dataset.id;
-                        const input = e.target.parentElement.querySelector('.input-precio');
-                        const nuevoPrecio = parseFloat(input.value);
-                        
-                        if (isNaN(nuevoPrecio) || nuevoPrecio <= 0) {
-                            mostrarToast("Precio inválido", "error");
-                            return;
-                        }
-                        
-                        // Actualizar en memoria
-                        const producto = productos.find(p => p.id === id);
-                        if (producto) {
-                            producto.basePrecio = nuevoPrecio;
-                            renderProductos(filtro);
-                            mostrarToast("Precio actualizado", "success");
-                            
-                            // Guardar en Firestore
-                            guardarPrecioEnFirestore(id, nuevoPrecio);
-                        }
-                    });
-                });
-                
                 // Upload image
                 container.querySelectorAll('.btn-image').forEach(button => {
                     button.addEventListener('click', (e) => {
@@ -929,7 +798,7 @@
                             
                             // Reset form
                             document.getElementById('productImageInput').value = '';
-                            document.getElementById('imagePreview').innerHTML = '<span>Selecciona una imagen</span>';
+                            document.getElementById('imagePreview').innerHTML = '📷';
                             document.getElementById('deleteImageButton').style.display = producto.imagen ? 'block' : 'none';
                             
                             // Show panel
@@ -971,12 +840,12 @@
             const file = fileInput.files[0];
             
             if (!file) {
-                mostrarToast("Por favor selecciona una imagen", "error");
+                alert("Por favor selecciona una imagen");
                 return;
             }
             
             if (currentProductId === null) {
-                mostrarToast("Producto no seleccionado", "error");
+                alert("Producto no seleccionado");
                 return;
             }
             
@@ -995,12 +864,12 @@
                     renderProductos(document.getElementById('buscadorProductos').value);
                 }
                 
-                mostrarToast("Imagen subida correctamente", "success");
+                alert("Imagen subida correctamente");
                 cerrarPanelImagen();
                 
             } catch (error) {
                 console.error("Error subiendo imagen:", error);
-                mostrarToast("Error al subir la imagen. Intenta nuevamente.", "error");
+                alert("Error al subir la imagen. Intenta nuevamente.");
             }
         }
         
@@ -1018,57 +887,14 @@
                 // Update product
                 producto.imagen = null;
                 
-                mostrarToast("Imagen eliminada", "success");
+                alert("Imagen eliminada");
                 cerrarPanelImagen();
                 renderProductos(document.getElementById('buscadorProductos').value);
                 
             } catch (error) {
                 console.error("Error eliminando imagen:", error);
-                mostrarToast("Error al eliminar la imagen.", "error");
+                alert("Error al eliminar la imagen.");
             }
-        }
-        
-        // Guardar precio en Firestore
-        async function guardarPrecioEnFirestore(productId, nuevoPrecio) {
-            try {
-                // Buscar el producto en la colección "productos"
-                const querySnapshot = await db.collection("productos")
-                    .where("id", "==", productId)
-                    .get();
-                
-                if (!querySnapshot.empty) {
-                    // Actualizar el documento existente
-                    const docRef = querySnapshot.docs[0].ref;
-                    await docRef.update({
-                        basePrecio: nuevoPrecio,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } else {
-                    // Crear un nuevo documento si no existe
-                    await db.collection("productos").add({
-                        id: productId,
-                        basePrecio: nuevoPrecio,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-                
-                console.log("Precio guardado en Firestore");
-            } catch (error) {
-                console.error("Error guardando precio en Firestore:", error);
-                mostrarToast("Error al guardar precio", "error");
-            }
-        }
-        
-        // Show toast notification
-        function mostrarToast(text, type = "success") {
-            toastText.textContent = text;
-            toastMessage.className = 'toast';
-            toastMessage.classList.add(type);
-            toastMessage.classList.add('show');
-            
-            setTimeout(() => {
-                toastMessage.classList.remove('show');
-            }, 3000);
         }
         
         // Initialize on DOM load
