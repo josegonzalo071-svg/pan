@@ -41,9 +41,9 @@
         
         /* Header */
         header {
-            padding: 20px 16px;
+            padding: px 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0,0, 0.6);
             backdrop-filter: blur(10px);
             position: sticky;
             top: 0;
@@ -59,7 +59,7 @@
         }
         
         .logo-title h1 {
-            margin: 0;
+            margin 0;
             font-size: 24px;
             letter-spacing: 0.03em;
             font-weight: 700;
@@ -434,7 +434,7 @@
 <body>
     <!-- Header -->
     <header>
-        <div class="header-inner">
+        <divheader-inner">
             <div class="logo-title">
                 <h1>Trifusion Technologies</h1>
             </div>
@@ -475,17 +475,17 @@
     <div class="overlay" id="adminOverlay"></div>
     <div class="admin-panel" id="imagePanel">
         <button class="close" id="closeImagePanel">&times;</button>
-        <h3>Subir Imagen del Producto</h3>
+        <h3>Subir Imagen Producto</h3>
         <div class="form-group">
-            <label>Producto:</label>
+            <label for="productNameDisplay">Producto:</label>
             <div id="productNameDisplay" style="color: var(--text); font-size: 16px; margin-top: 5px;"></div>
         </div>
         <div class="form-group">
-            <label>Seleccionar imagen:</label>
+            <label for="productImageInput">Seleccionar imagen:</label>
             <input type="file" id="productImageInput" accept="image/*" name="productImage">
         </div>
         <div class="form-group">
-            <label>Vista previa:</label>
+            <label for="imagePreview">Vista previa:</label>
             <div id="imagePreview" style="width: 100%; height: 180px; background: #1f2940; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 36px;">
                 📷
             </div>
@@ -546,7 +546,7 @@
             // Image panel events
             document.getElementById('closeImagePanel').addEventListener('click', cerrarPanelImagen);
             document.getElementById('productImageInput').addEventListener('change', previsualizarImagen);
-            document.getElementById('uploadImageButton').addEventListener('click', subirImagen);
+            document.getElementById('uploadImageButton').', subirImagen);
             document.getElementById('deleteImageButton').addEventListener('click', eliminarImagen);
             
             // Load catalog
@@ -869,7 +869,15 @@
                 
             } catch (error) {
                 console.error("Error subiendo imagen:", error);
-                alert("Error al subir la imagen. Intenta nuevamente.");
+                
+                // Manejar específicamente el error de CORS
+                if (error.code === 'storage/unauthorized') {
+                    alert("Error de autenticación. Verifica tus credenciales de Firebase.");
+                } else if (error.code === 'storage/cors') {
+                    alert("Error de CORS. Configura las reglas CORS en Firebase Storage o contacta al administrador del sitio.");
+                } else {
+                    alert("Error al subir la imagen. Inténtalo de nuevo.");
+                }
             }
         }
         
