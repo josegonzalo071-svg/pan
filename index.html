@@ -175,6 +175,12 @@
             background: rgba(255, 255, 255, 0.15);
         }
         
+        button.danger {
+            background: linear-gradient(135deg, var(--danger), #ff6b8a);
+            color: #02030a;
+            box-shadow: 0 6px 18px rgba(255, 75, 106, 0.35);
+        }
+        
         /* Catálogo */
         .catalogo-wrapper {
             max-width: 1200px;
@@ -251,35 +257,9 @@
         }
         
         .producto-image::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .producto-image:hover::after {
-            opacity: 1;
-        }
-        
-        .producto-image:hover .image-overlay {
-            opacity: 1;
-        }
-        
-        .image-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
+            content: "📷";
             font-size: 24px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            color: var(--muted);
         }
         
         .producto-content {
@@ -333,19 +313,6 @@
         
         .btn-image:hover {
             box-shadow: 0 8px 24px rgba(74, 222, 128, 0.45);
-        }
-        
-        .btn-edit {
-            background: linear-gradient(135deg, var(--accent), #62e3ff);
-            color: #02030a;
-            box-shadow: 0 6px 18px rgba(0, 194, 255, 0.35);
-            font-size: 12px;
-            padding: 6px 10px;
-            width: 80px;
-        }
-        
-        .btn-edit:hover {
-            box-shadow: 0 8px 24px rgba(0, 194, 255, 0.45);
         }
         
         #mensajeVacio {
@@ -471,7 +438,7 @@
         .spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid rgba(255, 255, 25, 0.1);
+            border: 4px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             border-top-color: var(--accent);
             animation: spin 1s linear infinite;
@@ -513,89 +480,6 @@
         
         .toast .icon {
             font-size: 20px;
-        }
-        
-        /* Product modal */
-        .product-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .product-modal.active {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: var(--card);
-            border-radius: var(--border-radius);
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow: auto;
-            border: 1px solid var(--card-border);
-        }
-        
-        .modal-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--card-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-body {
-            padding: 20px;
-        }
-        
-        .product-images {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            padding: 10px 0;
-        }
-        
-        .product-image {
-            width: 150px;
-            height: 150px;
-            border-radius: 10px;
-            background: #1f2940;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-        
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .product-image .placeholder {
-            font-size: 24px;
-            color: var(--muted);
-        }
-        
-        .product-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        @media (max-width: 600px) {
-            .product-details {
-                grid-template-columns: 1fr;
-            }
         }
         
         /* Responsive */
@@ -699,32 +583,6 @@
         <button class="secondary" id="deleteImageButton" style="margin-top: 8px; display: none;">Eliminar Imagen</button>
     </div>
     
-    <!-- Product Modal -->
-    <div class="product-modal" id="productModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Detalles del Producto</h3>
-                <button class="close" id="closeProductModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="product-images" id="productImages">
-                    <!-- Images will be added here -->
-                </div>
-                
-                <div class="product-details">
-                    <div>
-                        <h4 del producto</h4>
-                        <p id="modalDescription">Cargando...</p>
-                    </div>
-                    <div>
-                        <h4>Precio</h4>
-                        <p id="modalPrice" class="precio">$0.00</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <!-- Toast notifications -->
     <div class="toast" id="toastMessage">
         <span class="icon">✓</span>
@@ -758,7 +616,6 @@
         let productos = [];
         let secciones = [];
         let currentProductId = null;
-        let currentProductIndex = null;
         
         // DOM elements
         const toastMessage = document.getElementById('toastMessage');
@@ -792,9 +649,6 @@
             document.getElementById('uploadImageButton').addEventListener('click', subirImagen);
             document.getElementById('deleteImageButton').addEventListener('click', eliminarImagen);
             
-            // Product modal events
-            document.getElementById('closeProductModal').addEventListener('click', cerrarModalProducto);
-            
             // Load catalog
             cargarCatalogo();
         }
@@ -802,7 +656,6 @@
         // Login with Firebase
         async function iniciarSesion() {
             try {
-                // Mostrar modal de login
                 const email = prompt("Correo electrónico:");
                 if (!email) return;
                 
@@ -854,7 +707,7 @@
             }
         }
         
-        // Process data from Google Sheets - CORRECCIÓN CLAVE
+        // Process data from Google Sheets - CORREGIDO
         function procesarDatos(data) {
             productos = [];
             secciones = [];
@@ -888,7 +741,7 @@
                         basePrecio = parseFloat(soloNum) || null;
                     }
                     
-                    // CORRECCIÓN CLAVE: Generar ID estable
+                    // Generar ID estable
                     const id = generarIdProducto(categoria, descripcion);
                     
                     const producto = {
@@ -902,9 +755,9 @@
                     
                     productos.push(producto);
                     
-                    // Agregar a la sección actual
+                    // Agregar a la sección actual - CORREGIDO
                     if (seccionActual) {
-                        const seccion = secciones.find(s => s.nombre === se);
+                        const seccion = secciones.find(s => s.nombre === seccionActual);
                         if (seccion) {
                             seccion.productos.push(producto);
                         }
@@ -912,22 +765,20 @@
                 }
             });
             
-            // Cargar imágenes desde Firebase Storage
+            // Cargar imágenes desde Firebase Storage - CORREGIDO (público)
             cargarImagenes();
         }
         
         // Generar ID estable para productos
         function generarIdProducto(categoria, descripcion) {
-            // CORRECCIÓN: ID estable basado en categoría y descripción
             const cleanCategoria = categoria.toLowerCase().replace(/\s+/g, "-");
             const cleanDescripcion = descripcion.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
             return `${cleanCategoria}-${cleanDescripcion}`;
         }
         
-        // Load images from Firebase Storage
+        // Load images from Firebase Storage - CORREGIDO (público)
         async function cargarImagenes() {
-            if (!esAdmin) return;
-            
+            // Cargar imágenes para TODOS los usuarios, no solo admin
             for (let producto of productos) {
                 try {
                     const imageRef = storage.ref(`productos/${producto.id}.jpg`);
@@ -1005,24 +856,11 @@
                     
                     html += `
                         <div class="producto" data-id="${producto.id}">
-                            ${esAdmin ? `
-                                <div class="producto-image" onclick="abrirModalProducto('${producto.id}')">
-                                    ${tieneImagen ? `
-                                        <img src="${producto.imagen}" alt="${producto.descripcion}">
-                                    ` : `
-                                        <div class="placeholder">📷</div>
-                                    `}
-                                    <div class="image-overlay">🔍</div>
+                            ${tieneImagen ? `
+                                <div class="producto-image">
+                                    <img src="${producto.imagen}" alt="${producto.descripcion}">
                                 </div>
-                            ` : `
-                                <div class="producto-image" onclick="abrirModalProducto('${producto.id}')">
-                                    ${tieneImagen ? `
-                                        <img src="${producto.imagen}" alt="${producto.descripcion}">
-                                    ` : `
-                                        <div class="placeholder">📷</div>
-                                    `}
-                                </div>
-                            `}
+                            ` : ''}
                             <div class="producto-content">
                                 <div class="descripcion">${producto.descripcion}</div>
                             </div>
@@ -1035,7 +873,7 @@
                                     </div>
                                 ` : ''}
                                 ${esAdmin ? `
-                                    <button class="btn-image" data-id="${producto.id}" data-index="${productos.indexOf(producto)}">
+                                    <button class="btn-image" data-id="${producto.id}">
                                         ${tieneImagen ? 'Cambiar' : 'Imagen'}
                                     </button>
                                 ` : ''}
@@ -1082,12 +920,11 @@
                 // Upload image
                 container.querySelectorAll('.btn-image').forEach(button => {
                     button.addEventListener('click', (e) => {
-                        const index = parseInt(e.target.dataset.index);
-                        const producto = productos[index];
+                        const id = e.target.dataset.id;
+                        const producto = productos.find(p => p.id === id);
                         
                         if (producto) {
-                            currentProductId = producto.id;
-                            currentProductIndex = index;
+                            currentProductId = id;
                             document.getElementById('productNameDisplay').textContent = producto.descripcion;
                             
                             // Reset form
@@ -1110,24 +947,9 @@
         }
         
         // Image Panel Functions
-        function abrirPanelImagen(producto, index) {
-            currentProductIndex = index;
-            document.getElementById('productNameDisplay').textContent = producto.descripcion;
-            
-            // Reset form
-            document.getElementById('productImageInput').value = '';
-            document.getElementById('imagePreview').innerHTML = '<span>Selecciona una imagen</span>';
-            document.getElementById('deleteImageButton').style.display = producto.imagen ? 'block' : 'none';
-            
-            // Show panel
-            document.getElementById('adminOverlay').classList.add('active');
-            document.getElementById('imagePanel').classList.add('active');
-        }
-        
         function cerrarPanelImagen() {
             document.getElementById('adminOverlay').classList.remove('active');
             document.getElementById('imagePanel').classList.remove('active');
-            currentProductIndex = null;
             currentProductId = null;
         }
         
@@ -1202,7 +1024,7 @@
                 
             } catch (error) {
                 console.error("Error eliminando imagen:", error);
-                mostrarToast(" al eliminar la imagen.", "error");
+                mostrarToast("Error al eliminar la imagen.", "error");
             }
         }
         
@@ -1218,14 +1040,15 @@
                     // Actualizar el documento existente
                     const docRef = querySnapshot.docs[0].ref;
                     await docRef.update({
-                        basePrecio: nuevoPrecio
+                        basePrecio: nuevoPrecio,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 } else {
                     // Crear un nuevo documento si no existe
                     await db.collection("productos").add({
                         id: productId,
                         basePrecio: nuevoPrecio,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
                 
@@ -1234,55 +1057,6 @@
                 console.error("Error guardando precio en Firestore:", error);
                 mostrarToast("Error al guardar precio", "error");
             }
-        }
-        
-        // Open product modal
-        function abrirModalProducto(productId) {
-            const producto = productos.find(p => p.id === productId);
-            if (!producto) return;
-            
-            document.getElementById('modalTitle').textContent = producto.descripcion;
-            document.getElementById('modalDescription').textContent = producto.descripcion;
-            
-            let precioFinal = "";
-            if (producto.esTransito) {
-                precioFinal = "TRÁNSITO";
-            } else if (producto.basePrecio) {
-                precioFinal = formatearPrecio(Math.round(producto.basePrecio * MARGEN));
-            } else {
-                precioFinal = "SIN PRECIO";
-            }
-            
-            document.getElementById('modalPrice'). precioFinal;
-            document.getElementById('modalPrice').className = 'precio';
-            if (producto.esTransito) {
-                document.getElementById('modalPrice').classList.add('transito');
-            }
-            
-            // Cargar imágenes
-            const productImages = document.getElementById('');
-            productImages.innerHTML = '';
-            
-            if (producto.imagen) {
-                productImages.innerHTML = `
-                    <div class="product-image">
-                        <img src="${producto.imagen}" alt="${producto.descripcion}">
-                    </div>
-                `;
-            } else {
-                productImages.innerHTML = `
-                    <div class="product-image">
-                        <div class="placeholder">Sin imagen</div>
-                    </div>
-                `;
-            }
-            
-            document.getElementById('productModal').classList.add('active');
-        }
-        
-        // Close product modal
-        function cerrarModalProducto() {
-            document.getElementById('productModal').classList.remove('active');
         }
         
         // Show toast notification
