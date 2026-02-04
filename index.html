@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0b0f19;
@@ -21,16 +22,26 @@
             --danger: #ff4b6a;
             --warning: #ffc14b;
             --success: #4ade80;
+            --border-radius: 14px;
+            --shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            font-family: system-ui, Arial, sans-serif;
+            font-family: 'Inter', 'Roboto', sans-serif;
             background: radial-gradient(circle at top, #172239 0, #050712 55%, #02030a 100%);
             margin: 0;
             color: var(--text);
             min-height: 100vh;
         }
         
+        /* Header */
         header {
             padding: 18px 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -53,6 +64,15 @@
             margin: 0;
             font-size: 22px;
             letter-spacing: 0.03em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-title h1 svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--accent);
         }
         
         .header-contact {
@@ -79,7 +99,7 @@
         
         .panel {
             background: rgba(8, 12, 26, 0.9);
-            border-radius: 14px;
+            border-radius: var(--border-radius);
             padding: 10px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
@@ -90,6 +110,15 @@
             color: var(--muted);
             text-transform: uppercase;
             letter-spacing: 0.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .panel-title svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent);
         }
         
         input[type="text"], input[type="number"], input[type="file"] {
@@ -101,6 +130,11 @@
             color: var(--text);
             font-size: 14px;
             outline: none;
+        }
+        
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 194, 255, 0.2);
         }
         
         button {
@@ -115,7 +149,11 @@
             color: #02030a;
             box-shadow: 0 6px 18px rgba(0, 194, 255, 0.35);
             white-space: nowrap;
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         button:hover {
@@ -147,7 +185,7 @@
         .seccion {
             margin-bottom: 30px;
             background: rgba(8, 12, 26, 0.3);
-            border-radius: 14px;
+            border-radius: var(--border-radius);
             padding: 20px;
             border-left: 4px solid var(--accent);
         }
@@ -175,15 +213,15 @@
         
         .producto {
             background: var(--card);
-            border-radius: 14px;
+            border-radius: var(--border-radius);
             padding: 14px;
             border: 1px solid var(--card-border);
-            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+            box-shadow: var(--shadow);
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             gap: 15px;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
         
         .producto:hover {
@@ -201,18 +239,47 @@
             justify-content: center;
             overflow: hidden;
             flex-shrink: 0;
+            cursor: pointer;
+            position: relative;
         }
         
         .producto-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 10px;
         }
         
         .producto-image::after {
-            content: "📷";
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .producto-image:hover::after {
+            opacity: 1;
+        }
+        
+        .producto-image:hover .image-overlay {
+            opacity: 1;
+        }
+        
+        .image-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
             font-size: 24px;
-            color: var(--muted);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
         
         .producto-content {
@@ -249,19 +316,10 @@
             text-shadow: 0 0 6px rgba(255, 193, 75, 0.45);
         }
         
-        .precio.sin-precio {
-            color: var(--muted);
-            font-size: 16px;
-        }
-        
         .editor-precio {
             display: flex;
             gap: 6px;
             align-items: center;
-        }
-        
-        .editor-precio label {
-            display: none;
         }
         
         .btn-image {
@@ -275,6 +333,19 @@
         
         .btn-image:hover {
             box-shadow: 0 8px 24px rgba(74, 222, 128, 0.45);
+        }
+        
+        .btn-edit {
+            background: linear-gradient(135deg, var(--accent), #62e3ff);
+            color: #02030a;
+            box-shadow: 0 6px 18px rgba(0, 194, 255, 0.35);
+            font-size: 12px;
+            padding: 6px 10px;
+            width: 80px;
+        }
+        
+        .btn-edit:hover {
+            box-shadow: 0 8px 24px rgba(0, 194, 255, 0.45);
         }
         
         #mensajeVacio {
@@ -310,7 +381,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: var(--card);
-            border-radius: 14px;
+            border-radius: var(--border-radius);
             padding: 25px;
             border: 1px solid var(--card-border);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
@@ -360,6 +431,17 @@
             font-size: 13px;
         }
         
+        .admin-panel input {
+            width: 100%;
+            background: #050815;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 10px;
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+        }
+        
         .admin-panel button {
             width: 100%;
             margin-top: 10px;
@@ -389,7 +471,7 @@
         .spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
+            border: 4px solid rgba(255, 255, 25, 0.1);
             border-radius: 50%;
             border-top-color: var(--accent);
             animation: spin 1s linear infinite;
@@ -398,6 +480,122 @@
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card);
+            border-radius: 10px;
+            padding: 15px 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        .toast .icon {
+            font-size: 20px;
+        }
+        
+        /* Product modal */
+        .product-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .product-modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--card);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: auto;
+            border: 1px solid var(--card-border);
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .product-images {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        
+        .product-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 10px;
+            background: #1f2940;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .product-image .placeholder {
+            font-size: 24px;
+            color: var(--muted);
+        }
+        
+        .product-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .product-details {
+                grid-template-columns: 1fr;
+            }
         }
         
         /* Responsive */
@@ -419,9 +617,14 @@
     </style>
 </head>
 <body>
+    <!-- Header -->
     <header>
         <div class="header-inner">
             <div class="logo-title">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    <path d="M12 6v6l4 2v-6l-4-2z"/>
+                </svg>
                 <h1>Trifusion Technologies</h1>
             </div>
             <div class="header-contact">
@@ -435,14 +638,27 @@
     <div class="toolbar">
         <!-- Buscador -->
         <div class="panel">
-            <div class="panel-title">Buscar artículos</div>
+            <div class="panel-title">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.31 16 9.9 16 7.14 13.86 5 11 5S6 7.14 6 9.9s2.14 4.9 4.9 4.9c1.41 0 2.69-.59 3.57-1.57L14.2 14h1.3c.55 0 1-.45 1-1v-1.5c0-.55-.45-1-1-1zM9 9.9c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3-3-1.34-3-3z"/>
+                </svg>
+                Buscar artículos
+            </div>
             <input id="buscadorProductos" type="text" placeholder="Escribe el modelo o parte del nombre...">
         </div>
+        
         <!-- Acceso admin -->
         <div class="panel">
-            <div class="panel-title">Acceso</div>
-            <button id="btnLogin">Entrar</button>
-            <button id="btnLogout" style="display:none;">Salir</button>
+            <div class="panel-title">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                Acceso
+            </div>
+            <div>
+                <button id="btnLogin">Entrar</button>
+                <button id="btnLogout" style="display:none;">Salir</button>
+            </div>
         </div>
     </div>
     
@@ -466,12 +682,12 @@
         <button class="close" id="closeImagePanel">&times;</button>
         <h3>Subir Imagen del Producto</h3>
         <div class="form-group">
-            <label>Producto:</label>
+            <label for="productNameDisplay">Producto:</label>
             <div id="productNameDisplay" style="color: var(--text); margin-bottom: 10px;"></div>
         </div>
         <div class="form-group">
-            <label>Seleccionar imagen:</label>
-            <input type="file" id="productImageInput" accept="image/*">
+            <label for="productImageInput">Seleccionar imagen:</label>
+            <input type="file" id="productImageInput" accept="image/*" name="productImage">
         </div>
         <div class="form-group">
             <label>Vista previa:</label>
@@ -481,6 +697,38 @@
         </div>
         <button id="uploadImageButton">Subir Imagen</button>
         <button class="secondary" id="deleteImageButton" style="margin-top: 8px; display: none;">Eliminar Imagen</button>
+    </div>
+    
+    <!-- Product Modal -->
+    <div class="product-modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Detalles del Producto</h3>
+                <button class="close" id="closeProductModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-images" id="productImages">
+                    <!-- Images will be added here -->
+                </div>
+                
+                <div class="product-details">
+                    <div>
+                        <h4 del producto</h4>
+                        <p id="modalDescription">Cargando...</p>
+                    </div>
+                    <div>
+                        <h4>Precio</h4>
+                        <p id="modalPrice" class="precio">$0.00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast notifications -->
+    <div class="toast" id="toastMessage">
+        <span class="icon">✓</span>
+        <span id="toastText">Operación completada</span>
     </div>
     
     <script>
@@ -500,14 +748,21 @@
         const db = firebase.firestore();
         const storage = firebase.storage();
         
-        // Configuration
+        // Constants
+        const MARGEN = 1.20; // Margen configurable
         const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
         const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
         
+        // State
         let esAdmin = false;
         let productos = [];
         let secciones = [];
+        let currentProductId = null;
         let currentProductIndex = null;
+        
+        // DOM elements
+        const toastMessage = document.getElementById('toastMessage');
+        const toastText = document.getElementById('toastText');
         
         // Initialize app
         function initApp() {
@@ -537,36 +792,40 @@
             document.getElementById('uploadImageButton').addEventListener('click', subirImagen);
             document.getElementById('deleteImageButton').addEventListener('click', eliminarImagen);
             
+            // Product modal events
+            document.getElementById('closeProductModal').addEventListener('click', cerrarModalProducto);
+            
             // Load catalog
             cargarCatalogo();
         }
         
         // Login with Firebase
-        function iniciarSesion() {
-            const phoneNumber = prompt("Número de teléfono (con código de país):");
-            if (!phoneNumber) return;
-            
-            const password = prompt("Contraseña:");
-            if (!password) return;
-            
-            auth.signInWithEmailAndPassword(phoneNumber, password)
-                .then(() => {
-                    alert("¡Acceso administrativo activado!");
-                })
-                .catch(error => {
-                    console.error("Error de autenticación:", error);
-                    alert("Acceso denegado. Verifica tus credenciales.");
-                });
+        async function iniciarSesion() {
+            try {
+                // Mostrar modal de login
+                const email = prompt("Correo electrónico:");
+                if (!email) return;
+                
+                const password = prompt("Contraseña:");
+                if (!password) return;
+                
+                await auth.signInWithEmailAndPassword(email, password);
+                mostrarToast("Acceso administrativo activado", "success");
+            } catch (error) {
+                console.error("Error de autenticación:", error);
+                mostrarToast("Acceso denegado. Verifica tus credenciales.", "error");
+            }
         }
         
         // Logout
         function cerrarSesion() {
             auth.signOut()
                 .then(() => {
-                    alert("Sesión cerrada.");
+                    mostrarToast("Sesión cerrada.", "success");
                 })
                 .catch(error => {
                     console.error("Error al cerrar sesión:", error);
+                    mostrarToast("Error al cerrar sesión", "error");
                 });
         }
         
@@ -595,7 +854,7 @@
             }
         }
         
-        // Process data from Google Sheets
+        // Process data from Google Sheets - CORRECCIÓN CLAVE
         function procesarDatos(data) {
             productos = [];
             secciones = [];
@@ -629,8 +888,11 @@
                         basePrecio = parseFloat(soloNum) || null;
                     }
                     
+                    // CORRECCIÓN CLAVE: Generar ID estable
+                    const id = generarIdProducto(categoria, descripcion);
+                    
                     const producto = {
-                        id: `prod-${idx}`,
+                        id,
                         categoria: seccionActual,
                         descripcion,
                         basePrecio,
@@ -642,7 +904,7 @@
                     
                     // Agregar a la sección actual
                     if (seccionActual) {
-                        const seccion = secciones.find(s => s.nombre === seccionActual);
+                        const seccion = secciones.find(s => s.nombre === se);
                         if (seccion) {
                             seccion.productos.push(producto);
                         }
@@ -652,6 +914,14 @@
             
             // Cargar imágenes desde Firebase Storage
             cargarImagenes();
+        }
+        
+        // Generar ID estable para productos
+        function generarIdProducto(categoria, descripcion) {
+            // CORRECCIÓN: ID estable basado en categoría y descripción
+            const cleanCategoria = categoria.toLowerCase().replace(/\s+/g, "-");
+            const cleanDescripcion = descripcion.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+            return `${cleanCategoria}-${cleanDescripcion}`;
         }
         
         // Load images from Firebase Storage
@@ -706,6 +976,11 @@
             Object.keys(productosPorSeccion).sort().forEach(seccionNombre => {
                 const productosSeccion = productosPorSeccion[seccionNombre];
                 
+                // Si la sección es "Otros" y no tiene productos, no mostrar
+                if (seccionNombre === 'Otros' && productosSeccion.length === 0) {
+                    return;
+                }
+                
                 html += `
                     <div class="seccion">
                         <div class="seccion-titulo">${seccionNombre}</div>
@@ -720,10 +995,10 @@
                         precioFinal = "TRÁNSITO";
                         clasePrecio = "transito";
                     } else if (producto.basePrecio) {
-                        precioFinal = formatearPrecio(Math.round(producto.basePrecio * 1.20));
+                        precioFinal = formatearPrecio(Math.round(producto.basePrecio * MARGEN));
                     } else {
                         precioFinal = "SIN PRECIO";
-                        clasePrecio = "sin-precio";
+                        clasePrecio = "transito";
                     }
                     
                     const tieneImagen = producto.imagen;
@@ -731,14 +1006,23 @@
                     html += `
                         <div class="producto" data-id="${producto.id}">
                             ${esAdmin ? `
-                                <div class="producto-image">
+                                <div class="producto-image" onclick="abrirModalProducto('${producto.id}')">
                                     ${tieneImagen ? `
                                         <img src="${producto.imagen}" alt="${producto.descripcion}">
                                     ` : `
-                                        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:24px;">📷</div>
+                                        <div class="placeholder">📷</div>
+                                    `}
+                                    <div class="image-overlay">🔍</div>
+                                </div>
+                            ` : `
+                                <div class="producto-image" onclick="abrirModalProducto('${producto.id}')">
+                                    ${tieneImagen ? `
+                                        <img src="${producto.imagen}" alt="${producto.descripcion}">
+                                    ` : `
+                                        <div class="placeholder">📷</div>
                                     `}
                                 </div>
-                            ` : ''}
+                            `}
                             <div class="producto-content">
                                 <div class="descripcion">${producto.descripcion}</div>
                             </div>
@@ -778,15 +1062,19 @@
                         const nuevoPrecio = parseFloat(input.value);
                         
                         if (isNaN(nuevoPrecio) || nuevoPrecio <= 0) {
-                            alert("Precio inválido");
+                            mostrarToast("Precio inválido", "error");
                             return;
                         }
                         
+                        // Actualizar en memoria
                         const producto = productos.find(p => p.id === id);
                         if (producto) {
                             producto.basePrecio = nuevoPrecio;
                             renderProductos(filtro);
-                            alert("Precio actualizado");
+                            mostrarToast("Precio actualizado", "success");
+                            
+                            // Guardar en Firestore
+                            guardarPrecioEnFirestore(id, nuevoPrecio);
                         }
                     });
                 });
@@ -798,7 +1086,18 @@
                         const producto = productos[index];
                         
                         if (producto) {
-                            abrirPanelImagen(producto, index);
+                            currentProductId = producto.id;
+                            currentProductIndex = index;
+                            document.getElementById('productNameDisplay').textContent = producto.descripcion;
+                            
+                            // Reset form
+                            document.getElementById('productImageInput').value = '';
+                            document.getElementById('imagePreview').innerHTML = '<span>Selecciona una imagen</span>';
+                            document.getElementById('deleteImageButton').style.display = producto.imagen ? 'block' : 'none';
+                            
+                            // Show panel
+                            document.getElementById('adminOverlay').classList.add('active');
+                            document.getElementById('imagePanel').classList.add('active');
                         }
                     });
                 });
@@ -829,6 +1128,7 @@
             document.getElementById('adminOverlay').classList.remove('active');
             document.getElementById('imagePanel').classList.remove('active');
             currentProductIndex = null;
+            currentProductId = null;
         }
         
         function previsualizarImagen(e) {
@@ -849,58 +1149,152 @@
             const file = fileInput.files[0];
             
             if (!file) {
-                alert("Por favor selecciona una imagen");
+                mostrarToast("Por favor selecciona una imagen", "error");
                 return;
             }
             
-            if (!currentProductIndex && currentProductIndex !== 0) return;
-            
-            const producto = productos[currentProductIndex];
-            if (!producto) return;
+            if (currentProductId === null) {
+                mostrarToast("Producto no seleccionado", "error");
+                return;
+            }
             
             try {
                 // Upload to Firebase Storage
-                const imageRef = storage.ref(`productos/${producto.id}.jpg`);
+                const imageRef = storage.ref(`productos/${currentProductId}.jpg`);
                 await imageRef.put(file);
                 
                 // Get download URL
                 const url = await imageRef.getDownloadURL();
                 
                 // Update product
-                producto.imagen = url;
+                const producto = productos.find(p => p.id === currentProductId);
+                if (producto) {
+                    producto.imagen = url;
+                    renderProductos(document.getElementById('buscadorProductos').value);
+                }
                 
-                alert("Imagen subida correctamente");
+                mostrarToast("Imagen subida correctamente", "success");
                 cerrarPanelImagen();
-                renderProductos(document.getElementById('buscadorProductos').value);
                 
             } catch (error) {
                 console.error("Error subiendo imagen:", error);
-                alert("Error al subir la imagen. Intenta nuevamente.");
+                mostrarToast("Error al subir la imagen. Intenta nuevamente.", "error");
             }
         }
         
         async function eliminarImagen() {
-            if (!currentProductIndex && currentProductIndex !== 0) return;
+            if (currentProductId === null) return;
             
-            const producto = productos[currentProductIndex];
+            const producto = productos.find(p => p.id === currentProductId);
             if (!producto || !producto.imagen) return;
             
             try {
                 // Delete from Firebase Storage
-                const imageRef = storage.ref(`productos/${producto.id}.jpg`);
+                const imageRef = storage.ref(`productos/${currentProductId}.jpg`);
                 await imageRef.delete();
                 
                 // Update product
                 producto.imagen = null;
                 
-                alert("Imagen eliminada");
+                mostrarToast("Imagen eliminada", "success");
                 cerrarPanelImagen();
                 renderProductos(document.getElementById('buscadorProductos').value);
                 
             } catch (error) {
                 console.error("Error eliminando imagen:", error);
-                alert("Error al eliminar la imagen.");
+                mostrarToast(" al eliminar la imagen.", "error");
             }
+        }
+        
+        // Guardar precio en Firestore
+        async function guardarPrecioEnFirestore(productId, nuevoPrecio) {
+            try {
+                // Buscar el producto en la colección "productos"
+                const querySnapshot = await db.collection("productos")
+                    .where("id", "==", productId)
+                    .get();
+                
+                if (!querySnapshot.empty) {
+                    // Actualizar el documento existente
+                    const docRef = querySnapshot.docs[0].ref;
+                    await docRef.update({
+                        basePrecio: nuevoPrecio
+                    });
+                } else {
+                    // Crear un nuevo documento si no existe
+                    await db.collection("productos").add({
+                        id: productId,
+                        basePrecio: nuevoPrecio,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                
+                console.log("Precio guardado en Firestore");
+            } catch (error) {
+                console.error("Error guardando precio en Firestore:", error);
+                mostrarToast("Error al guardar precio", "error");
+            }
+        }
+        
+        // Open product modal
+        function abrirModalProducto(productId) {
+            const producto = productos.find(p => p.id === productId);
+            if (!producto) return;
+            
+            document.getElementById('modalTitle').textContent = producto.descripcion;
+            document.getElementById('modalDescription').textContent = producto.descripcion;
+            
+            let precioFinal = "";
+            if (producto.esTransito) {
+                precioFinal = "TRÁNSITO";
+            } else if (producto.basePrecio) {
+                precioFinal = formatearPrecio(Math.round(producto.basePrecio * MARGEN));
+            } else {
+                precioFinal = "SIN PRECIO";
+            }
+            
+            document.getElementById('modalPrice'). precioFinal;
+            document.getElementById('modalPrice').className = 'precio';
+            if (producto.esTransito) {
+                document.getElementById('modalPrice').classList.add('transito');
+            }
+            
+            // Cargar imágenes
+            const productImages = document.getElementById('');
+            productImages.innerHTML = '';
+            
+            if (producto.imagen) {
+                productImages.innerHTML = `
+                    <div class="product-image">
+                        <img src="${producto.imagen}" alt="${producto.descripcion}">
+                    </div>
+                `;
+            } else {
+                productImages.innerHTML = `
+                    <div class="product-image">
+                        <div class="placeholder">Sin imagen</div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('productModal').classList.add('active');
+        }
+        
+        // Close product modal
+        function cerrarModalProducto() {
+            document.getElementById('productModal').classList.remove('active');
+        }
+        
+        // Show toast notification
+        function mostrarToast(text, type = "success") {
+            toastText.textContent = text;
+            toastMessage.className = 'toast';
+            toastMessage.classList.add(type);
+            toastMessage.classList.add('show');
+            
+            setTimeout(() => {
+                toastMessage.classList.remove('show');
+            }, 3000);
         }
         
         // Initialize on DOM load
