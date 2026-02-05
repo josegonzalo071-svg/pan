@@ -1,4 +1,19 @@
-<!DOCTYPE html>
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                body {
+                  background-color: white; /* Ensure the iframe has a white background */
+                }
+
+                
+              </style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -410,6 +425,20 @@
             display: block;
         }
         
+        .img-error {
+            background: rgba(100, 0, 0, 0.2);
+            border: 1px dashed #ff4b6a;
+            color: #ff8a9a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+        }
+        
         footer {
             text-align: center;
             padding: 25px;
@@ -506,15 +535,17 @@
     <div id="imageModal" class="modal">
         <div class="modal-content">
             <button class="close-modal">&times;</button>
-            <img id="modalImage" class="modal-img" src="" alt="Imagen del producto">
+            <!-- CAMBIO 2: Imagen del modal con referrerpolicy -->
+            <img id="modalImage" class="modal-img" src="" alt="Imagen del producto" referrerpolicy="no-referrer">
         </div>
     </div>
     
     <div id="loginModal" class="login-modal">
         <div class="login-box">
             <h2>Acceso de Administrador</h2>
-            <input type="email" id="adminEmail" class="login-input" placeholder="Correo electrónico" required>
-            <input type="password" id="adminPassword" class="login-input" placeholder="Contraseña" required>
+            <!-- CORREGIDO: Inputs con name y autocomplete -->
+            <input type="email" id="adminEmail" name="email" class="login-input" placeholder="Correo electrónico" autocomplete="email" required>
+            <input type="password" id="adminPassword" name="password" class="login-input" placeholder="Contraseña" autocomplete="current-password" required>
             <button id="submitLogin" class="btn btn-login">Iniciar Sesión</button>
         </div>
     </div>
@@ -565,13 +596,16 @@
         let productImages = {};
         let sheetData = [];
         
-        // ✅ FUNCIÓN CLAVE: Convertir URLs de Google Drive automáticamente
+        // ✅ FUNCIÓN MEJORADA: Convertir URLs de Google Drive automáticamente
         function convertDriveUrl(url) {
             if (!url) return url;
             
+            // Eliminar parámetros innecesarios primero
+            url = url.split('?')[0];
+            
             // Convertir formato /file/d/ID/view
             if (url.includes('drive.google.com') && url.includes('/file/d/')) {
-                const match = url.match(/\/d\/([^\/?]+)/);
+                const match = url.match(/\/d\/([^\/]+)/);
                 if (match && match[1]) {
                     return `https://drive.google.com/uc?export=view&id=${match[1]}`;
                 }
@@ -583,6 +617,11 @@
                 if (match && match[1]) {
                     return `https://drive.google.com/uc?export=view&id=${match[1]}`;
                 }
+            }
+            
+            // Si ya está en formato uc, devolver tal cual
+            if (url.includes('drive.google.com/uc')) {
+                return url;
             }
             
             return url;
@@ -773,11 +812,17 @@
                     </div>
                 `;
                 
-                // Add image if exists
+                // Add image if exists - ✅ CAMBIO 1: con referrerpolicy y manejo de errores
                 if (imageUrl) {
                     productHTML += `
                     <div class="producto-img-container">
-                        <img src="${imageUrl}" alt="${cleanName}" class="producto-img">
+                        <img 
+                            src="${imageUrl}" 
+                            alt="${cleanName}" 
+                            class="producto-img"
+                            referrerpolicy="no-referrer"
+                            onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'img-error\'>⚠️ Imagen no disponible<br>Verifica la URL o permisos de acceso</div>'"
+                        >
                     </div>
                     `;
                 }
@@ -787,13 +832,27 @@
                     productHTML += `
                     <div class="admin-section active">
                         <h4>📸 Imagen del Producto</h4>
-                        <input type="text" class="admin-input image-url" placeholder="Pega URL pública de imagen (Drive, Imgur, etc.)" value="${imageUrl}">
+                        <!-- CORREGIDO: Input con name attribute -->
+                        <input 
+                            type="text" 
+                            class="admin-input image-url" 
+                            name="image-url" 
+                            placeholder="Pega URL pública de imagen (Drive, Imgur, etc.)" 
+                            value="${imageUrl}"
+                        >
                         <div class="admin-actions">
                             <button class="btn btn-save save-image">💾 Guardar Imagen</button>
                             ${imageUrl ? `<button class="btn btn-delete delete-image">🗑️ Eliminar Imagen</button>` : ''}
                         </div>
                         <h4 style="margin-top: 15px">💰 Precio Personalizado</h4>
-                        <input type="text" class="admin-input custom-price" placeholder="Precio personalizado (ej: 29499)" value="${productData.customPrice || ''}">
+                        <!-- CORREGIDO: Input con name attribute -->
+                        <input 
+                            type="text" 
+                            class="admin-input custom-price" 
+                            name="custom-price" 
+                            placeholder="Precio personalizado (ej: 29499)" 
+                            value="${productData.customPrice || ''}"
+                        >
                         <div class="admin-actions">
                             <button class="btn btn-save save-price">💾 Guardar Precio</button>
                             ${productData.customPrice ? `<button class="btn btn-delete delete-price">🗑️ Restaurar Original</button>` : ''}
@@ -835,6 +894,11 @@
                             
                             // ✅ CONVERTIR URL DE DRIVE AUTOMÁTICAMENTE
                             url = convertDriveUrl(url);
+                            
+                            // Validar que sea una URL de imagen
+                            if (!url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)$/i) && !url.includes('drive.google.com')) {
+                                if (!confirm("⚠️ La URL no parece ser una imagen válida. ¿Deseas guardarla igual?")) return;
+                            }
                             
                             try {
                                 await db.collection("products").doc(productId).set({
@@ -948,3 +1012,45 @@
 </body>
 </html>
 
+<img 
+  src="${imageUrl}" 
+  alt="${cleanName}" 
+  class="producto-img"
+  referrerpolicy="no-referrer"
+  onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'img-error\'>⚠️ Imagen no disponible<br>Verifica la URL o permisos de acceso</div>'"
+>
+
+<img id="modalImage" class="modal-img" src="" alt="Imagen del producto" referrerpolicy="no-referrer">
+
+<!-- Login modal -->
+<input type="email" id="adminEmail" name="email" ...>
+<input type="password" id="adminPassword" name="password" ...>
+
+<!-- Admin section -->
+<input type="text" class="admin-input image-url" name="image-url" ...>
+<input type="text" class="admin-input custom-price" name="custom-price" ...>
+
+
+
+              <script>
+                              function convertDriveUrl(url) {
+    if (!url) return url;
+    
+    // Eliminar parámetros innecesarios primero
+    url = url.split('?')[0];
+    
+    // Convertir formato /file/d/ID/view
+    if (url.includes('drive.google.com') && url.includes('/file/d/')) {
+        const match = url.match(/\/d\/([^\/]+)/); // ✅ Corregido: sin ? en el regex
+        if (match && match[1]) {
+            return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+        }
+    }
+    // ... resto de la función
+}
+
+
+              </script>
+                        </body>
+                        </html>
+                    
