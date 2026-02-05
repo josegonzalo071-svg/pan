@@ -1,4 +1,19 @@
-<!DOCTYPE html>
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                body {
+                  background-color: white; /* Ensure the iframe has a white background */
+                }
+
+                
+              </style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -109,7 +124,7 @@
         border-radius: 2px;
     }
 
-    input[type="text"], input[type="number"]{
+    input[type="text"]{
         width:100%;
         background:#050815;
         border-radius:10px;
@@ -121,7 +136,7 @@
         transition: border-color 0.3s;
     }
     
-    input[type="text"]:focus, input[type="number"]:focus {
+    input[type="text"]:focus {
         border-color: var(--accent);
         box-shadow: 0 0 0 2px rgba(0, 194, 255, 0.2);
     }
@@ -152,25 +167,6 @@
     
     button:active {
         transform: translateY(1px);
-    }
-
-    .btn-admin {
-        background: linear-gradient(135deg, #ff8a00, #ff4b6a);
-        box-shadow: 0 6px 18px rgba(255, 75, 106, 0.35);
-    }
-    
-    .btn-admin:hover {
-        box-shadow: 0 8px 22px rgba(255, 75, 106, 0.45);
-    }
-
-    .btn-logout {
-        background: linear-gradient(135deg, #c53030, #822727);
-        display: none;
-        box-shadow: 0 6px 18px rgba(197, 48, 48, 0.35);
-    }
-    
-    .btn-logout:hover {
-        box-shadow: 0 8px 22px rgba(197, 48, 48, 0.45);
     }
 
     /* Catálogo */
@@ -254,38 +250,6 @@
         color: #ffc14b;
     }
 
-    .editor-precio{
-        display:flex;
-        gap:8px;
-        align-items:center;
-        width: 100%;
-        margin-top: 4px;
-    }
-
-    .editor-precio label{
-        display:none;
-    }
-    
-    .input-precio {
-        width: 100px;
-        text-align: right;
-        font-weight: 600;
-        background: rgba(0, 30, 60, 0.7);
-        border-color: var(--accent);
-    }
-    
-    .btn-aplicar {
-        background: linear-gradient(135deg, var(--success), #00aa30);
-        color: white;
-        padding: 6px 12px;
-        font-size: 13px;
-        min-width: 50px;
-    }
-    
-    .btn-aplicar:hover {
-        box-shadow: 0 6px 15px rgba(0, 200, 83, 0.4);
-    }
-
     #mensajeVacio{
         text-align:center;
         margin-top:30px;
@@ -311,13 +275,6 @@
         color: var(--accent);
     }
     
-    .precio-final {
-        font-size: 13px;
-        color: var(--muted);
-        margin-top: -4px;
-        font-weight: normal;
-    }
-    
     @media (max-width: 768px) {
         .producto {
             flex-direction: column;
@@ -335,15 +292,6 @@
         
         .descripcion {
             font-size: 16px;
-        }
-        
-        .editor-precio {
-            width: 100%;
-            flex-wrap: wrap;
-        }
-        
-        .input-precio {
-            width: 120px;
         }
     }
     
@@ -409,11 +357,13 @@
         </div>
     </div>
 
-    <!-- Acceso admin (solo muestra ENTRAR) -->
+    <!-- Panel vacío para mantener el layout -->
     <div class="panel">
-        <div class="panel-title">Acceso Administrador</div>
-        <button id="btnLogin" class="btn-admin">🔐 Entrar</button>
-        <button id="btnLogout" class="btn-logout">👋 Salir</button>
+        <div class="panel-title">Información</div>
+        <div style="color: var(--muted); font-size: 14px; padding: 8px 0;">
+            Catálogo actualizado en tiempo real<br>
+            desde Google Sheets
+        </div>
     </div>
 
 </div>
@@ -424,180 +374,126 @@
     <div id="mensajeVacio" style="display:none;">No se encontraron productos.</div>
 </div>
 
-<!-- Sin espacios en la URL -->
+<!-- PapaParse - SIN ESPACIOS EN LA URL -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <script>
 // =========================
-// CONFIG PRIVADA DEL CÓDIGO
+// CONFIGURACIÓN
 // =========================
-const ADMIN_USER = "TELEFONO";
-const ADMIN_PASS = "1234"; // contraseña
 const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
-const IMPUESTO = 1.22; // 22% de impuesto
-
-let esAdmin = false;
-let productos = [];
-// Sin espacios en la URL
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+const IMPUESTO = 1.22; // 22% de impuesto
+const cont = document.getElementById("catalogo");
+const buscador = document.getElementById("buscadorProductos");
+const mensajeVacio = document.getElementById("mensajeVacio");
 
-function formatearPrecio(num){
+// =========================
+// FUNCIONES AUXILIARES
+// =========================
+function limpiarEmojis(txt) {
+    return txt.replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
+}
+
+function formatearPrecio(num) {
     return "$" + num.toLocaleString("es-DO");
 }
 
-function cargarLista(data){
-    productos = [];
-
-    data.forEach(fila=>{
-        const desc = (fila[2]||"").trim();
-        const precioRaw = (fila[3]||"").trim();
-        if (!desc || !precioRaw) return;
-
-        let esTransito = false;
-        let base = null;
-
-        if (precioRaw.toUpperCase().includes("TRANSITO")) {
-            esTransito = true;
-        } else {
-            let soloNum = precioRaw.replace(/[^0-9]/g,"");
-            base = parseFloat(soloNum) || null;
-        }
-
-        productos.push({
-            descripcion: desc,
-            basePrecio: base,
-            esTransito
-        });
-    });
+function esCategoria(row) {
+    const celdasNoVacias = row.filter(c => (c || "").trim() !== "");
+    if (celdasNoVacias.length !== 1) return false;
+    
+    const texto = celdasNoVacias[0].trim();
+    if (/\d/.test(texto)) return false; // Contiene números
+    if (texto.length > 15) return false; // Demasiado largo
+    if (texto.toUpperCase().includes("TRANSITO")) return false;
+    
+    return true;
 }
 
-function renderProductos(filtro=""){
-    const cont = document.getElementById("catalogo");
-    const vacio = document.getElementById("mensajeVacio");
-
-    cont.innerHTML = "";
-    const f = filtro.trim().toLowerCase();
-
-    const lista = productos.filter(p=>!f || p.descripcion.toLowerCase().includes(f));
-
-    vacio.style.display = lista.length === 0 ? "block" : "none";
-
-    lista.forEach((p,idx)=>{
-        let final = "";
-        let clase = "";
-
-        if(p.esTransito){
-            final = "TRÁNSITO";
-            clase = "transito";
-        } else if(p.basePrecio){
-            // Aplicar 22% de impuesto (multiplicar por 1.22) y redondear
-            const precioConImpuesto = Math.round(p.basePrecio * IMPUESTO);
-            final = formatearPrecio(precioConImpuesto);
-        } else {
-            final = "SIN PRECIO";
-            clase = "transito";
-        }
-
-        const card = document.createElement("div");
-        card.className = "producto";
-
-        // EDITOR SOLO SI ADMIN (no muestra precio base al público)
-        const editor = esAdmin && !p.esTransito ? `
-            <div class="editor-precio">
-                <input type="number" value="${p.basePrecio||""}" min="0" data-idx="${idx}" class="input-precio" placeholder="Precio base">
-                <button data-idx="${idx}" class="btn-aplicar">✅ Aplicar</button>
-            </div>
-            <div class="precio-final">*Precio final con impuestos</div>
-        ` : "";
-
-        card.innerHTML = `
-            <div class="descripcion">${p.descripcion}</div>
-            <div class="producto-right">
-                <div class="precio ${clase}">${final}</div>
-                ${editor}
-            </div>
-        `;
-
-        cont.appendChild(card);
-    });
-}
-
-async function cargarCatalogo(){
+// =========================
+// CARGAR Y RENDERIZAR CATÁLOGO
+// =========================
+async function cargarCatalogo() {
     try {
+        cont.innerHTML = '<div style="text-align:center;padding:30px;color:var(--accent)">Cargando productos...</div>';
+        
         const resp = await fetch(CSV_URL);
-        if (!resp.ok) throw new Error(`Error al cargar el catálogo: ${resp.status}`);
+        if (!resp.ok) throw new Error(`Error al cargar: ${resp.status}`);
+        
         const csv = await resp.text();
-        Papa.parse(csv,{
-            header:false,
-            skipEmptyLines:true,
-            complete:(res)=>{
-                cargarLista(res.data);
-                renderProductos();
+        Papa.parse(csv, {
+            skipEmptyLines: true,
+            complete: (results) => {
+                renderCatalogo(results.data);
             },
             error: (err) => {
                 console.error("Error parsing CSV:", err);
-                document.getElementById("mensajeVacio").textContent = "❌ Error al cargar el catálogo. Verifica tu conexión.";
-                document.getElementById("mensajeVacio").style.display = "block";
+                cont.innerHTML = `<div class="status-error">❌ Error al procesar el catálogo</div>`;
             }
         });
     } catch (error) {
         console.error("Error fetching catalog:", error);
-        document.getElementById("mensajeVacio").textContent = `❌ Error: ${error.message}`;
-        document.getElementById("mensajeVacio").style.display = "block";
+        cont.innerHTML = `<div class="status-error">❌ Error: ${error.message}</div>`;
     }
 }
 
-// Buscar
-document.getElementById("buscadorProductos").addEventListener("input", e=>{
-    renderProductos(e.target.value);
-});
-
-// Login
-document.getElementById("btnLogin").addEventListener("click", ()=>{
-    const u = prompt("Usuario:");
-    if(!u) return;
-    const p = prompt("Contraseña:");
-
-    if(u===ADMIN_USER && p===ADMIN_PASS){
-        esAdmin = true;
-        document.getElementById("btnLogout").style.display="inline-block";
-        document.getElementById("btnLogin").style.display="none";
-        alert("✅ Modo administrador activado\n\nPuedes editar los precios base de los productos.\n*Los clientes solo ven el precio final con impuestos.");
-        renderProductos(document.getElementById("buscadorProductos").value);
-    } else {
-        alert("❌ Acceso denegado\n\nUsuario o contraseña incorrectos");
-    }
-});
-
-// Logout
-document.getElementById("btnLogout").addEventListener("click", ()=>{
-    esAdmin = false;
-    document.getElementById("btnLogout").style.display="none";
-    document.getElementById("btnLogin").style.display="inline-block";
-    alert("✅ Sesión cerrada");
-    renderProductos(document.getElementById("buscadorProductos").value);
-});
-
-// Guardar precio
-document.getElementById("catalogo").addEventListener("click", e=>{
-    if(e.target.classList.contains("btn-aplicar")){
-        const idx = e.target.dataset.idx;
-        const input = document.querySelector(`.input-precio[data-idx="${idx}"]`);
-        const val = parseFloat(input.value);
-        if(!val || val <= 0){ 
-            alert("❌ Precio inválido. Debe ser un número mayor a 0.");
+function renderCatalogo(rows) {
+    cont.innerHTML = "";
+    const filtro = buscador.value.trim().toLowerCase();
+    let productosMostrados = 0;
+    
+    rows.forEach(row => {
+        const A = (row[0] || "").trim(); // Emoji/columna A
+        const C = (row[2] || "").trim(); // Nombre/modelo
+        const D = (row[3] || "").trim(); // Precio
+        
+        // Renderizar categoría
+        if (esCategoria(row)) {
+            const textoCategoria = limpiarEmojis(row.find(c => (c || "").trim()) || "");
+            const catEl = document.createElement("div");
+            catEl.className = "categoria";
+            catEl.innerHTML = `<div style="padding:14px 18px;background:rgba(0,194,255,0.25);border-left:6px solid #00c2ff;font-weight:800;letter-spacing:.18em;text-transform:uppercase">${textoCategoria}</div>`;
+            cont.appendChild(catEl);
             return;
         }
-        productos[idx].basePrecio = val;
-        // Mostrar confirmación visual
-        e.target.textContent = "✅ Guardado";
-        e.target.style.background = "linear-gradient(135deg, var(--success), #00aa30)";
-        setTimeout(() => {
-            e.target.textContent = "✅ Aplicar";
-            e.target.style.background = "";
-        }, 1500);
-        renderProductos(document.getElementById("buscadorProductos").value);
-    }
+        
+        // Saltar productos en TRÁNSITO o inválidos
+        if (D.toUpperCase().includes("TRANSITO") || !C || !D) return;
+        
+        // Aplicar filtro de búsqueda
+        if (filtro && !C.toLowerCase().includes(filtro)) return;
+        
+        // Calcular precio con impuesto (22%)
+        const precioBase = D.replace(/[^0-9]/g, "");
+        if (!precioBase) return;
+        
+        // ✅ APLICAR 22% DE IMPUESTO Y REDONDEAR
+        const precioConImpuesto = Math.round(parseFloat(precioBase) * IMPUESTO);
+        
+        // Crear elemento de producto
+        const prodEl = document.createElement("div");
+        prodEl.className = "producto";
+        prodEl.innerHTML = `
+            <div class="descripcion">${limpiarEmojis(A ? A + " " : "") + C}</div>
+            <div class="producto-right">
+                <div class="precio">${formatearPrecio(precioConImpuesto)}</div>
+            </div>
+        `;
+        
+        cont.appendChild(prodEl);
+        productosMostrados++;
+    });
+    
+    // Mostrar mensaje si no hay productos
+    mensajeVacio.style.display = productosMostrados === 0 ? "block" : "none";
+}
+
+// =========================
+// EVENTOS
+// =========================
+buscador.addEventListener("input", () => {
+    renderCatalogo(Papa.parse(cont.innerHTML, {skipEmptyLines: true}).data);
 });
 
 // Cargar catálogo al iniciar
@@ -607,3 +503,14 @@ window.addEventListener("DOMContentLoaded", cargarCatalogo);
 </body>
 </html>
 
+
+
+              <script>
+                                 const IMPUESTO = 1.22; // 22% de impuesto
+   const precioConImpuesto = Math.round(parseFloat(precioBase) * IMPUESTO);
+   
+
+              </script>
+                        </body>
+                        </html>
+                    
