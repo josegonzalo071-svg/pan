@@ -4,996 +4,242 @@
     <meta charset="UTF-8">
     <title>Trifusion Technologies — Catálogo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- 🔴 FIX CLAVE PARA GOOGLE DRIVE -->
+    <meta name="referrer" content="no-referrer">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            margin: 0;
             font-family: 'Segoe UI', system-ui, Arial, sans-serif;
-            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+            background: linear-gradient(135deg, #0a0e17, #1a1f2e);
             color: #e6ecff;
-            line-height: 1.6;
         }
-        
+
         header {
-            padding: 20px 16px;
-            background: rgba(0, 0, 0, 0.85);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            padding: 20px;
+            background: rgba(0,0,0,.85);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        
+
         header h1 {
             font-size: 1.8rem;
-            background: linear-gradient(90deg, #00c2ff, #0077ff, #7b3fe4);
+            background: linear-gradient(90deg,#00c2ff,#7b3fe4);
             -webkit-background-clip: text;
-            background-clip: text;
             color: transparent;
-            font-weight: 800;
-            letter-spacing: -0.5px;
         }
-        
-        .admin-controls {
-            display: flex;
-            gap: 12px;
-        }
-        
+
         .btn {
-            border: none;
-            border-radius: 10px;
             padding: 10px 18px;
+            border-radius: 10px;
+            border: none;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-        }
-        
-        .btn-admin {
-            background: linear-gradient(90deg, #ff8a00, #da4a00);
-            color: white;
-        }
-        
-        .btn-admin:hover {
-            background: linear-gradient(90deg, #ff9a20, #e55a10);
-            box-shadow: 0 0 15px rgba(255, 138, 0, 0.4);
-        }
-        
-        .btn-logout {
-            background: linear-gradient(90deg, #ff4b6a, #c53030);
-            color: white;
-            display: none;
-        }
-        
-        .btn-logout:hover {
-            background: linear-gradient(90deg, #ff5b7a, #d54040);
-            box-shadow: 0 0 15px rgba(255, 75, 106, 0.4);
-        }
-        
+
+        .btn-admin { background: #ff8a00; color: #fff; }
+        .btn-logout { background: #ff4b6a; color: #fff; display:none }
+
         .catalogo {
             max-width: 1200px;
             margin: 30px auto;
             padding: 0 20px;
         }
-        
+
         .categoria {
-            margin: 32px 0 20px;
-            padding: 16px 22px;
-            background: rgba(0, 30, 60, 0.7);
-            border-left: 6px solid #00c2ff;
-            border-radius: 0 12px 12px 0;
+            margin: 30px 0 15px;
+            padding: 15px;
+            background: rgba(0,30,60,.7);
+            border-left: 5px solid #00c2ff;
             font-weight: 800;
-            letter-spacing: 0.15em;
             text-transform: uppercase;
-            font-size: 1.25rem;
-            box-shadow: 0 4px 15px rgba(0, 194, 255, 0.15);
-            position: relative;
-            overflow: hidden;
         }
-        
-        .categoria::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background: linear-gradient(90deg, transparent, rgba(0, 194, 255, 0.1), transparent);
-            z-index: -1;
-        }
-        
+
         .producto {
-            background: rgba(16, 22, 36, 0.85);
-            border: 1px solid rgba(31, 41, 64, 0.9);
+            background: rgba(16,22,36,.85);
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 16px;
             display: flex;
-            flex-direction: column;
-            gap: 14px;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-            position: relative;
-            overflow: hidden;
+            gap: 20px;
+            align-items: center;
         }
-        
-        .producto:hover {
-            transform: translateY(-3px);
-            border-color: rgba(0, 194, 255, 0.4);
-            box-shadow: 0 8px 25px rgba(0, 194, 255, 0.2);
-        }
-        
-        .producto::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #00c2ff, #7b3fe4, #ff4b6a);
-            opacity: 0.7;
-        }
-        
-        .producto-content {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex: 1;
-        }
-        
+
         .descripcion {
+            font-size: 1.2rem;
             color: #4da6ff;
             font-weight: 700;
-            font-size: 1.25rem;
-            margin-bottom: 4px;
         }
-        
+
         .precio {
-            color: #ff4b6a;
+            font-size: 1.4rem;
             font-weight: 800;
-            font-size: 1.5rem;
-            white-space: nowrap;
-            margin-top: 4px;
+            color: #ff4b6a;
         }
-        
+
         .producto-img {
-            width: 100%;
-            max-height: 220px;
+            width: 200px;
+            max-height: 200px;
             object-fit: contain;
+            background: #050814;
             border-radius: 12px;
-            background: rgba(2, 3, 10, 0.8);
-            border: 1px solid rgba(31, 41, 64, 0.7);
-            transition: all 0.4s ease;
             cursor: pointer;
-            display: block;
-            margin: 10px auto;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
-        
-        .producto-img:hover {
-            transform: scale(1.03);
-            box-shadow: 0 6px 20px rgba(0, 194, 255, 0.3);
-        }
-        
-        .admin-section {
-            background: rgba(30, 25, 50, 0.8);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 12px;
-            border: 1px solid rgba(100, 80, 180, 0.5);
-            display: none;
-        }
-        
-        .admin-section.active {
-            display: block;
-        }
-        
-        .admin-section h4 {
-            color: #ffb703;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .admin-input {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: 10px;
-            border: 1px solid rgba(100, 120, 180, 0.6);
-            background: rgba(10, 15, 30, 0.8);
-            color: white;
-            margin: 8px 0;
-            font-family: inherit;
-            font-size: 0.95rem;
-        }
-        
-        .admin-input:focus {
-            outline: none;
-            border-color: #00c2ff;
-            box-shadow: 0 0 0 3px rgba(0, 194, 255, 0.2);
-        }
-        
-        .admin-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .btn-save {
-            flex: 1;
-            background: linear-gradient(90deg, #00c853, #009629);
-            color: white;
-        }
-        
-        .btn-save:hover {
-            background: linear-gradient(90deg, #00e05d, #00aa30);
-            box-shadow: 0 0 15px rgba(0, 200, 83, 0.3);
-        }
-        
-        .btn-delete {
-            flex: 1;
-            background: linear-gradient(90deg, #ff4b6a, #c53030);
-            color: white;
-        }
-        
-        .btn-delete:hover {
-            background: linear-gradient(90deg, #ff5b7a, #d54040);
-            box-shadow: 0 0 15px rgba(255, 75, 106, 0.4);
-        }
-        
+
         .modal {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.92);
+            background: rgba(0,0,0,.9);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 2000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            z-index: 999;
         }
-        
-        .modal.active {
-            display: flex;
-            opacity: 1;
-        }
-        
-        .modal-content {
+
+        .modal.active { display: flex; }
+
+        .modal-img {
             max-width: 90%;
             max-height: 90%;
             border-radius: 16px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7);
-            position: relative;
-            overflow: hidden;
-            background: rgba(16, 22, 36, 0.95);
-            border: 2px solid rgba(0, 194, 255, 0.5);
         }
-        
-        .modal-img {
-            max-width: 100%;
-            max-height: 85vh;
-            display: block;
-            border-radius: 14px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-        }
-        
+
         .close-modal {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 20px;
+            right: 20px;
+            background: #ff4b6a;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(30, 30, 40, 0.8);
-            border: 2px solid #ff4b6a;
-            color: white;
-            font-size: 1.5rem;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            z-index: 2001;
         }
-        
-        .close-modal:hover {
-            background: #ff4b6a;
-            transform: rotate(90deg);
-        }
-        
-        .login-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-        }
-        
-        .login-modal.active {
-            display: flex;
-        }
-        
-        .login-box {
-            background: rgba(20, 25, 40, 0.95);
-            border-radius: 16px;
-            padding: 30px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(100, 150, 255, 0.3);
-        }
-        
-        .login-box h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #00c2ff;
-            font-weight: 700;
-        }
-        
-        .login-input {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(100, 120, 180, 0.6);
-            background: rgba(10, 15, 30, 0.8);
-            color: white;
-            margin: 10px 0;
-            font-family: inherit;
-            font-size: 1rem;
-        }
-        
-        .login-input:focus {
-            outline: none;
-            border-color: #00c2ff;
-            box-shadow: 0 0 0 3px rgba(0, 194, 255, 0.2);
-        }
-        
-        .btn-login {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(90deg, #00c2ff, #0077ff);
-            color: white;
-            font-weight: 700;
-            margin-top: 15px;
-            font-size: 1.05rem;
-        }
-        
+
         .loading {
             text-align: center;
             padding: 40px;
-            font-size: 1.2rem;
             color: #00c2ff;
-        }
-        
-        .status-message {
-            text-align: center;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 12px;
-            font-weight: 600;
-            display: none;
-        }
-        
-        .status-success {
-            background: rgba(0, 100, 0, 0.3);
-            border: 1px solid #00c853;
-            color: #4cff9a;
-            display: block;
-        }
-        
-        .status-error {
-            background: rgba(100, 0, 0, 0.3);
-            border: 1px solid #ff4b6a;
-            color: #ff8a9a;
-            display: block;
-        }
-        
-        .img-error {
-            background: rgba(100, 0, 0, 0.2);
-            border: 1px dashed #ff4b6a;
-            color: #ff8a9a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 0.85rem;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 25px;
-            margin-top: 20px;
-            color: rgba(230, 236, 255, 0.6);
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(31, 41, 64, 0.7);
-            background: rgba(10, 15, 25, 0.7);
-        }
-        
-        @media (min-width: 768px) {
-            .producto {
-                flex-direction: row;
-                align-items: center;
-            }
-            
-            .producto-content {
-                flex: 1;
-            }
-            
-            .producto-img-container {
-                width: 220px;
-                height: 220px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-            }
-            
-            .producto-img {
-                max-width: 100%;
-                max-height: 100%;
-                margin: 0;
-            }
-            
-            .admin-section {
-                margin-top: 0;
-                margin-left: 20px;
-                width: 300px;
-                flex-shrink: 0;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            header {
-                flex-direction: column;
-                gap: 15px;
-                padding: 15px;
-            }
-            
-            .admin-controls {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .btn {
-                width: 100%;
-                padding: 12px;
-                font-size: 1.05rem;
-            }
-            
-            .categoria {
-                font-size: 1.1rem;
-                padding: 14px 18px;
-            }
-            
-            .producto {
-                padding: 16px;
-            }
-            
-            .descripcion {
-                font-size: 1.15rem;
-            }
-            
-            .precio {
-                font-size: 1.4rem;
-            }
+            font-size: 1.2rem;
         }
     </style>
 </head>
-<body>
-    <header>
-        <h1>Trifusion Technologies</h1>
-        <div class="admin-controls">
-            <button id="loginBtn" class="btn btn-admin">🔐 Modo Admin</button>
-            <button id="logoutBtn" class="btn btn-logout">👋 Salir</button>
-        </div>
-    </header>
-    
-    <div class="catalogo" id="catalogo">
-        <div class="loading">Cargando catálogo...</div>
-    </div>
-    
-    <div id="imageModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal">&times;</button>
-            <!-- CAMBIO 2: Imagen del modal con referrerpolicy -->
-            <img id="modalImage" class="modal-img" src="" alt="Imagen del producto" referrerpolicy="no-referrer">
-        </div>
-    </div>
-    
-    <div id="loginModal" class="login-modal">
-        <div class="login-box">
-            <h2>Acceso de Administrador</h2>
-            <!-- CORREGIDO: Inputs con name y autocomplete -->
-            <input type="email" id="adminEmail" name="email" class="login-input" placeholder="Correo electrónico" autocomplete="email" required>
-            <input type="password" id="adminPassword" name="password" class="login-input" placeholder="Contraseña" autocomplete="current-password" required>
-            <button id="submitLogin" class="btn btn-login">Iniciar Sesión</button>
-        </div>
-    </div>
-    
-    <footer>
-        <p>Trifusion Technologies © 2026 - Todos los derechos reservados</p>
-        <p style="margin-top: 8px; font-size: 0.85rem; opacity: 0.7;">Catálogo actualizado en tiempo real desde Google Sheets</p>
-    </footer>
 
-    <!-- Firebase SDK - CORREGIDO: SIN ESPACIOS EN URLs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
-    <!-- PapaParse for CSV parsing - CORREGIDO: SIN ESPACIOS -->
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-    
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDlOJqBgd-8KqUT-Y94lsma5W8T79PsPjM",
-            authDomain: "trifusion-cotizador.firebaseapp.com",
-            projectId: "trifusion-cotizador",
-            storageBucket: "trifusion-cotizador.firebasestorage.app",
-            messagingSenderId: "407374211882",
-            appId: "1:407374211882:web:b692792ccc39c8d48f4c53"
-        };
-        
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`; // CORREGIDO: SIN ESPACIOS
-        const cont = document.getElementById("catalogo");
-        const loginBtn = document.getElementById("loginBtn");
-        const logoutBtn = document.getElementById("logoutBtn");
-        const loginModal = document.getElementById("loginModal");
-        const submitLogin = document.getElementById("submitLogin");
-        const imageModal = document.getElementById("imageModal");
-        const modalImage = document.getElementById("modalImage");
-        const closeModal = document.querySelector(".close-modal");
-        
-        let isAdmin = false;
-        let productImages = {};
-        let sheetData = [];
-        
-        // ✅ FUNCIÓN MEJORADA: Convertir URLs de Google Drive automáticamente
-        function convertDriveUrl(url) {
-            if (!url) return url;
-            
-            // Eliminar parámetros innecesarios primero
-            url = url.split('?')[0];
-            
-            // Convertir formato /file/d/ID/view
-            if (url.includes('drive.google.com') && url.includes('/file/d/')) {
-                const match = url.match(/\/d\/([^\/]+)/);
-                if (match && match[1]) {
-                    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-                }
-            }
-            
-            // Convertir formato /open?id=ID
-            if (url.includes('drive.google.com') && url.includes('open?id=')) {
-                const match = url.match(/open\?id=([^&]+)/);
-                if (match && match[1]) {
-                    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-                }
-            }
-            
-            // Si ya está en formato uc, devolver tal cual
-            if (url.includes('drive.google.com/uc')) {
-                return url;
-            }
-            
-            return url;
-        }
-        
-        // Initialize the application
-        function init() {
-            // Set up auth state observer
-            auth.onAuthStateChanged(user => {
-                isAdmin = !!user;
-                loginBtn.style.display = isAdmin ? "none" : "inline-flex";
-                logoutBtn.style.display = isAdmin ? "inline-flex" : "none";
-                loadCatalog();
-            });
-            
-            // Set up button event listeners
-            loginBtn.onclick = () => loginModal.classList.add("active");
-            logoutBtn.onclick = () => auth.signOut();
-            submitLogin.onclick = handleLogin;
-            closeModal.onclick = () => imageModal.classList.remove("active");
-            imageModal.onclick = (e) => {
-                if (e.target === imageModal) {
-                    imageModal.classList.remove("active");
-                }
-            };
-            
-            // Close login modal when clicking outside
-            loginModal.onclick = (e) => {
-                if (e.target === loginModal) {
-                    loginModal.classList.remove("active");
-                }
-            };
-            
-            // Load catalog initially
-            loadCatalog();
-        }
-        
-        // Handle login
-        function handleLogin() {
-            const email = document.getElementById("adminEmail").value.trim();
-            const password = document.getElementById("adminPassword").value.trim();
-            
-            if (!email || !password) {
-                alert("Por favor ingresa correo y contraseña");
-                return;
-            }
-            
-            auth.signInWithEmailAndPassword(email, password)
-                .catch(error => {
-                    let message = "Error al iniciar sesión. ";
-                    if (error.code === "auth/invalid-email") {
-                        message += "Correo electrónico inválido.";
-                    } else if (error.code === "auth/wrong-password") {
-                        message += "Contraseña incorrecta.";
-                    } else if (error.code === "auth/user-not-found") {
-                        message += "Usuario no encontrado.";
-                    } else {
-                        message += error.message;
-                    }
-                    alert(message);
-                });
-        }
-        
-        // Clean text (remove emojis and trim)
-        function limpiarEmojis(txt) {
-            return txt.replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
-        }
-        
-        // Generate product ID from name
-        function generateProductId(name) {
-            return limpiarEmojis(name)
-                .toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/(^-|-$)/g, "");
-        }
-        
-        // Check if row is a category
-        function esCategoria(row) {
-            const nonEmptyCells = row.filter(cell => (cell || "").trim() !== "");
-            if (nonEmptyCells.length !== 1) return false;
-            
-            const text = nonEmptyCells[0].trim();
-            if (/\d/.test(text)) return false; // Contains numbers
-            if (text.length > 15) return false; // Too long
-            if (text.toUpperCase().includes("TRANSITO")) return false;
-            
-            return true;
-        }
-        
-        // Format price
-        function formatearPrecio(precioStr) {
-            const num = precioStr.replace(/[^0-9]/g, "");
-            if (!num) return "";
-            return "$" + Number(num).toLocaleString("es-DO");
-        }
-        
-        // Load catalog data
-        async function loadCatalog() {
-            try {
-                cont.innerHTML = '<div class="loading">Cargando productos...</div>';
-                
-                // Fetch CSV and Firestore data in parallel
-                const [csvResponse, productsSnapshot] = await Promise.all([
-                    fetch(CSV_URL),
-                    db.collection("products").get()
-                ]);
-                
-                // Process Firestore data - ✅ CONVERTIR URLs al cargar
-                productImages = {};
-                productsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.imageUrl) {
-                        // Convertir URL de Drive si es necesario
-                        productImages[doc.id] = {
-                            ...data,
-                            imageUrl: convertDriveUrl(data.imageUrl)
-                        };
-                    } else {
-                        productImages[doc.id] = data;
-                    }
-                });
-                
-                // Process CSV data
-                const csvText = await csvResponse.text();
-                const results = Papa.parse(csvText, {
-                    skipEmptyLines: true
-                });
-                
-                sheetData = results.data;
-                
-                // Render catalog
-                renderCatalog();
-                
-            } catch (error) {
-                console.error("Error loading catalog:", error);
-                cont.innerHTML = `
-                    <div class="status-message status-error">
-                        ❌ Error al cargar el catálogo. Por favor, recarga la página.<br>
-                        <small style="display:block;margin-top:8px">${error.message}</small>
-                    </div>
-                `;
-            }
-        }
-        
-        // Render catalog from CSV data
-        function renderCatalog() {
-            cont.innerHTML = "";
-            
-            sheetData.forEach((row, index) => {
-                const A = (row[0] || "").trim();
-                const C = (row[2] || "").trim(); // Product name/model
-                const D = (row[3] || "").trim(); // Price
-                
-                // Render category row
-                if (esCategoria(row)) {
-                    const categoryText = limpiarEmojis(row.find(cell => (cell || "").trim()) || "");
-                    const catEl = document.createElement("div");
-                    catEl.className = "categoria";
-                    catEl.textContent = categoryText;
-                    cont.appendChild(catEl);
-                    return;
-                }
-                
-                // Skip "TRÁNSITO" items and invalid rows
-                if (D.toUpperCase().includes("TRANSITO") || !C || !D) return;
-                
-                // Clean product name and generate ID
-                const cleanName = limpiarEmojis(C);
-                const productId = generateProductId(cleanName);
-                
-                // Get product data if exists - ✅ USAR URL CONVERTIDA
-                const productData = productImages[productId] || {};
-                const imageUrl = productData.imageUrl ? convertDriveUrl(productData.imageUrl) : "";
-                const customPrice = productData.customPrice || D;
-                
-                // Create product element
-                const prodEl = document.createElement("div");
-                prodEl.className = "producto";
-                prodEl.dataset.productId = productId;
-                prodEl.dataset.rowIndex = index;
-                
-                // Product content
-                let productHTML = `
-                    <div class="producto-content">
-                        <div class="descripcion">${cleanName}</div>
-                        <div class="precio">${formatearPrecio(customPrice)}</div>
-                    </div>
-                `;
-                
-                // Add image if exists - ✅ CAMBIO 1: con referrerpolicy y manejo de errores
-                if (imageUrl) {
-                    productHTML += `
-                    <div class="producto-img-container">
-                        <img 
-                            src="${imageUrl}" 
-                            alt="${cleanName}" 
-                            class="producto-img"
-                            referrerpolicy="no-referrer"
-                            onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\\'img-error\\'>⚠️ Imagen no disponible<br>Verifica la URL o permisos de acceso</div>'"
-                        >
-                    </div>
-                    `;
-                }
-                
-                // Add admin section if admin
-                if (isAdmin) {
-                    productHTML += `
-                    <div class="admin-section active">
-                        <h4>📸 Imagen del Producto</h4>
-                        <!-- CORREGIDO: Input con name attribute -->
-                        <input 
-                            type="text" 
-                            class="admin-input image-url" 
-                            name="image-url" 
-                            placeholder="Pega URL pública de imagen (Drive, Imgur, etc.)" 
-                            value="${imageUrl}"
-                        >
-                        <div class="admin-actions">
-                            <button class="btn btn-save save-image">💾 Guardar Imagen</button>
-                            ${imageUrl ? `<button class="btn btn-delete delete-image">🗑️ Eliminar Imagen</button>` : ''}
-                        </div>
-                        <h4 style="margin-top: 15px">💰 Precio Personalizado</h4>
-                        <!-- CORREGIDO: Input con name attribute -->
-                        <input 
-                            type="text" 
-                            class="admin-input custom-price" 
-                            name="custom-price" 
-                            placeholder="Precio personalizado (ej: 29499)" 
-                            value="${productData.customPrice || ''}"
-                        >
-                        <div class="admin-actions">
-                            <button class="btn btn-save save-price">💾 Guardar Precio</button>
-                            ${productData.customPrice ? `<button class="btn btn-delete delete-price">🗑️ Restaurar Original</button>` : ''}
-                        </div>
-                    </div>
-                    `;
-                }
-                
-                prodEl.innerHTML = productHTML;
-                
-                // Add image click handler if image exists
-                if (imageUrl) {
-                    const imgEl = prodEl.querySelector(".producto-img");
-                    imgEl.onclick = (e) => {
-                        e.stopPropagation();
-                        modalImage.src = imageUrl;
-                        imageModal.classList.add("active");
-                    };
-                }
-                
-                // Add admin event listeners if in admin mode
-                if (isAdmin) {
-                    const saveImageBtn = prodEl.querySelector(".save-image");
-                    const deleteImageBtn = prodEl.querySelector(".delete-image");
-                    const imageUrlInput = prodEl.querySelector(".image-url");
-                    
-                    const savePriceBtn = prodEl.querySelector(".save-price");
-                    const deletePriceBtn = prodEl.querySelector(".delete-price");
-                    const priceInput = prodEl.querySelector(".custom-price");
-                    
-                    // Image handlers - ✅ CONVERTIR URL ANTES DE GUARDAR
-                    if (saveImageBtn) {
-                        saveImageBtn.onclick = async () => {
-                            let url = imageUrlInput.value.trim();
-                            if (!url) {
-                                alert("Por favor ingresa una URL válida");
-                                return;
-                            }
-                            
-                            // ✅ CONVERTIR URL DE DRIVE AUTOMÁTICAMENTE
-                            url = convertDriveUrl(url);
-                            
-                            // Validar que sea una URL de imagen
-                            if (!url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)$/i) && !url.includes('drive.google.com')) {
-                                if (!confirm("⚠️ La URL no parece ser una imagen válida. ¿Deseas guardarla igual?")) return;
-                            }
-                            
-                            try {
-                                await db.collection("products").doc(productId).set({
-                                    imageUrl: url,
-                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                                }, { merge: true });
-                                
-                                showStatus(`✅ Imagen guardada exitosamente para "${cleanName}"`, true);
-                                loadCatalog();
-                            } catch (error) {
-                                console.error("Error saving image:", error);
-                                alert("Error al guardar la imagen: " + error.message);
-                            }
-                        };
-                    }
-                    
-                    if (deleteImageBtn) {
-                        deleteImageBtn.onclick = async () => {
-                            if (!confirm(`¿Eliminar la imagen de "${cleanName}"?`)) return;
-                            
-                            try {
-                                await db.collection("products").doc(productId).update({
-                                    imageUrl: firebase.firestore.FieldValue.delete(),
-                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                                });
-                                
-                                showStatus(`✅ Imagen eliminada exitosamente para "${cleanName}"`, true);
-                                loadCatalog();
-                            } catch (error) {
-                                console.error("Error deleting image:", error);
-                                alert("Error al eliminar la imagen: " + error.message);
-                            }
-                        };
-                    }
-                    
-                    // Price handlers
-                    if (savePriceBtn) {
-                        savePriceBtn.onclick = async () => {
-                            const price = priceInput.value.trim();
-                            if (!price) {
-                                alert("Por favor ingresa un precio válido");
-                                return;
-                            }
-                            
-                            // Validate price format
-                            if (!/^\d+$/.test(price.replace(/[^0-9]/g, ""))) {
-                                alert("El precio debe contener solo números");
-                                return;
-                            }
-                            
-                            try {
-                                await db.collection("products").doc(productId).set({
-                                    customPrice: price,
-                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                                }, { merge: true });
-                                
-                                showStatus(`✅ Precio personalizado guardado para "${cleanName}"`, true);
-                                loadCatalog();
-                            } catch (error) {
-                                console.error("Error saving price:", error);
-                                alert("Error al guardar el precio: " + error.message);
-                            }
-                        };
-                    }
-                    
-                    if (deletePriceBtn) {
-                        deletePriceBtn.onclick = async () => {
-                            if (!confirm(`¿Restaurar el precio original de "${cleanName}"?`)) return;
-                            
-                            try {
-                                await db.collection("products").doc(productId).update({
-                                    customPrice: firebase.firestore.FieldValue.delete(),
-                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                                });
-                                
-                                showStatus(`✅ Precio original restaurado para "${cleanName}"`, true);
-                                loadCatalog();
-                            } catch (error) {
-                                console.error("Error deleting price:", error);
-                                alert("Error al restaurar el precio: " + error.message);
-                            }
-                        };
-                    }
-                }
-                
-                cont.appendChild(prodEl);
-            });
-        }
-        
-        // Show status message
-        function showStatus(message, isSuccess) {
-            // Remove existing messages
-            const existing = document.querySelector(".status-message");
-            if (existing) existing.remove();
-            
-            // Create new message
-            const msg = document.createElement("div");
-            msg.className = `status-message ${isSuccess ? 'status-success' : 'status-error'}`;
-            msg.innerHTML = message;
-            cont.insertBefore(msg, cont.firstChild);
-            
-            // Auto-hide after 3 seconds
-            setTimeout(() => {
-                if (msg.parentNode) msg.parentNode.removeChild(msg);
-            }, 3000);
-        }
-        
-        // Initialize the app when page loads
-        window.addEventListener("DOMContentLoaded", init);
-    </script>
+<body>
+
+<header>
+    <h1>Trifusion Technologies</h1>
+    <div>
+        <button id="loginBtn" class="btn btn-admin">🔐 Modo Admin</button>
+        <button id="logoutBtn" class="btn btn-logout">👋 Salir</button>
+    </div>
+</header>
+
+<div class="catalogo" id="catalogo">
+    <div class="loading">Cargando catálogo…</div>
+</div>
+
+<!-- MODAL -->
+<div id="imageModal" class="modal">
+    <button class="close-modal">&times;</button>
+    <img id="modalImage"
+         class="modal-img"
+         src=""
+         referrerpolicy="no-referrer">
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- PapaParse -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDlOJqBgd-8KqUT-Y94lsma5W8T79PsPjM",
+  authDomain: "trifusion-cotizador.firebaseapp.com",
+  projectId: "trifusion-cotizador"
+};
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+
+const cont = document.getElementById("catalogo");
+const modal = document.getElementById("imageModal");
+const modalImage = document.getElementById("modalImage");
+
+function limpiar(txt) {
+  return txt.replace(/[\u{1F300}-\u{1FAFF}]/gu,"").trim();
+}
+
+function esCategoria(row) {
+  return row.filter(c => c && c.trim()).length === 1;
+}
+
+function precio(p) {
+  return "$" + Number(p.replace(/\D/g,"")).toLocaleString("es-DO");
+}
+
+fetch(CSV_URL)
+  .then(r => r.text())
+  .then(csv => {
+    const data = Papa.parse(csv,{skipEmptyLines:true}).data;
+    cont.innerHTML = "";
+
+    data.forEach(row => {
+      if (esCategoria(row)) {
+        const cat = document.createElement("div");
+        cat.className = "categoria";
+        cat.textContent = limpiar(row.find(c=>c));
+        cont.appendChild(cat);
+        return;
+      }
+
+      const nombre = limpiar(row[2]||"");
+      const price = row[3]||"";
+      if (!nombre || !price) return;
+
+      const prod = document.createElement("div");
+      prod.className = "producto";
+
+      prod.innerHTML = `
+        <div style="flex:1">
+          <div class="descripcion">${nombre}</div>
+          <div class="precio">${precio(price)}</div>
+        </div>
+        <img class="producto-img"
+             src="https://drive.google.com/uc?export=view&id=10cfAV5CR5PmoudLV6_b_vHGsXUsWoR_r"
+             referrerpolicy="no-referrer">
+      `;
+
+      const img = prod.querySelector("img");
+      img.onclick = () => {
+        modalImage.src = img.src;
+        modal.classList.add("active");
+      };
+
+      cont.appendChild(prod);
+    });
+  });
+
+document.querySelector(".close-modal").onclick = () => {
+  modal.classList.remove("active");
+};
+modal.onclick = e => {
+  if (e.target === modal) modal.classList.remove("active");
+};
+</script>
+
 </body>
 </html>
-
