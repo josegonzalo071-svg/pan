@@ -236,23 +236,22 @@
     }
 
     .precio{
-        font-size:22px;
+        font-size:24px;
         font-weight:800;
         white-space:nowrap;
         color:var(--danger);
         text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(90deg, #ff4b6a, #ff8a00);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
     }
     
-    .precio-base {
-        font-size: 14px;
-        color: var(--muted);
-        text-decoration: line-through;
-        margin-top: -4px;
-    }
-
     .precio.transito{
         color:#ffc14b;
         text-shadow:0 0 6px rgba(255,193,75,0.45);
+        background: none;
+        color: #ffc14b;
     }
 
     .editor-precio{
@@ -271,6 +270,8 @@
         width: 100px;
         text-align: right;
         font-weight: 600;
+        background: rgba(0, 30, 60, 0.7);
+        border-color: var(--accent);
     }
     
     .btn-aplicar {
@@ -310,6 +311,13 @@
         color: var(--accent);
     }
     
+    .precio-final {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: -4px;
+        font-weight: normal;
+    }
+    
     @media (max-width: 768px) {
         .producto {
             flex-direction: column;
@@ -322,7 +330,7 @@
         }
         
         .precio {
-            font-size: 20px;
+            font-size: 22px;
         }
         
         .descripcion {
@@ -364,7 +372,7 @@
         }
         
         .precio {
-            font-size: 19px;
+            font-size: 20px;
         }
         
         .descripcion {
@@ -383,7 +391,7 @@
         <div class="header-contact">
             📍 Santo Domingo<br>
             WhatsApp: +1 (829) 872-5163<br>
-            <span style="color: var(--accent); font-weight: 600; display: block; margin-top: 4px">✅ Precios con 22% de impuesto incluido</span>
+            <span style="color: var(--accent); font-weight: 600; display: block; margin-top: 4px">✅ Todos los precios incluyen impuestos</span>
         </div>
     </div>
 </header>
@@ -396,8 +404,8 @@
         <div class="panel-title">Buscar artículos</div>
         <input id="buscadorProductos" type="text" placeholder="Escribe el modelo o parte del nombre...">
         <div class="impuesto-info">
-            <strong>ℹ️ Todos los precios incluyen 22% de impuesto</strong><br>
-            El precio base se multiplica por 1.22
+            <strong>ℹ️ Precios finales con 22% de impuesto incluido</strong><br>
+            Los precios mostrados ya incluyen todos los impuestos
         </div>
     </div>
 
@@ -416,7 +424,7 @@
     <div id="mensajeVacio" style="display:none;">No se encontraron productos.</div>
 </div>
 
-<!-- CORREGIDO: Sin espacios en la URL -->
+<!-- Sin espacios en la URL -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <script>
@@ -426,11 +434,11 @@
 const ADMIN_USER = "TELEFONO";
 const ADMIN_PASS = "1234"; // contraseña
 const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
-const IMPUESTO = 1.22; // 22% de impuesto (CORREGIDO DE 1.20 a 1.22)
+const IMPUESTO = 1.22; // 22% de impuesto
 
 let esAdmin = false;
 let productos = [];
-// CORREGIDO: Sin espacios en la URL
+// Sin espacios en la URL
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 
 function formatearPrecio(num){
@@ -477,16 +485,14 @@ function renderProductos(filtro=""){
     lista.forEach((p,idx)=>{
         let final = "";
         let clase = "";
-        let precioBaseFormatted = "";
 
         if(p.esTransito){
             final = "TRÁNSITO";
             clase = "transito";
         } else if(p.basePrecio){
-            // CORREGIDO: Aplicar 22% de impuesto (multiplicar por 1.22)
+            // Aplicar 22% de impuesto (multiplicar por 1.22) y redondear
             const precioConImpuesto = Math.round(p.basePrecio * IMPUESTO);
             final = formatearPrecio(precioConImpuesto);
-            precioBaseFormatted = formatearPrecio(p.basePrecio);
         } else {
             final = "SIN PRECIO";
             clase = "transito";
@@ -495,19 +501,19 @@ function renderProductos(filtro=""){
         const card = document.createElement("div");
         card.className = "producto";
 
-        // EDITOR SOLO SI ADMIN
+        // EDITOR SOLO SI ADMIN (no muestra precio base al público)
         const editor = esAdmin && !p.esTransito ? `
             <div class="editor-precio">
                 <input type="number" value="${p.basePrecio||""}" min="0" data-idx="${idx}" class="input-precio" placeholder="Precio base">
                 <button data-idx="${idx}" class="btn-aplicar">✅ Aplicar</button>
             </div>
+            <div class="precio-final">*Precio final con impuestos</div>
         ` : "";
 
         card.innerHTML = `
             <div class="descripcion">${p.descripcion}</div>
             <div class="producto-right">
                 <div class="precio ${clase}">${final}</div>
-                ${precioBaseFormatted ? `<div class="precio-base">Base: ${precioBaseFormatted}</div>` : ''}
                 ${editor}
             </div>
         `;
@@ -556,7 +562,7 @@ document.getElementById("btnLogin").addEventListener("click", ()=>{
         esAdmin = true;
         document.getElementById("btnLogout").style.display="inline-block";
         document.getElementById("btnLogin").style.display="none";
-        alert("✅ Modo administrador activado\n\nPuedes editar los precios base de los productos.");
+        alert("✅ Modo administrador activado\n\nPuedes editar los precios base de los productos.\n*Los clientes solo ven el precio final con impuestos.");
         renderProductos(document.getElementById("buscadorProductos").value);
     } else {
         alert("❌ Acceso denegado\n\nUsuario o contraseña incorrectos");
