@@ -6,88 +6,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-:root{
-    --bg:#0b0f19;
-    --card:#101624;
-    --card-border:#1f2940;
-    --accent:#00c2ff;
-    --text:#e6ecff;
-    --muted:#9aa4c6;
-    --danger:#ff4b6a;
-}
-
 body{
     margin:0;
     font-family:system-ui, Arial, sans-serif;
-    background:radial-gradient(circle at top,#172239,#02030a);
-    color:var(--text);
+    background:#0b0f19;
+    color:#e6ecff;
 }
-
 header{
-    position:sticky;
-    top:0;
-    z-index:50;
-    background:rgba(0,0,0,0.6);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid rgba(255,255,255,0.05);
-    padding:18px 16px;
+    padding:16px;
+    background:#000;
 }
-
-.header-inner{
+h1{margin:0}
+.catalogo{
     max-width:1100px;
-    margin:auto;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-h1{margin:0;font-size:22px}
-
-.header-contact{
-    font-size:12px;
-    color:var(--muted);
-    text-align:right;
-}
-
-.catalogo-wrapper{
-    max-width:1100px;
-    margin:30px auto 40px;
+    margin:30px auto;
     padding:0 16px;
 }
-
 .categoria{
-    margin:26px 0 12px;
-    padding:10px 16px;
-    border-left:5px solid var(--accent);
-    background:rgba(0,194,255,.12);
+    margin:28px 0 12px;
+    padding:10px 14px;
+    border-left:5px solid #00c2ff;
+    background:rgba(0,194,255,.15);
     font-weight:800;
-    letter-spacing:.14em;
+    letter-spacing:.12em;
     text-transform:uppercase;
-    color:var(--accent);
-    border-radius:10px;
 }
-
 .producto{
-    background:var(--card);
-    border:1px solid var(--card-border);
-    border-radius:14px;
+    background:#101624;
+    border:1px solid #1f2940;
+    border-radius:12px;
     padding:14px;
-    margin-bottom:12px;
+    margin-bottom:10px;
     display:flex;
     justify-content:space-between;
-    gap:14px;
 }
-
 .descripcion{
-    color:var(--accent);
+    color:#00c2ff;
     font-weight:600;
-    flex:1;
 }
-
 .precio{
-    font-size:20px;
+    color:#ff4b6a;
     font-weight:700;
-    color:var(--danger);
 }
 </style>
 </head>
@@ -95,81 +54,68 @@ h1{margin:0;font-size:22px}
 <body>
 
 <header>
-    <div class="header-inner">
-        <h1>Trifusion Technologies</h1>
-        <div class="header-contact">
-            📍 Santo Domingo<br>
-            WhatsApp: +1 (829) 872-5163
-        </div>
-    </div>
+    <h1>Trifusion Technologies</h1>
 </header>
 
-<div class="catalogo-wrapper" id="catalogo"></div>
+<div id="catalogo" class="catalogo"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
 <script>
 const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
-
 const catalogo = document.getElementById("catalogo");
 
-function formatearPrecio(n){
-    return "$" + n.toLocaleString("es-DO");
+function precioFormateado(n){
+    return "$" + Number(n).toLocaleString("es-DO");
 }
 
-/* ===============================
-   🧠 DETECTOR INTELIGENTE REAL
-================================ */
-function procesarFilas(data){
+function esCategoria(texto, precio){
+    if(!texto) return false;
+    if(texto.includes(" ")) return false;        // una sola palabra
+    if(texto.length > 9) return false;           // corta
+    if(/\d/.test(texto)) return false;            // sin números
+    if(/\d/.test(precio)) return false;           // sin precio
+    return true;
+}
+
+function procesar(data){
     catalogo.innerHTML = "";
 
     data.forEach(fila=>{
-        const texto = (fila[2] || "").trim();
-        const precioRaw = (fila[3] || "").trim();
+        const descripcion = (fila[2] || "").trim();
+        const precioRaw   = (fila[3] || "").trim();
 
-        if(!texto) return;
+        if(!descripcion) return;
 
-        const esTransito = precioRaw.toUpperCase().includes("TRANSITO");
-
-        // 🔷 CATEGORÍA
-        if(
-            !precioRaw &&
-            !esTransito &&
-            texto.split(" ").length === 1 &&
-            texto.length <= 9
-        ){
-            const cat = document.createElement("div");
-            cat.className = "categoria";
-            cat.textContent = texto;
-            catalogo.appendChild(cat);
+        // 🔷 IDENTIFICADOR / CATEGORÍA
+        if(esCategoria(descripcion, precioRaw)){
+            const c = document.createElement("div");
+            c.className = "categoria";
+            c.textContent = descripcion;
+            catalogo.appendChild(c);
             return;
         }
 
-        // 🟢 PRODUCTO (solo si tiene precio numérico)
+        // 🚫 TRANSITO NO SE MUESTRA
+        if(precioRaw.toUpperCase().includes("TRANSITO")) return;
+
+        // 🟢 PRODUCTO REAL (solo con número)
         const num = precioRaw.replace(/[^0-9]/g,"");
-        if(!num || esTransito) return;
+        if(!num) return;
 
-        const card = document.createElement("div");
-        card.className = "producto";
-        card.innerHTML = `
-            <div class="descripcion">${texto}</div>
-            <div class="precio">${formatearPrecio(parseInt(num))}</div>
+        const p = document.createElement("div");
+        p.className = "producto";
+        p.innerHTML = `
+            <div class="descripcion">${descripcion}</div>
+            <div class="precio">${precioFormateado(num)}</div>
         `;
-        catalogo.appendChild(card);
+        catalogo.appendChild(p);
     });
 }
 
-async function cargar(){
-    const r = await fetch(CSV_URL);
-    const t = await r.text();
-    Papa.parse(t,{
-        skipEmptyLines:true,
-        complete:res=>procesarFilas(res.data)
-    });
-}
-
-cargar();
+fetch(CSV_URL)
+.then(r=>r.text())
+.then(t=>Papa.parse(t,{skipEmptyLines:true,complete:r=>procesar(r.data)}));
 </script>
 
 </body>
