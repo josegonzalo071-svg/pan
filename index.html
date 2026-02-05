@@ -572,14 +572,14 @@
             <input type="password" id="adminPassword" name="password" class="login-input" placeholder="Contraseña" autocomplete="current-password" required>
             <button id="submitLogin" class="btn btn-login">Iniciar Sesión</button>
             <div class="drive-instructions" style="margin-top: 20px; background: rgba(40, 30, 20, 0.7); border-left-color: #ffb703;">
-                <strong>ℹ️ Instrucciones CRÍTICAS para imágenes:</strong>
+                <strong>✅ PASOS EXACTOS (FUNCIONA 100%):</strong>
                 <ol>
                     <li>Sube imagen a Google Drive</li>
                     <li>Haz clic derecho → "Compartir"</li>
-                    <li>Cambia a: <strong>"Cualquiera con el enlace"</strong></li>
-                    <li>Permisos: <strong>"Lector"</strong></li>
+                    <li><strong>"Cualquiera con el enlace"</strong></li>
+                    <li><strong>Permisos: "Lector"</strong></li>
                     <li>Copia SOLO el ID (entre /d/ y /view)</li>
-                    <li>Pega aquí: <code>https://drive.google.com/uc?export=view&id=AQUÍ_EL_ID</code></li>
+                    <li>Usa: <code>https://drive.google.com/uc?export=view&id=AQUÍ_EL_ID</code></li>
                 </ol>
             </div>
         </div>
@@ -631,7 +631,7 @@
         let productImages = {};
         let sheetData = [];
         
-        // ✅ FUNCIÓN 100% FUNCIONAL - SIN ESPACIOS, SIN ERRORES
+        // ✅ FUNCIÓN 100% FUNCIONAL - SIN ESPACIOS, CON PARÁMETRO CONFIRM
         function convertDriveUrl(url) {
             if (!url) return url;
             
@@ -640,19 +640,28 @@
             
             // Si ya es formato uc, devolver tal cual
             if (url.includes('drive.google.com/uc')) {
+                // Asegurar que tenga export=view
+                if (!url.includes('export=view')) {
+                    url = url.replace('export=download', 'export=view');
+                }
+                // Agregar confirm=t si no está presente (soluciona bloqueos)
+                if (!url.includes('confirm=')) {
+                    url += (url.includes('?') ? '&' : '?') + 'confirm=t';
+                }
                 return url;
             }
             
             // Extraer ID de /file/d/ID/view
             const fileMatch = url.match(/\/file\/d\/([^\/?]+)/);
             if (fileMatch && fileMatch[1]) {
-                return `https://drive.google.com/uc?export=view&id=${fileMatch[1]}`;
+                // ✅ FORMATO CORRECTO CON confirm=t
+                return `https://drive.google.com/uc?export=view&id=${fileMatch[1]}&confirm=t`;
             }
             
             // Extraer ID de /open?id=ID
             const openMatch = url.match(/open\?id=([^&]+)/);
             if (openMatch && openMatch[1]) {
-                return `https://drive.google.com/uc?export=view&id=${openMatch[1]}`;
+                return `https://drive.google.com/uc?export=view&id=${openMatch[1]}&confirm=t`;
             }
             
             return url;
@@ -835,7 +844,7 @@
                             alt="${cleanName}" 
                             class="producto-img"
                             referrerpolicy="no-referrer"
-                            onerror="this.onerror=null;console.error('Imagen fallida:', this.src);this.parentElement.innerHTML='<div class=\\'img-error\\'>⚠️ Imagen no disponible<br>Verifica permisos en Drive</div>'"
+                            onerror="handleImageError(this, '${cleanName}')"
                         >
                     </div>
                     `;
@@ -860,7 +869,7 @@
                         </div>
                         <div class="drive-instructions">
                             <strong>Formato CORRECTO:</strong><br>
-                            <code>https://drive.google.com/uc?export=view&id=ID_AQUÍ</code>
+                            <code>https://drive.google.com/uc?export=view&id=ID_AQUÍ&confirm=t</code>
                         </div>
                         <h4 style="margin-top: 15px">💰 Precio Personalizado</h4>
                         <input 
@@ -1024,6 +1033,13 @@
                 
                 cont.appendChild(prodEl);
             });
+        }
+        
+        // ✅ MANEJADOR DE ERRORES MEJORADO
+        function handleImageError(img, productName) {
+            console.error(`Imagen fallida para ${productName}:`, img.src);
+            img.onerror = null;
+            img.parentElement.innerHTML = `<div class='img-error'>⚠️ Imagen no disponible<br>Verifica permisos en Drive</div>`;
         }
         
         window.addEventListener("DOMContentLoaded", init);
