@@ -1,912 +1,338 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trifusion Technologies — Catálogo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #0b0f19;
-            --card: #101624;
-            --card-border: #1f2940;
-            --accent: #00c2ff;
-            --accent-soft: rgba(0, 194, 255, 0.18);
-            --text: #e6ecff;
-            --muted: #9aa4c6;
-            --danger: #ff4b6a;
-            --warning: #ffc14b;
-            --success: #4ade80;
-            --border-radius: 14px;
-            --shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at top, #172239 0, #050712 55%, #02030a 100%);
-            margin: 0;
-            color: var(--text);
-            line-height: 1.6;
-        }
-        
-        /* Header */
-        header {
-            padding: px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(0, 0,0, 0.6);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 50;
-        }
-        
-        .header-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo-title h1 {
-            margin 0;
-            font-size: 24px;
-            letter-spacing: 0.03em;
-            font-weight: 700;
-        }
-        
-        .header-contact {
-            font-size: 13px;
-            color: var(--muted);
-            text-align: right;
-            line-height: 1.4;
-        }
-        
-        /* Toolbar */
-        .toolbar {
-            max-width: 1200px;
-            margin: 20px auto 0;
-            padding: 0 16px;
-            display: grid;
-            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-            gap: 15px;
-        }
-        
-        @media (max-width: 800px) {
-            .toolbar {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .panel {
-            background: rgba(8, 12, 26, 0.9);
-            border-radius: var(--border-radius);
-            padding: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .panel-title {
-            font-size: 13px;
-            margin-bottom: 8px;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-weight: 600;
-        }
-        
-        input[type="text"], input[type="number"], input[type="file"] {
-            width: 100%;
-            background: #050815;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 10px 12px;
-            color: var(--text);
-            font-size: 14px;
-            outline: none;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        input[type="text"]:focus, input[type="number"]:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(0, 194, 255, 0.2);
-        }
-        
-        button {
-            border: none;
-            border-radius: 10px;
-            padding: 10px 18px;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            cursor: pointer;
-            background: linear-gradient(135deg, var(--accent), #62e3ff);
-            color: #02030a;
-            box-shadow: 0 6px 18px rgba(0, 194, 255, 0.35);
-            white-space: nowrap;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 194, 255, 0.45);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        button.secondary {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text);
-            box-shadow: none;
-        }
-        
-        button.secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-        
-        /* Catálogo */
-        .catalogo-wrapper {
-            max-width: 1200px;
-            margin: 25px auto 40px;
-            padding: 0 16px;
-        }
-        
-        .seccion {
-            margin-bottom: 35px;
-            background: rgba(8, 12, 26, 0.3);
-            border-radius: var(--border-radius);
-            padding: 25px;
-            border-left: 5px solid var(--accent);
-        }
-        
-        .seccion-titulo {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--accent);
-            padding-left: 12px;
-            border-left: 3px solid var(--accent);
-            position: relative;
-        }
-        
-        .seccion-titulo::before {
-            content: "";
-            position: absolute;
-            left: -5px;
-            top: -10px;
-            bottom: -10px;
-            width: 3px;
-            background: var(--accent);
-            border-radius: 3px;
-        }
-        
-        .catalogo {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 18px;
-        }
-        
-        @media (max-width: 768px) {
-            .catalogo {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .producto {
-            background: var(--card);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            border: 1px solid var(--card-border);
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            transition: all 0.3s ease;
-        }
-        
-        .producto:hover {
-            transform: translateY(-5px);
-            border-color: rgba(0, 194, 255, 0.4);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-        
-        .producto-image {
-            width: 100%;
-            height: 180px;
-            border-radius: 10px;
-            background: linear-gradient(45deg, #1f2940, #0f1524);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .producto-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .producto-image::after {
-            content: "📷";
-            font-size: 36px;
-            color: var(--muted);
-        }
-        
-        .descripcion {
-            font-size: 16px;
-            color: var(--accent);
-            font-weight: 600;
-            word-break: break-word;
-            line-height: 1.4;
-        }
-        
-        .producto-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .precio {
-            font-size: 24px;
-            font-weight: 700;
-            white-space: nowrap;
-            color: var(--danger);
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .precio.transito {
-            color: var(--warning);
-            text-shadow: 0 0 6px rgba(255, 193, 75, 0.45);
-        }
-        
-        .precio.sin-precio {
-            color: var(--muted);
-            font-size: 18px;
-        }
-        
-        .editor-precio {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin-top: 10px;
-        }
-        
-        .btn-image {
-            background: linear-gradient(135deg, var(--success), #6ee7b7);
-            color: #02030a;
-            box-shadow: 0 6px 18px rgba(74, 222, 128, 0.35);
-            font-size: 12px;
-            padding: 8px 12px;
-            width: 90px;
-        }
-        
-        .btn-image:hover {
-            box-shadow: 0 8px 24px rgba(74, 222, 128, 0.45);
-        }
-        
-        #mensajeVacio {
-            text-align: center;
-            margin-top: 30px;
-            color: var(--muted);
-            padding: 40px;
-            font-size: 18px;
-            background: var(--card);
-            border-radius: var(--border-radius);
-            border: 1px solid var(--card-border);
-        }
-        
-        /* Admin panel */
-        .admin-panel {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--card);
-            border-radius: var(--border-radius);
-            padding: 30px;
-            border: 1px solid var(--card-border);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            width: 90%;
-            max-width: 500px;
-        }
-        
-        .admin-panel.active {
-            display: block;
-        }
-        
-        .admin-panel h3 {
-            margin: 0 0 20px 0;
-            color: var(--accent);
-            font-size: 22px;
-            font-weight: 700;
-        }
-        
-        .admin-panel .close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: var(--text);
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 20px;
-            line-height: 35px;
-            text-align: center;
-            font-weight: 600;
-        }
-        
-        .admin-panel .close:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .admin-panel .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .admin-panel label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--muted);
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .admin-panel input {
-            width: 100%;
-            background: #050815;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 12px 15px;
-            color: var(--text);
-            font-size: 15px;
-            outline: none;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .admin-panel button {
-            width: 100%;
-            margin-top: 15px;
-            padding: 12px;
-            font-size: 16px;
-        }
-        
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 999;
-        }
-        
-        .overlay.active {
-            display: block;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .seccion {
-                padding: 20px 15px;
-            }
-            
-            .seccion-titulo {
-                font-size: 18px;
-                margin-bottom: 15px;
-            }
-            
-            .producto {
-                padding: 15px;
-            }
-            
-            .producto-image {
-                height: 150px;
-            }
-            
-            .precio {
-                font-size: 20px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Trifusion Technologies — Catálogo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+:root{
+    --bg:#0b0f19;
+    --card:#101624;
+    --card-border:#1f2940;
+    --accent:#00c2ff;
+    --accent-soft:rgba(0,194,255,0.15);
+    --text:#e6ecff;
+    --muted:#9aa4c6;
+    --danger:#ff4b6a;
+}
+
+body{
+    margin:0;
+    font-family:system-ui,Arial,sans-serif;
+    background:radial-gradient(circle at top,#172239,#02030a);
+    color:var(--text);
+}
+
+header{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:rgba(0,0,0,0.6);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    padding:18px 16px;
+}
+
+.header-inner{
+    max-width:1100px;
+    margin:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.header-inner h1{
+    margin:0;
+    font-size:22px;
+}
+
+.header-contact{
+    font-size:12px;
+    color:var(--muted);
+    text-align:right;
+}
+
+.toolbar{
+    max-width:1100px;
+    margin:18px auto 0;
+    padding:0 16px;
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:12px;
+}
+
+@media(max-width:800px){
+    .toolbar{grid-template-columns:1fr;}
+}
+
+.panel{
+    background:rgba(8,12,26,0.9);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:14px;
+    padding:10px;
+}
+
+.panel-title{
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:.12em;
+    margin-bottom:6px;
+}
+
+input{
+    width:100%;
+    padding:8px 10px;
+    border-radius:10px;
+    background:#050815;
+    border:1px solid rgba(255,255,255,0.08);
+    color:var(--text);
+    outline:none;
+}
+
+button{
+    border:none;
+    border-radius:10px;
+    padding:8px 16px;
+    font-weight:600;
+    cursor:pointer;
+    background:linear-gradient(135deg,var(--accent),#5de0ff);
+    color:#02030a;
+    box-shadow:0 6px 18px rgba(0,194,255,0.35);
+}
+
+.catalogo-wrapper{
+    max-width:1100px;
+    margin:20px auto 40px;
+    padding:0 16px;
+}
+
+.catalogo{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.categoria{
+    margin:26px 0 10px;
+    padding:12px 16px;
+    background:linear-gradient(135deg,rgba(0,194,255,.35),rgba(0,194,255,.1));
+    border-left:5px solid var(--accent);
+    border-radius:12px;
+    font-weight:800;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+}
+
+.producto{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:14px;
+    padding:14px;
+    display:flex;
+    justify-content:space-between;
+    gap:14px;
+    box-shadow:0 14px 30px rgba(0,0,0,0.35);
+}
+
+.descripcion{
+    color:var(--accent);
+    font-weight:600;
+    flex:1;
+}
+
+.producto-right{
+    text-align:right;
+    min-width:150px;
+}
+
+.precio{
+    font-size:20px;
+    font-weight:700;
+    color:var(--danger);
+}
+
+.precio.transito{
+    color:#ffc14b;
+    text-shadow:0 0 6px rgba(255,193,75,.45);
+}
+
+.editor-precio{
+    margin-top:6px;
+    display:flex;
+    gap:6px;
+}
+
+.editor-precio input{
+    width:90px;
+}
+
+#mensajeVacio{
+    text-align:center;
+    color:var(--muted);
+    margin-top:20px;
+}
+</style>
 </head>
+
 <body>
-    <!-- Header -->
-    <header>
-        <divheader-inner">
-            <div class="logo-title">
-                <h1>Trifusion Technologies</h1>
-            </div>
-            <div class="header-contact">
-                📍 Santo Domingo<br>
-                WhatsApp: +1 (829) 872-5163
-            </div>
-        </div>
-    </header>
-    
-    <!-- TOOLBAR -->
-    <div class="toolbar">
-        <!-- Buscador -->
-        <div class="panel">
-            <div class="panel-title">Buscar artículos</div>
-            <input id="buscadorProductos" type="text" placeholder="Escribe el modelo o parte del nombre...">
-        </div>
-        
-        <!-- Acceso admin -->
-        <div class="panel">
-            <div class="panel-title">Acceso Administrador</div>
-            <div>
-                <button id="btnLogin">Entrar</button>
-                <button id="btnLogout" style="display:none;">Salir</button>
-            </div>
+
+<header>
+    <div class="header-inner">
+        <h1>Trifusion Technologies</h1>
+        <div class="header-contact">
+            📍 Santo Domingo<br>
+            WhatsApp: +1 (829) 872-5163
         </div>
     </div>
-    
-    <!-- CATÁLOGO -->
-    <div class="catalogo-wrapper">
-        <div id="catalogoContainer"></div>
-        <div id="mensajeVacio" style="display:none;">
-            No se encontraron productos que coincidan con tu búsqueda.
-        </div>
+</header>
+
+<div class="toolbar">
+    <div class="panel">
+        <div class="panel-title">Buscar artículos</div>
+        <input id="buscadorProductos" placeholder="Buscar producto…">
     </div>
-    
-    <!-- Admin Panel for Images -->
-    <div class="overlay" id="adminOverlay"></div>
-    <div class="admin-panel" id="imagePanel">
-        <button class="close" id="closeImagePanel">&times;</button>
-        <h3>Subir Imagen Producto</h3>
-        <div class="form-group">
-            <label for="productNameDisplay">Producto:</label>
-            <div id="productNameDisplay" style="color: var(--text); font-size: 16px; margin-top: 5px;"></div>
-        </div>
-        <div class="form-group">
-            <label for="productImageInput">Seleccionar imagen:</label>
-            <input type="file" id="productImageInput" accept="image/*" name="productImage">
-        </div>
-        <div class="form-group">
-            <label for="imagePreview">Vista previa:</label>
-            <div id="imagePreview" style="width: 100%; height: 180px; background: #1f2940; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 36px;">
-                📷
-            </div>
-        </div>
-        <button id="uploadImageButton">Subir Imagen</button>
-        <button class="secondary" id="deleteImageButton" style="margin-top: 12px; display: none;">Eliminar Imagen</button>
+
+    <div class="panel">
+        <div class="panel-title">Acceso</div>
+        <button id="btnLogin">Entrar</button>
+        <button id="btnLogout" style="display:none;">Salir</button>
     </div>
-    
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDlOJqBgd-8KqUT-Y94lsma5W8T79PsPjM",
-            authDomain: "trifusion-cotizador.firebaseapp.com",
-            projectId: "trifusion-cotizador",
-            storageBucket: "trifusion-cotizador.firebasestorage.app",
-            messagingSenderId: "407374211882",
-            appId: "1:407374211882:web:b692792ccc39c8d48f4c53"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const storage = firebase.storage();
-        
-        // Constants
-        const MARGEN = 1.20; // Margen del 20%
-        const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
-        
-        // State
-        let esAdmin = false;
-        let productos = [];
-        let secciones = [];
-        let currentProductId = null;
-        
-        // Initialize app
-        function initApp() {
-            // Check auth state
-            auth.onAuthStateChanged(user => {
-                esAdmin = !!user;
-                if (esAdmin) {
-                    document.getElementById('btnLogout').style.display = 'inline-block';
-                    document.getElementById('btnLogin').style.display = 'none';
-                } else {
-                    document.getElementById('btnLogout').style.display = 'none';
-                    document.getElementById('btnLogin').style.display = 'inline-block';
-                }
-                renderProductos();
-            });
-            
-            // Event listeners
-            document.getElementById('btnLogin').addEventListener('click', iniciarSesion);
-            document.getElementById('btnLogout').addEventListener('click', cerrarSesion);
-            document.getElementById('buscadorProductos').addEventListener('input', (e) => {
-                renderProductos(e.target.value);
-            });
-            
-            // Image panel events
-            document.getElementById('closeImagePanel').addEventListener('click', cerrarPanelImagen);
-            document.getElementById('productImageInput').addEventListener('change', previsualizarImagen);
-            document.getElementById('uploadImageButton').', subirImagen);
-            document.getElementById('deleteImageButton').addEventListener('click', eliminarImagen);
-            
-            // Load catalog
-            cargarCatalogo();
+</div>
+
+<div class="catalogo-wrapper">
+    <div id="catalogo" class="catalogo"></div>
+    <div id="mensajeVacio" style="display:none;">No se encontraron productos.</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<script>
+const ADMIN_USER = "TELEFONO";
+const ADMIN_PASS = "1234";
+const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+
+const CATEGORIA_REGEX = /^[A-Z0-9\- \/]+$/;
+
+let productos = [];
+let esAdmin = false;
+
+function formatearPrecio(n){
+    return "$" + n.toLocaleString("es-DO");
+}
+
+function cargarLista(data){
+    productos = [];
+
+    data.forEach(fila=>{
+        const desc = (fila[2]||"").trim();
+        const precio = (fila[3]||"").trim();
+
+        if(!desc) return;
+
+        if(!precio && CATEGORIA_REGEX.test(desc)){
+            productos.push({tipo:"categoria", descripcion:desc});
+            return;
         }
-        
-        // Login with Firebase
-        async function iniciarSesion() {
-            try {
-                const email = prompt("Correo electrónico:");
-                if (!email) return;
-                
-                const password = prompt("Contraseña:");
-                if (!password) return;
-                
-                await auth.signInWithEmailAndPassword(email, password);
-                alert("¡Acceso administrativo activado!");
-            } catch (error) {
-                console.error("Error de autenticación:", error);
-                alert("Acceso denegado. Verifica tus credenciales.");
-            }
+
+        let esTransito = precio.toUpperCase().includes("TRANSITO");
+        let base = esTransito ? null : parseFloat(precio.replace(/\D/g,"")) || null;
+
+        productos.push({
+            tipo:"producto",
+            descripcion:desc,
+            basePrecio:base,
+            esTransito
+        });
+    });
+}
+
+function renderProductos(filtro=""){
+    const cont = document.getElementById("catalogo");
+    const vacio = document.getElementById("mensajeVacio");
+    cont.innerHTML = "";
+
+    const f = filtro.toLowerCase();
+    const lista = productos.filter(p=>!f || p.descripcion.toLowerCase().includes(f));
+
+    vacio.style.display = lista.length ? "none" : "block";
+
+    lista.forEach((p,idx)=>{
+        if(p.tipo==="categoria"){
+            const d=document.createElement("div");
+            d.className="categoria";
+            d.textContent=p.descripcion;
+            cont.appendChild(d);
+            return;
         }
-        
-        // Logout
-        function cerrarSesion() {
-            auth.signOut()
-                .then(() => {
-                    alert("Sesión cerrada.");
-                })
-                .catch(error => {
-                    console.error("Error al cerrar sesión:", error);
-                });
+
+        let texto = p.esTransito ? "TRÁNSITO" :
+                    p.basePrecio ? formatearPrecio(Math.round(p.basePrecio*1.20)) :
+                    "SIN PRECIO";
+
+        let clase = p.esTransito || !p.basePrecio ? "transito" : "";
+
+        const card=document.createElement("div");
+        card.className="producto";
+        card.innerHTML=`
+            <div class="descripcion">${p.descripcion}</div>
+            <div class="producto-right">
+                <div class="precio ${clase}">${texto}</div>
+                ${esAdmin && !p.esTransito ? `
+                <div class="editor-precio">
+                    <input type="number" value="${p.basePrecio||""}" data-idx="${idx}">
+                    <button class="btn-aplicar" data-idx="${idx}">OK</button>
+                </div>` : ""}
+            </div>`;
+        cont.appendChild(card);
+    });
+}
+
+async function cargarCatalogo(){
+    const r=await fetch(CSV_URL);
+    const t=await r.text();
+    Papa.parse(t,{complete:r=>{
+        cargarLista(r.data);
+        renderProductos();
+    }});
+}
+
+document.getElementById("buscadorProductos")
+.addEventListener("input",e=>renderProductos(e.target.value));
+
+document.getElementById("btnLogin").onclick=()=>{
+    const u=prompt("Usuario");
+    const p=prompt("Contraseña");
+    if(u===ADMIN_USER && p===ADMIN_PASS){
+        esAdmin=true;
+        btnLogout.style.display="inline-block";
+        alert("Modo edición activado");
+        renderProductos(buscadorProductos.value);
+    }
+};
+
+document.getElementById("btnLogout").onclick=()=>{
+    esAdmin=false;
+    btnLogout.style.display="none";
+    renderProductos(buscadorProductos.value);
+};
+
+document.getElementById("catalogo").addEventListener("click",e=>{
+    if(e.target.classList.contains("btn-aplicar")){
+        const i=e.target.dataset.idx;
+        const v=parseFloat(e.target.previousElementSibling.value);
+        if(v){
+            productos[i].basePrecio=v;
+            renderProductos(buscadorProductos.value);
         }
-        
-        // Load catalog from Google Sheets
-        async function cargarCatalogo() {
-            try {
-                const resp = await fetch(CSV_URL);
-                const csv = await resp.text();
-                
-                Papa.parse(csv, {
-                    header: false,
-                    skipEmptyLines: true,
-                    complete: (res) => {
-                        procesarDatos(res.data);
-                        renderProductos();
-                    }
-                });
-            } catch (error) {
-                console.error("Error cargando catálogo:", error);
-                document.getElementById('catalogoContainer').innerHTML = `
-                    <div style="text-align:center;padding:40px;color:var(--muted);">
-                        <p>Error cargando el catálogo. Intenta nuevamente.</p>
-                    </div>
-                `;
-            }
-        }
-        
-        // Process data from Google Sheets
-        function procesarDatos(data) {
-            productos = [];
-            secciones = [];
-            
-            let seccionActual = null;
-            
-            data.forEach((fila, idx) => {
-                // Columnas: [0] índice, [1] categoría/sección, [2] descripción, [3] precio
-                const categoria = (fila[1] || "").trim();
-                const descripcion = (fila[2] || "").trim();
-                const precioRaw = (fila[3] || "").trim();
-                
-                // Detectar secciones (filas con categoría pero sin descripción)
-                // Estas son las filas azules que quieres mostrar como divisiones
-                if (categoria && !descripcion) {
-                    seccionActual = categoria;
-                    secciones.push({
-                        nombre: categoria,
-                        indice: idx,
-                        productos: []
-                    });
-                } 
-                // Detectar productos
-                else if (descripcion) {
-                    let esTransito = false;
-                    let basePrecio = null;
-                    
-                    if (precioRaw.toUpperCase().includes("TRANSITO")) {
-                        esTransito = true;
-                    } else if (precioRaw) {
-                        const soloNum = precioRaw.replace(/[^0-9]/g, "");
-                        basePrecio = parseFloat(soloNum) || null;
-                    }
-                    
-                    // Generar ID estable basado en la sección y descripción
-                    const id = generarIdProducto(seccionActual, descripcion);
-                    
-                    const producto = {
-                        id,
-                        categoria: seccionActual,
-                        descripcion,
-                        basePrecio,
-                        esTransito,
-                        imagen: null
-                    };
-                    
-                    productos.push(producto);
-                    
-                    // Agregar a la sección actual
-                    if (seccionActual) {
-                        const seccion = secciones.find(s => s.nombre === seccionActual);
-                        if (seccion) {
-                            seccion.productos.push(producto);
-                        }
-                    }
-                }
-            });
-            
-            // Cargar imágenes desde Firebase Storage (público)
-            cargarImagenes();
-        }
-        
-        // Generar ID estable para productos
-        function generarIdProducto(categoria, descripcion) {
-            const cleanCategoria = categoria ? categoria.toLowerCase().replace(/\s+/g, "-") : "sin-categoria";
-            const cleanDescripcion = descripcion.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-            return `${cleanCategoria}-${cleanDescripcion}`;
-        }
-        
-        // Load images from Firebase Storage (público para todos)
-        async function cargarImagenes() {
-            for (let producto of productos) {
-                try {
-                    const imageRef = storage.ref(`productos/${producto.id}.jpg`);
-                    const url = await imageRef.getDownloadURL();
-                    producto.imagen = url;
-                } catch (error) {
-                    // Imagen no encontrada, mantener null
-                    producto.imagen = null;
-                }
-            }
-            renderProductos();
-        }
-        
-        // Render products with sections
-        function renderProductos(filtro = "") {
-            const container = document.getElementById('catalogoContainer');
-            const mensajeVacio = document.getElementById('mensajeVacio');
-            
-            const f = filtro.trim().toLowerCase();
-            
-            // Filtrar productos
-            const productosFiltrados = productos.filter(p => 
-                !f || p.descripcion.toLowerCase().includes(f)
-            );
-            
-            // Mostrar/Ocultar mensaje vacío
-            mensajeVacio.style.display = productosFiltrados.length === 0 ? 'block' : 'none';
-            
-            if (productosFiltrados.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
-            
-            // Agrupar productos por sección
-            const productosPorSeccion = {};
-            productosFiltrados.forEach(producto => {
-                const seccion = producto.categoria || 'Otros';
-                if (!productosPorSeccion[seccion]) {
-                    productosPorSeccion[seccion] = [];
-                }
-                productosPorSeccion[seccion].push(producto);
-            });
-            
-            // Renderizar secciones
-            let html = '';
-            
-            // Ordenar secciones alfabéticamente
-            const seccionesOrdenadas = Object.keys(productosPorSeccion).sort();
-            
-            seccionesOrdenadas.forEach(seccionNombre => {
-                const productosSeccion = productosPorSeccion[seccionNombre];
-                
-                // Si la sección es "Otros" y no tiene productos, no mostrar
-                if (seccionNombre === 'Otros' && productosSeccion.length === 0) {
-                    return;
-                }
-                
-                html += `
-                    <div class="seccion">
-                        <div class="seccion-titulo">${seccionNombre}</div>
-                        <div class="catalogo">
-                `;
-                
-                productosSeccion.forEach((producto, idx) => {
-                    let precioFinal = "";
-                    let clasePrecio = "";
-                    
-                    if (producto.esTransito) {
-                        precioFinal = "TRÁNSITO";
-                        clasePrecio = "transito";
-                    } else if (producto.basePrecio) {
-                        precioFinal = formatearPrecio(Math.round(producto.basePrecio * MARGEN));
-                    } else {
-                        precioFinal = "SIN PRECIO";
-                        clasePrecio = "sin-precio";
-                    }
-                    
-                    const tieneImagen = producto.imagen;
-                    
-                    html += `
-                        <div class="producto" data-id="${producto.id}">
-                            ${tieneImagen ? `
-                                <div class="producto-image">
-                                    <img src="${producto.imagen}" alt="${producto.descripcion}">
-                                </div>
-                            ` : ''}
-                            <div class="descripcion">${producto.descripcion}</div>
-                            <div class="producto-footer">
-                                <div class="precio ${clasePrecio}">${precioFinal}</div>
-                                ${esAdmin ? `
-                                    <button class="btn-image" data-id="${producto.id}">
-                                        ${tieneImagen ? 'Cambiar' : 'Imagen'}
-                                    </button>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                html += `
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-            
-            // Add event listeners solo si es admin
-            if (esAdmin) {
-                // Upload image
-                container.querySelectorAll('.btn-image').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const id = e.target.dataset.id;
-                        const producto = productos.find(p => p.id === id);
-                        
-                        if (producto) {
-                            currentProductId = id;
-                            document.getElementById('productNameDisplay').textContent = producto.descripcion;
-                            
-                            // Reset form
-                            document.getElementById('productImageInput').value = '';
-                            document.getElementById('imagePreview').innerHTML = '📷';
-                            document.getElementById('deleteImageButton').style.display = producto.imagen ? 'block' : 'none';
-                            
-                            // Show panel
-                            document.getElementById('adminOverlay').classList.add('active');
-                            document.getElementById('imagePanel').classList.add('active');
-                        }
-                    });
-                });
-            }
-        }
-        
-        // Format price
-        function formatearPrecio(num) {
-            return "$" + num.toLocaleString("es-DO");
-        }
-        
-        // Image Panel Functions
-        function cerrarPanelImagen() {
-            document.getElementById('adminOverlay').classList.remove('active');
-            document.getElementById('imagePanel').classList.remove('active');
-            currentProductId = null;
-        }
-        
-        function previsualizarImagen(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                document.getElementById('imagePreview').innerHTML = `
-                    <img src="${event.target.result}" style="width:100%;height:100%;object-fit:cover;">
-                `;
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        async function subirImagen() {
-            const fileInput = document.getElementById('productImageInput');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                alert("Por favor selecciona una imagen");
-                return;
-            }
-            
-            if (currentProductId === null) {
-                alert("Producto no seleccionado");
-                return;
-            }
-            
-            try {
-                // Upload to Firebase Storage
-                const imageRef = storage.ref(`productos/${currentProductId}.jpg`);
-                await imageRef.put(file);
-                
-                // Get download URL
-                const url = await imageRef.getDownloadURL();
-                
-                // Update product
-                const producto = productos.find(p => p.id === currentProductId);
-                if (producto) {
-                    producto.imagen = url;
-                    renderProductos(document.getElementById('buscadorProductos').value);
-                }
-                
-                alert("Imagen subida correctamente");
-                cerrarPanelImagen();
-                
-            } catch (error) {
-                console.error("Error subiendo imagen:", error);
-                
-                // Manejar específicamente el error de CORS
-                if (error.code === 'storage/unauthorized') {
-                    alert("Error de autenticación. Verifica tus credenciales de Firebase.");
-                } else if (error.code === 'storage/cors') {
-                    alert("Error de CORS. Configura las reglas CORS en Firebase Storage o contacta al administrador del sitio.");
-                } else {
-                    alert("Error al subir la imagen. Inténtalo de nuevo.");
-                }
-            }
-        }
-        
-        async function eliminarImagen() {
-            if (currentProductId === null) return;
-            
-            const producto = productos.find(p => p.id === currentProductId);
-            if (!producto || !producto.imagen) return;
-            
-            try {
-                // Delete from Firebase Storage
-                const imageRef = storage.ref(`productos/${currentProductId}.jpg`);
-                await imageRef.delete();
-                
-                // Update product
-                producto.imagen = null;
-                
-                alert("Imagen eliminada");
-                cerrarPanelImagen();
-                renderProductos(document.getElementById('buscadorProductos').value);
-                
-            } catch (error) {
-                console.error("Error eliminando imagen:", error);
-                alert("Error al eliminar la imagen.");
-            }
-        }
-        
-        // Initialize on DOM load
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
+    }
+});
+
+cargarCatalogo();
+</script>
+
 </body>
 </html>
+
