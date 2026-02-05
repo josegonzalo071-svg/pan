@@ -13,7 +13,7 @@ body{
     color:#e6ecff;
 }
 header{
-    padding:16px;
+    padding:18px;
     background:#000;
 }
 .catalogo{
@@ -22,12 +22,12 @@ header{
     padding:0 16px;
 }
 .categoria{
-    margin:30px 0 14px;
-    padding:12px 16px;
-    background:rgba(0,194,255,.15);
+    margin:28px 0 14px;
+    padding:14px 18px;
+    background:rgba(0,194,255,.18);
     border-left:6px solid #00c2ff;
     font-weight:800;
-    letter-spacing:.15em;
+    letter-spacing:.18em;
     text-transform:uppercase;
 }
 .producto{
@@ -62,71 +62,62 @@ header{
 <script>
 const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
-const catalogo = document.getElementById("catalogo");
+const cont = document.getElementById("catalogo");
 
-function esCategoria(texto){
-    if(!texto) return false;
+function esCategoria(row){
+    const a = (row[0]||"").trim();
+    const b = (row[1]||"").trim();
+    const c = (row[2]||"").trim();
+    const d = (row[3]||"").trim();
 
-    // una sola palabra
-    if(texto.includes(" ")) return false;
-
-    // sin números
-    if(/\d/.test(texto)) return false;
-
-    // corta (marcas / tipos)
-    if(texto.length > 12) return false;
-
-    // no símbolos típicos de modelos
-    if(/[\/\-"]/g.test(texto)) return false;
-
-    return true;
+    return a && a === b && b === c && c === d;
 }
 
-function precioFormateado(n){
+function formatearPrecio(n){
     return "$" + Number(n).toLocaleString("es-DO");
-}
-
-function procesar(data){
-    catalogo.innerHTML = "";
-
-    data.forEach(fila=>{
-        const descripcion = (fila[2] || "").trim();
-        const precioRaw   = (fila[3] || "").trim();
-
-        if(!descripcion) return;
-
-        // 🔷 CATEGORÍA / IDENTIFICADOR
-        if(esCategoria(descripcion)){
-            const cat = document.createElement("div");
-            cat.className = "categoria";
-            cat.textContent = descripcion;
-            catalogo.appendChild(cat);
-            return;
-        }
-
-        // 🚫 TRANSITO NO SE MUESTRA
-        if(precioRaw.toUpperCase().includes("TRANSITO")) return;
-
-        // 🟢 PRODUCTO (solo si hay número de precio)
-        const num = precioRaw.replace(/[^0-9]/g,"");
-        if(!num) return;
-
-        const prod = document.createElement("div");
-        prod.className = "producto";
-        prod.innerHTML = `
-            <div class="descripcion">${descripcion}</div>
-            <div class="precio">${precioFormateado(num)}</div>
-        `;
-        catalogo.appendChild(prod);
-    });
 }
 
 fetch(CSV_URL)
 .then(r=>r.text())
-.then(t=>Papa.parse(t,{
-    skipEmptyLines:true,
-    complete:r=>procesar(r.data)
-}));
+.then(t=>{
+    Papa.parse(t,{
+        skipEmptyLines:true,
+        complete:(res)=>{
+            cont.innerHTML = "";
+
+            res.data.forEach(row=>{
+                const desc = (row[2]||"").trim();
+                const precioRaw = (row[3]||"").trim();
+
+                if(!desc) return;
+
+                // 🔵 CATEGORÍA
+                if(esCategoria(row)){
+                    const cat = document.createElement("div");
+                    cat.className = "categoria";
+                    cat.textContent = desc;
+                    cont.appendChild(cat);
+                    return;
+                }
+
+                // 🚫 TRANSITO
+                if(precioRaw.toUpperCase().includes("TRANSITO")) return;
+
+                // 🟢 PRODUCTO
+                const num = precioRaw.replace(/[^0-9]/g,"");
+                if(!num) return;
+
+                const prod = document.createElement("div");
+                prod.className = "producto";
+                prod.innerHTML = `
+                    <div class="descripcion">${desc}</div>
+                    <div class="precio">${formatearPrecio(num)}</div>
+                `;
+                cont.appendChild(prod);
+            });
+        }
+    });
+});
 </script>
 
 </body>
