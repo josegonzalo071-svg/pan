@@ -16,19 +16,18 @@ header{
     padding:16px;
     background:#000;
 }
-h1{margin:0}
 .catalogo{
     max-width:1100px;
     margin:30px auto;
     padding:0 16px;
 }
 .categoria{
-    margin:28px 0 12px;
-    padding:10px 14px;
-    border-left:5px solid #00c2ff;
+    margin:30px 0 14px;
+    padding:12px 16px;
     background:rgba(0,194,255,.15);
+    border-left:6px solid #00c2ff;
     font-weight:800;
-    letter-spacing:.12em;
+    letter-spacing:.15em;
     text-transform:uppercase;
 }
 .producto{
@@ -65,17 +64,26 @@ const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 const catalogo = document.getElementById("catalogo");
 
-function precioFormateado(n){
-    return "$" + Number(n).toLocaleString("es-DO");
+function esCategoria(texto){
+    if(!texto) return false;
+
+    // una sola palabra
+    if(texto.includes(" ")) return false;
+
+    // sin números
+    if(/\d/.test(texto)) return false;
+
+    // corta (marcas / tipos)
+    if(texto.length > 12) return false;
+
+    // no símbolos típicos de modelos
+    if(/[\/\-"]/g.test(texto)) return false;
+
+    return true;
 }
 
-function esCategoria(texto, precio){
-    if(!texto) return false;
-    if(texto.includes(" ")) return false;        // una sola palabra
-    if(texto.length > 9) return false;           // corta
-    if(/\d/.test(texto)) return false;            // sin números
-    if(/\d/.test(precio)) return false;           // sin precio
-    return true;
+function precioFormateado(n){
+    return "$" + Number(n).toLocaleString("es-DO");
 }
 
 function procesar(data){
@@ -87,35 +95,38 @@ function procesar(data){
 
         if(!descripcion) return;
 
-        // 🔷 IDENTIFICADOR / CATEGORÍA
-        if(esCategoria(descripcion, precioRaw)){
-            const c = document.createElement("div");
-            c.className = "categoria";
-            c.textContent = descripcion;
-            catalogo.appendChild(c);
+        // 🔷 CATEGORÍA / IDENTIFICADOR
+        if(esCategoria(descripcion)){
+            const cat = document.createElement("div");
+            cat.className = "categoria";
+            cat.textContent = descripcion;
+            catalogo.appendChild(cat);
             return;
         }
 
         // 🚫 TRANSITO NO SE MUESTRA
         if(precioRaw.toUpperCase().includes("TRANSITO")) return;
 
-        // 🟢 PRODUCTO REAL (solo con número)
+        // 🟢 PRODUCTO (solo si hay número de precio)
         const num = precioRaw.replace(/[^0-9]/g,"");
         if(!num) return;
 
-        const p = document.createElement("div");
-        p.className = "producto";
-        p.innerHTML = `
+        const prod = document.createElement("div");
+        prod.className = "producto";
+        prod.innerHTML = `
             <div class="descripcion">${descripcion}</div>
             <div class="precio">${precioFormateado(num)}</div>
         `;
-        catalogo.appendChild(p);
+        catalogo.appendChild(prod);
     });
 }
 
 fetch(CSV_URL)
 .then(r=>r.text())
-.then(t=>Papa.parse(t,{skipEmptyLines:true,complete:r=>procesar(r.data)}));
+.then(t=>Papa.parse(t,{
+    skipEmptyLines:true,
+    complete:r=>procesar(r.data)
+}));
 </script>
 
 </body>
