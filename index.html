@@ -1,980 +1,603 @@
-
-                        <!DOCTYPE html>
-                        <html lang="en">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                body {
-                  background-color: white; /* Ensure the iframe has a white background */
-                }
-
-                
-              </style>
-                        </head>
-                        <body>
-                            <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Trifusion Technologies — Catálogo</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+<meta charset="UTF-8">
+<title>Trifusion Technologies — Catálogo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+    :root{
+        --bg:#0b0f19;
+        --card:#101624;
+        --card-border:#1f2940;
+        --accent:#00c2ff;
+        --accent-soft:rgba(0,194,255,0.18);
+        --text:#e6ecff;
+        --muted:#9aa4c6;
+        --danger:#ff4b6a;
+        --success:#00c853;
+    }
+
+    body {
+        font-family: system-ui, Arial, sans-serif;
+        background: radial-gradient(circle at top, #172239 0, #050712 55%, #02030a 100%);
+        margin: 0;
+        color: var(--text);
+        line-height: 1.5;
+    }
+
+    header {
+        padding: 18px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-inner{
+        max-width: 1100px;
+        margin: 0 auto;
+        display:flex;
+        justify-content: space-between;
+        align-items:center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .logo-title h1{
+        margin:0;
+        font-size:24px;
+        letter-spacing:0.03em;
+        background: linear-gradient(90deg, var(--accent), #7b3fe4, #ff4b6a);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-weight: 800;
+    }
+
+    .header-contact{
+        font-size:13px;
+        color: var(--muted);
+        text-align:right;
+        line-height: 1.4;
+    }
+
+    /* Toolbar */
+    .toolbar{
+        max-width:1100px;
+        margin:18px auto 0;
+        padding:0 16px 4px;
+        display:grid;
+        grid-template-columns:minmax(0,2fr) minmax(0,1fr);
+        gap:12px;
+    }
+
+    @media(max-width:800px){
+        .toolbar{
+            grid-template-columns:1fr;
         }
-        
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', system-ui, Arial, sans-serif;
-            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
-            color: #e6ecff;
-            line-height: 1.6;
-        }
-        
-        header {
-            padding: 20px 16px;
-            background: rgba(0, 0, 0, 0.85);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(10px);
-        }
-        
-        header h1 {
-            font-size: 1.8rem;
-            background: linear-gradient(90deg, #00c2ff, #0077ff, #7b3fe4);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-        
-        .admin-controls {
-            display: flex;
-            gap: 12px;
-        }
-        
-        .btn {
-            border: none;
-            border-radius: 10px;
-            padding: 10px 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-        }
-        
-        .btn-admin {
-            background: linear-gradient(90deg, #ff8a00, #da4a00);
-            color: white;
-        }
-        
-        .btn-admin:hover {
-            background: linear-gradient(90deg, #ff9a20, #e55a10);
-            box-shadow: 0 0 15px rgba(255, 138, 0, 0.4);
-        }
-        
-        .btn-logout {
-            background: linear-gradient(90deg, #ff4b6a, #c53030);
-            color: white;
-            display: none;
-        }
-        
-        .btn-logout:hover {
-            background: linear-gradient(90deg, #ff5b7a, #d54040);
-            box-shadow: 0 0 15px rgba(255, 75, 106, 0.4);
-        }
-        
-        .catalogo {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-        
-        .categoria {
-            margin: 32px 0 20px;
-            padding: 16px 22px;
-            background: rgba(0, 30, 60, 0.7);
-            border-left: 6px solid #00c2ff;
-            border-radius: 0 12px 12px 0;
-            font-weight: 800;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            font-size: 1.25rem;
-            box-shadow: 0 4px 15px rgba(0, 194, 255, 0.15);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .categoria::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background: linear-gradient(90deg, transparent, rgba(0, 194, 255, 0.1), transparent);
-            z-index: -1;
-        }
-        
+    }
+
+    .panel{
+        background:rgba(8,12,26,0.9);
+        border-radius:14px;
+        padding:12px;
+        border:1px solid rgba(255,255,255,0.05);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    }
+
+    .panel-title{
+        font-size:13px;
+        margin-bottom:8px;
+        color:var(--muted);
+        text-transform:uppercase;
+        letter-spacing:0.1em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .panel-title::before {
+        content: "";
+        display: inline-block;
+        width: 4px;
+        height: 14px;
+        background: var(--accent);
+        border-radius: 2px;
+    }
+
+    input[type="text"], input[type="number"]{
+        width:100%;
+        background:#050815;
+        border-radius:10px;
+        border:1px solid rgba(255,255,255,0.08);
+        padding:10px 12px;
+        color:var(--text);
+        font-size:15px;
+        outline:none;
+        transition: border-color 0.3s;
+    }
+    
+    input[type="text"]:focus, input[type="number"]:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(0, 194, 255, 0.2);
+    }
+
+    button{
+        border:none;
+        border-radius:10px;
+        padding:10px 18px;
+        font-size:15px;
+        font-weight:600;
+        letter-spacing:0.03em;
+        cursor:pointer;
+        background:linear-gradient(135deg,var(--accent),#62e3ff);
+        color:#02030a;
+        box-shadow:0 6px 18px rgba(0,194,255,0.35);
+        white-space:nowrap;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 22px rgba(0,194,255,0.45);
+    }
+    
+    button:active {
+        transform: translateY(1px);
+    }
+
+    .btn-admin {
+        background: linear-gradient(135deg, #ff8a00, #ff4b6a);
+        box-shadow: 0 6px 18px rgba(255, 75, 106, 0.35);
+    }
+    
+    .btn-admin:hover {
+        box-shadow: 0 8px 22px rgba(255, 75, 106, 0.45);
+    }
+
+    .btn-logout {
+        background: linear-gradient(135deg, #c53030, #822727);
+        display: none;
+        box-shadow: 0 6px 18px rgba(197, 48, 48, 0.35);
+    }
+    
+    .btn-logout:hover {
+        box-shadow: 0 8px 22px rgba(197, 48, 48, 0.45);
+    }
+
+    /* Catálogo */
+    .catalogo-wrapper{
+        max-width:1100px;
+        margin:20px auto 40px;
+        padding:0 16px;
+    }
+
+    .catalogo{
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+    }
+
+    .producto{
+        background:var(--card);
+        border-radius:14px;
+        padding:16px;
+        border:1px solid var(--card-border);
+        box-shadow:0 14px 30px rgba(0,0,0,0.35);
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:15px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .producto::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent), #7b3fe4, #ff4b6a);
+        opacity: 0.7;
+    }
+    
+    .producto:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 35px rgba(0, 0, 0, 0.45);
+        border-color: rgba(0, 194, 255, 0.3);
+    }
+
+    .descripcion{
+        font-size:17px;
+        color:var(--accent);
+        font-weight:600;
+        word-break:break-word;
+        flex:1;
+        line-height: 1.4;
+    }
+
+    .producto-right{
+        display:flex;
+        flex-direction:column;
+        align-items:flex-end;
+        min-width:170px;
+        gap:8px;
+    }
+
+    .precio{
+        font-size:22px;
+        font-weight:800;
+        white-space:nowrap;
+        color:var(--danger);
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .precio-base {
+        font-size: 14px;
+        color: var(--muted);
+        text-decoration: line-through;
+        margin-top: -4px;
+    }
+
+    .precio.transito{
+        color:#ffc14b;
+        text-shadow:0 0 6px rgba(255,193,75,0.45);
+    }
+
+    .editor-precio{
+        display:flex;
+        gap:8px;
+        align-items:center;
+        width: 100%;
+        margin-top: 4px;
+    }
+
+    .editor-precio label{
+        display:none;
+    }
+    
+    .input-precio {
+        width: 100px;
+        text-align: right;
+        font-weight: 600;
+    }
+    
+    .btn-aplicar {
+        background: linear-gradient(135deg, var(--success), #00aa30);
+        color: white;
+        padding: 6px 12px;
+        font-size: 13px;
+        min-width: 50px;
+    }
+    
+    .btn-aplicar:hover {
+        box-shadow: 0 6px 15px rgba(0, 200, 83, 0.4);
+    }
+
+    #mensajeVacio{
+        text-align:center;
+        margin-top:30px;
+        color:var(--muted);
+        font-size: 18px;
+        padding: 30px;
+        background: rgba(30, 35, 55, 0.6);
+        border-radius: 16px;
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+    
+    .impuesto-info {
+        background: rgba(30, 40, 70, 0.7);
+        border-left: 4px solid var(--accent);
+        padding: 10px 15px;
+        border-radius: 0 8px 8px 0;
+        margin-top: 8px;
+        font-size: 13px;
+        color: var(--muted);
+    }
+    
+    .impuesto-info strong {
+        color: var(--accent);
+    }
+    
+    @media (max-width: 768px) {
         .producto {
-            background: rgba(16, 22, 36, 0.85);
-            border: 1px solid rgba(31, 41, 64, 0.9);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            display: flex;
             flex-direction: column;
-            gap: 14px;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-            position: relative;
-            overflow: hidden;
+            align-items: stretch;
         }
         
-        .producto:hover {
-            transform: translateY(-3px);
-            border-color: rgba(0, 194, 255, 0.4);
-            box-shadow: 0 8px 25px rgba(0, 194, 255, 0.2);
-        }
-        
-        .producto::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #00c2ff, #7b3fe4, #ff4b6a);
-            opacity: 0.7;
-        }
-        
-        .producto-content {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex: 1;
-        }
-        
-        .descripcion {
-            color: #4da6ff;
-            font-weight: 700;
-            font-size: 1.25rem;
-            margin-bottom: 4px;
+        .producto-right {
+            min-width: auto;
+            align-items: flex-start;
         }
         
         .precio {
-            color: #ff4b6a;
-            font-weight: 800;
-            font-size: 1.5rem;
-            white-space: nowrap;
-            margin-top: 4px;
+            font-size: 20px;
         }
         
-        .producto-img {
+        .descripcion {
+            font-size: 16px;
+        }
+        
+        .editor-precio {
             width: 100%;
-            max-height: 220px;
-            object-fit: contain;
-            border-radius: 12px;
-            background: rgba(2, 3, 10, 0.8);
-            border: 1px solid rgba(31, 41, 64, 0.7);
-            transition: all 0.4s ease;
-            cursor: pointer;
-            display: block;
-            margin: 10px auto;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .producto-img:hover {
-            transform: scale(1.03);
-            box-shadow: 0 6px 20px rgba(0, 194, 255, 0.3);
-        }
-        
-        .admin-section {
-            background: rgba(30, 25, 50, 0.8);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 12px;
-            border: 1px solid rgba(100, 80, 180, 0.5);
-            display: none;
-        }
-        
-        .admin-section.active {
-            display: block;
-        }
-        
-        .admin-section h4 {
-            color: #ffb703;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .admin-input {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: 10px;
-            border: 1px solid rgba(100, 120, 180, 0.6);
-            background: rgba(10, 15, 30, 0.8);
-            color: white;
-            margin: 8px 0;
-            font-family: inherit;
-            font-size: 0.95rem;
-        }
-        
-        .admin-input:focus {
-            outline: none;
-            border-color: #00c2ff;
-            box-shadow: 0 0 0 3px rgba(0, 194, 255, 0.2);
-        }
-        
-        .admin-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
             flex-wrap: wrap;
         }
         
-        .btn-save {
-            flex: 1;
-            min-width: 100px;
-            background: linear-gradient(90deg, #00c853, #009629);
-            color: white;
+        .input-precio {
+            width: 120px;
         }
-        
-        .btn-save:hover {
-            background: linear-gradient(90deg, #00e05d, #00aa30);
-            box-shadow: 0 0 15px rgba(0, 200, 83, 0.3);
-        }
-        
-        .btn-delete {
-            flex: 1;
-            min-width: 100px;
-            background: linear-gradient(90deg, #ff4b6a, #c53030);
-            color: white;
-        }
-        
-        .btn-delete:hover {
-            background: linear-gradient(90deg, #ff5b7a, #d54040);
-            box-shadow: 0 0 15px rgba(255, 75, 106, 0.4);
-        }
-        
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.92);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .modal.active {
-            display: flex;
-            opacity: 1;
-        }
-        
-        .modal-content {
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 16px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7);
-            position: relative;
-            overflow: hidden;
-            background: rgba(16, 22, 36, 0.95);
-            border: 2px solid rgba(0, 194, 255, 0.5);
-        }
-        
-        .modal-img {
-            max-width: 100%;
-            max-height: 85vh;
-            display: block;
-            border-radius: 14px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-        }
-        
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(30, 30, 40, 0.8);
-            border: 2px solid #ff4b6a;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            z-index: 2001;
-        }
-        
-        .close-modal:hover {
-            background: #ff4b6a;
-            transform: rotate(90deg);
-        }
-        
-        .login-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-        }
-        
-        .login-modal.active {
-            display: flex;
-        }
-        
-        .login-box {
-            background: rgba(20, 25, 40, 0.95);
-            border-radius: 16px;
-            padding: 30px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(100, 150, 255, 0.3);
-        }
-        
-        .login-box h2 {
+    }
+    
+    @media (max-width: 480px) {
+        .header-inner {
+            flex-direction: column;
             text-align: center;
-            margin-bottom: 20px;
-            color: #00c2ff;
-            font-weight: 700;
         }
         
-        .login-input {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(100, 120, 180, 0.6);
-            background: rgba(10, 15, 30, 0.8);
-            color: white;
-            margin: 10px 0;
-            font-family: inherit;
-            font-size: 1rem;
+        .header-contact {
+            text-align: center;
         }
         
-        .login-input:focus {
-            outline: none;
-            border-color: #00c2ff;
-            box-shadow: 0 0 0 3px rgba(0, 194, 255, 0.2);
+        .toolbar {
+            padding: 0 10px;
         }
         
-        .btn-login {
+        .panel {
+            padding: 10px;
+        }
+        
+        button {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(90deg, #00c2ff, #0077ff);
-            color: white;
-            font-weight: 700;
-            margin-top: 15px;
-            font-size: 1.05rem;
+            font-size: 16px;
         }
         
-        .loading {
-            text-align: center;
-            padding: 40px;
-            font-size: 1.2rem;
-            color: #00c2ff;
+        .precio {
+            font-size: 19px;
         }
         
-        .status-message {
-            text-align: center;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 12px;
-            font-weight: 600;
-            display: none;
+        .descripcion {
+            font-size: 15px;
         }
-        
-        .status-success {
-            background: rgba(0, 100, 0, 0.3);
-            border: 1px solid #00c853;
-            color: #4cff9a;
-            display: block;
-        }
-        
-        .status-error {
-            background: rgba(100, 0, 0, 0.3);
-            border: 1px solid #ff4b6a;
-            color: #ff8a9a;
-            display: block;
-        }
-        
-        .img-error {
-            background: rgba(100, 0, 0, 0.2);
-            border: 1px dashed #ff4b6a;
-            color: #ff8a9a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 0.85rem;
-        }
-        
-        .drive-instructions {
-            background: rgba(30, 40, 70, 0.7);
-            border-left: 4px solid #4da6ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-size: 0.9rem;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 25px;
-            margin-top: 20px;
-            color: rgba(230, 236, 255, 0.6);
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(31, 41, 64, 0.7);
-            background: rgba(10, 15, 25, 0.7);
-        }
-        
-        @media (min-width: 768px) {
-            .producto {
-                flex-direction: row;
-                align-items: center;
-            }
-            
-            .producto-content {
-                flex: 1;
-            }
-            
-            .producto-img-container {
-                width: 220px;
-                height: 220px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-            }
-            
-            .producto-img {
-                max-width: 100%;
-                max-height: 100%;
-                margin: 0;
-            }
-            
-            .admin-section {
-                margin-top: 0;
-                margin-left: 20px;
-                width: 300px;
-                flex-shrink: 0;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            header {
-                flex-direction: column;
-                gap: 15px;
-                padding: 15px;
-            }
-            
-            .admin-controls {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .btn {
-                width: 100%;
-                padding: 12px;
-                font-size: 1.05rem;
-            }
-            
-            .categoria {
-                font-size: 1.1rem;
-                padding: 14px 18px;
-            }
-            
-            .producto {
-                padding: 16px;
-            }
-            
-            .descripcion {
-                font-size: 1.15rem;
-            }
-            
-            .precio {
-                font-size: 1.4rem;
-            }
-            
-            .admin-actions {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
-    <header>
-        <h1>Trifusion Technologies</h1>
-        <div class="admin-controls">
-            <button id="loginBtn" class="btn btn-admin">🔐 ADMIN</button>
-            <button id="logoutBtn" class="btn btn-logout">👋 SALIR</button>
-        </div>
-    </header>
-    
-    <div class="catalogo" id="catalogo">
-        <div class="loading">Cargando catálogo...</div>
-    </div>
-    
-    <div id="imageModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal">&times;</button>
-            <img id="modalImage" class="modal-img" src="" alt="Imagen del producto" referrerpolicy="no-referrer">
-        </div>
-    </div>
-    
-    <div id="loginModal" class="login-modal">
-        <div class="login-box">
-            <h2>Acceso de Administrador</h2>
-            <input type="email" id="adminEmail" name="email" class="login-input" placeholder="Correo electrónico" autocomplete="email" required>
-            <input type="password" id="adminPassword" name="password" class="login-input" placeholder="Contraseña" autocomplete="current-password" required>
-            <button id="submitLogin" class="btn btn-login">Iniciar Sesión</button>
-            <div class="drive-instructions" style="margin-top: 20px; background: rgba(40, 30, 20, 0.7); border-left-color: #ffb703;">
-                <strong>ℹ️ Instrucciones para imágenes:</strong>
-                <p style="margin-top:8px">Pega el link directo de Imgur, ImgBB o Google Drive</p>
-                <p style="margin-top:8px;font-size:0.85rem">
-                    <strong>Ejemplo ImgBB:</strong><br>
-                    <code>https://i.ibb.co/XXXX/tu-imagen.jpg</code>
-                </p>
-            </div>
-        </div>
-    </div>
-    
-    <footer>
-        <p>Trifusion Technologies © 2026 - Todos los derechos reservados</p>
-        <p style="margin-top: 8px; font-size: 0.85rem; opacity: 0.7;">Catálogo actualizado en tiempo real desde Google Sheets</p>
-    </footer>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
-    <!-- PapaParse -->
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-    
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDlOJqBgd-8KqUT-Y94lsma5W8T79PsPjM",
-            authDomain: "trifusion-cotizador.firebaseapp.com",
-            projectId: "trifusion-cotizador",
-            storageBucket: "trifusion-cotizador.firebasestorage.app",
-            messagingSenderId: "407374211882",
-            appId: "1:407374211882:web:b692792ccc39c8d48f4c53"
-        };
-        
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+<header>
+    <div class="header-inner">
+        <div class="logo-title">
+            <h1>Trifusion Technologies</h1>
+        </div>
+        <div class="header-contact">
+            📍 Santo Domingo<br>
+            WhatsApp: +1 (829) 872-5163<br>
+            <span style="color: var(--accent); font-weight: 600; display: block; margin-top: 4px">✅ Precios con 22% de impuesto incluido</span>
+        </div>
+    </div>
+</header>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+
+    <!-- Buscador -->
+    <div class="panel">
+        <div class="panel-title">Buscar artículos</div>
+        <input id="buscadorProductos" type="text" placeholder="Escribe el modelo o parte del nombre...">
+        <div class="impuesto-info">
+            <strong>ℹ️ Todos los precios incluyen 22% de impuesto</strong><br>
+            El precio base se multiplica por 1.22
+        </div>
+    </div>
+
+    <!-- Acceso admin (solo muestra ENTRAR) -->
+    <div class="panel">
+        <div class="panel-title">Acceso Administrador</div>
+        <button id="btnLogin" class="btn-admin">🔐 Entrar</button>
+        <button id="btnLogout" class="btn-logout">👋 Salir</button>
+    </div>
+
+</div>
+
+<!-- CATÁLOGO -->
+<div class="catalogo-wrapper">
+    <div id="catalogo" class="catalogo"></div>
+    <div id="mensajeVacio" style="display:none;">No se encontraron productos.</div>
+</div>
+
+<!-- CORREGIDO: Sin espacios en la URL -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<script>
+// =========================
+// CONFIG PRIVADA DEL CÓDIGO
+// =========================
+const ADMIN_USER = "TELEFONO";
+const ADMIN_PASS = "1234"; // contraseña
+const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
+const IMPUESTO = 1.22; // 22% de impuesto (CORREGIDO DE 1.20 a 1.22)
+
+let esAdmin = false;
+let productos = [];
+// CORREGIDO: Sin espacios en la URL
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+
+function formatearPrecio(num){
+    return "$" + num.toLocaleString("es-DO");
+}
+
+function cargarLista(data){
+    productos = [];
+
+    data.forEach(fila=>{
+        const desc = (fila[2]||"").trim();
+        const precioRaw = (fila[3]||"").trim();
+        if (!desc || !precioRaw) return;
+
+        let esTransito = false;
+        let base = null;
+
+        if (precioRaw.toUpperCase().includes("TRANSITO")) {
+            esTransito = true;
+        } else {
+            let soloNum = precioRaw.replace(/[^0-9]/g,"");
+            base = parseFloat(soloNum) || null;
         }
-        
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
-        const cont = document.getElementById("catalogo");
-        const loginBtn = document.getElementById("loginBtn");
-        const logoutBtn = document.getElementById("logoutBtn");
-        const loginModal = document.getElementById("loginModal");
-        const submitLogin = document.getElementById("submitLogin");
-        const imageModal = document.getElementById("imageModal");
-        const modalImage = document.getElementById("modalImage");
-        const closeModal = document.querySelector(".close-modal");
-        
-        let isAdmin = false;
-        let productImages = {};
-        
-        // Initialize the application
-        function init() {
-            // Set up auth state observer
-            auth.onAuthStateChanged(user => {
-                isAdmin = !!user;
-                loginBtn.style.display = isAdmin ? "none" : "inline-flex";
-                logoutBtn.style.display = isAdmin ? "inline-flex" : "none";
-                loadCatalog();
-            });
-            
-            // Set up button event listeners
-            loginBtn.onclick = () => loginModal.classList.add("active");
-            logoutBtn.onclick = () => auth.signOut();
-            submitLogin.onclick = handleLogin;
-            closeModal.onclick = () => imageModal.classList.remove("active");
-            imageModal.onclick = (e) => {
-                if (e.target === imageModal) {
-                    imageModal.classList.remove("active");
-                }
-            };
-            
-            // Close login modal when clicking outside
-            loginModal.onclick = (e) => {
-                if (e.target === loginModal) {
-                    loginModal.classList.remove("active");
-                }
-            };
-            
-            // Load catalog initially
-            loadCatalog();
+
+        productos.push({
+            descripcion: desc,
+            basePrecio: base,
+            esTransito
+        });
+    });
+}
+
+function renderProductos(filtro=""){
+    const cont = document.getElementById("catalogo");
+    const vacio = document.getElementById("mensajeVacio");
+
+    cont.innerHTML = "";
+    const f = filtro.trim().toLowerCase();
+
+    const lista = productos.filter(p=>!f || p.descripcion.toLowerCase().includes(f));
+
+    vacio.style.display = lista.length === 0 ? "block" : "none";
+
+    lista.forEach((p,idx)=>{
+        let final = "";
+        let clase = "";
+        let precioBaseFormatted = "";
+
+        if(p.esTransito){
+            final = "TRÁNSITO";
+            clase = "transito";
+        } else if(p.basePrecio){
+            // CORREGIDO: Aplicar 22% de impuesto (multiplicar por 1.22)
+            const precioConImpuesto = Math.round(p.basePrecio * IMPUESTO);
+            final = formatearPrecio(precioConImpuesto);
+            precioBaseFormatted = formatearPrecio(p.basePrecio);
+        } else {
+            final = "SIN PRECIO";
+            clase = "transito";
         }
-        
-        // Handle login
-        function handleLogin() {
-            const email = document.getElementById("adminEmail").value.trim();
-            const password = document.getElementById("adminPassword").value.trim();
-            
-            if (!email || !password) {
-                alert("Por favor ingresa correo y contraseña");
-                return;
+
+        const card = document.createElement("div");
+        card.className = "producto";
+
+        // EDITOR SOLO SI ADMIN
+        const editor = esAdmin && !p.esTransito ? `
+            <div class="editor-precio">
+                <input type="number" value="${p.basePrecio||""}" min="0" data-idx="${idx}" class="input-precio" placeholder="Precio base">
+                <button data-idx="${idx}" class="btn-aplicar">✅ Aplicar</button>
+            </div>
+        ` : "";
+
+        card.innerHTML = `
+            <div class="descripcion">${p.descripcion}</div>
+            <div class="producto-right">
+                <div class="precio ${clase}">${final}</div>
+                ${precioBaseFormatted ? `<div class="precio-base">Base: ${precioBaseFormatted}</div>` : ''}
+                ${editor}
+            </div>
+        `;
+
+        cont.appendChild(card);
+    });
+}
+
+async function cargarCatalogo(){
+    try {
+        const resp = await fetch(CSV_URL);
+        if (!resp.ok) throw new Error(`Error al cargar el catálogo: ${resp.status}`);
+        const csv = await resp.text();
+        Papa.parse(csv,{
+            header:false,
+            skipEmptyLines:true,
+            complete:(res)=>{
+                cargarLista(res.data);
+                renderProductos();
+            },
+            error: (err) => {
+                console.error("Error parsing CSV:", err);
+                document.getElementById("mensajeVacio").textContent = "❌ Error al cargar el catálogo. Verifica tu conexión.";
+                document.getElementById("mensajeVacio").style.display = "block";
             }
-            
-            auth.signInWithEmailAndPassword(email, password)
-                .catch(error => {
-                    let message = "Error al iniciar sesión. ";
-                    if (error.code === "auth/invalid-email") {
-                        message += "Correo electrónico inválido.";
-                    } else if (error.code === "auth/wrong-password") {
-                        message += "Contraseña incorrecta.";
-                    } else if (error.code === "auth/user-not-found") {
-                        message += "Usuario no encontrado.";
-                    } else {
-                        message += error.message;
-                    }
-                    alert(message);
-                });
+        });
+    } catch (error) {
+        console.error("Error fetching catalog:", error);
+        document.getElementById("mensajeVacio").textContent = `❌ Error: ${error.message}`;
+        document.getElementById("mensajeVacio").style.display = "block";
+    }
+}
+
+// Buscar
+document.getElementById("buscadorProductos").addEventListener("input", e=>{
+    renderProductos(e.target.value);
+});
+
+// Login
+document.getElementById("btnLogin").addEventListener("click", ()=>{
+    const u = prompt("Usuario:");
+    if(!u) return;
+    const p = prompt("Contraseña:");
+
+    if(u===ADMIN_USER && p===ADMIN_PASS){
+        esAdmin = true;
+        document.getElementById("btnLogout").style.display="inline-block";
+        document.getElementById("btnLogin").style.display="none";
+        alert("✅ Modo administrador activado\n\nPuedes editar los precios base de los productos.");
+        renderProductos(document.getElementById("buscadorProductos").value);
+    } else {
+        alert("❌ Acceso denegado\n\nUsuario o contraseña incorrectos");
+    }
+});
+
+// Logout
+document.getElementById("btnLogout").addEventListener("click", ()=>{
+    esAdmin = false;
+    document.getElementById("btnLogout").style.display="none";
+    document.getElementById("btnLogin").style.display="inline-block";
+    alert("✅ Sesión cerrada");
+    renderProductos(document.getElementById("buscadorProductos").value);
+});
+
+// Guardar precio
+document.getElementById("catalogo").addEventListener("click", e=>{
+    if(e.target.classList.contains("btn-aplicar")){
+        const idx = e.target.dataset.idx;
+        const input = document.querySelector(`.input-precio[data-idx="${idx}"]`);
+        const val = parseFloat(input.value);
+        if(!val || val <= 0){ 
+            alert("❌ Precio inválido. Debe ser un número mayor a 0.");
+            return;
         }
-        
-        // Clean text (remove emojis and trim)
-        function limpiarEmojis(txt) {
-            return txt.replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
-        }
-        
-        // Check if row is a category
-        function esCategoria(row) {
-            const nonEmptyCells = row.filter(cell => (cell || "").trim() !== "");
-            if (nonEmptyCells.length !== 1) return false;
-            
-            const text = nonEmptyCells[0].trim();
-            if (/\d/.test(text)) return false; // Contains numbers
-            if (text.length > 15) return false; // Too long
-            if (text.toUpperCase().includes("TRANSITO")) return false;
-            
-            return true;
-        }
-        
-        // Format price
-        function formatearPrecio(precioStr) {
-            const num = precioStr.replace(/[^0-9]/g, "");
-            if (!num) return "";
-            return "$" + Number(num).toLocaleString("es-DO");
-        }
-        
-        // Load catalog data
-        async function loadCatalog() {
-            try {
-                cont.innerHTML = '<div class="loading">Cargando productos...</div>';
-                
-                // Fetch CSV and Firestore data in parallel
-                const [csvResponse, productsSnapshot] = await Promise.all([
-                    fetch(CSV_URL),
-                    db.collection("products").get()
-                ]);
-                
-                // Process Firestore data
-                productImages = {};
-                productsSnapshot.forEach(doc => {
-                    productImages[doc.id] = doc.data();
-                });
-                
-                // Process CSV data
-                const csvText = await csvResponse.text();
-                const results = Papa.parse(csvText, {
-                    skipEmptyLines: true
-                });
-                
-                // Render catalog
-                renderCatalog(results.data);
-                
-            } catch (error) {
-                console.error("Error loading catalog:", error);
-                cont.innerHTML = `
-                    <div class="status-message status-error">
-                        ❌ Error al cargar el catálogo. Por favor, recarga la página.<br>
-                        <small style="display:block;margin-top:8px">${error.message}</small>
-                    </div>
-                `;
-            }
-        }
-        
-        // Render catalog from CSV data - USANDO ÍNDICE DE FILA COMO ID ESTABLE
-        function renderCatalog(rows) {
-            cont.innerHTML = "";
-            
-            rows.forEach((row, rowIndex) => {
-                const A = (row[0] || "").trim();
-                const C = (row[2] || "").trim(); // Product name/model
-                const D = (row[3] || "").trim(); // Price
-                
-                // Render category row
-                if (esCategoria(row)) {
-                    const categoryText = limpiarEmojis(row.find(cell => (cell || "").trim()) || "");
-                    const catEl = document.createElement("div");
-                    catEl.className = "categoria";
-                    catEl.textContent = categoryText;
-                    cont.appendChild(catEl);
-                    return;
-                }
-                
-                // Skip "TRÁNSITO" items and invalid rows
-                if (D.toUpperCase().includes("TRANSITO") || !C || !D) return;
-                
-                // Clean product name
-                const cleanName = limpiarEmojis(C);
-                
-                // ✅ USAR ÍNDICE DE FILA COMO ID ESTABLE (NUNCA CAMBIA)
-                const productId = `row-${rowIndex}`;
-                
-                // Get product data if exists
-                const productData = productImages[productId] || {};
-                const imageUrl = productData.imageUrl || "";
-                const customPrice = productData.customPrice || D;
-                
-                // Create product element
-                const prodEl = document.createElement("div");
-                prodEl.className = "producto";
-                prodEl.dataset.productId = productId;
-                
-                // Product content
-                let productHTML = `
-                    <div class="producto-content">
-                        <div class="descripcion">${cleanName}</div>
-                        <div class="precio">${formatearPrecio(customPrice)}</div>
-                    </div>
-                `;
-                
-                // Add image if exists
-                if (imageUrl) {
-                    productHTML += `
-                    <div class="producto-img-container">
-                        <img 
-                            src="${imageUrl}" 
-                            alt="${cleanName}" 
-                            class="producto-img"
-                            referrerpolicy="no-referrer"
-                            onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\\'img-error\\'>⚠️ Imagen no disponible</div>'"
-                        >
-                    </div>
-                    `;
-                }
-                
-                // Add admin section if admin
-                if (isAdmin) {
-                    productHTML += `
-                    <div class="admin-section active">
-                        <h4>📸 Imagen del Producto</h4>
-                        <input 
-                            type="text" 
-                            class="admin-input image-url" 
-                            name="image-url" 
-                            placeholder="Pega URL directa de imagen" 
-                            value="${imageUrl}"
-                        >
-                        <div class="admin-actions">
-                            <button class="btn btn-save save-image">💾 Guardar</button>
-                            ${imageUrl ? `<button class="btn btn-delete delete-image">🗑️ Eliminar</button>` : ''}
-                        </div>
-                        <h4 style="margin-top: 15px">💰 Precio Personalizado</h4>
-                        <input 
-                            type="text" 
-                            class="admin-input custom-price" 
-                            name="custom-price" 
-                            placeholder="Precio (ej: 29499)" 
-                            value="${productData.customPrice || ''}"
-                        >
-                        <div class="admin-actions">
-                            <button class="btn btn-save save-price">💾 Guardar Precio</button>
-                            ${productData.customPrice ? `<button class="btn btn-delete delete-price">🗑️ Restaurar Original</button>` : ''}
-                        </div>
-                    </div>
-                    `;
-                }
-                
-                prodEl.innerHTML = productHTML;
-                
-                // Add image click handler if image exists
-                if (imageUrl) {
-                    const imgEl = prodEl.querySelector(".producto-img");
-                    imgEl.onclick = (e) => {
-                        e.stopPropagation();
-                        modalImage.src = imageUrl;
-                        imageModal.classList.add("active");
-                    };
-                }
-                
-                // Add admin event listeners if in admin mode
-                if (isAdmin) {
-                    const saveImageBtn = prodEl.querySelector(".save-image");
-                    const deleteImageBtn = prodEl.querySelector(".delete-image");
-                    const imageUrlInput = prodEl.querySelector(".image-url");
-                    
-                    const savePriceBtn = prodEl.querySelector(".save-price");
-                    const deletePriceBtn = prodEl.querySelector(".delete-price");
-                    const priceInput = prodEl.querySelector(".custom-price");
-                    
-                    // Image handlers
-                    if (saveImageBtn) {
-                        saveImageBtn.onclick = async () => {
-                            const url = imageUrlInput.value.trim();
-                            if (!url) {
-                                alert("Por favor ingresa una URL válida");
-                                return;
-                            }
-                            
-                            // Validate URL format
-                            if (!url.match(/\.(jpeg|jpg|gif|png|webp|bmp|svg)(\?|$)/i) && 
-                                !url.includes('drive.google.com/uc') && 
-                                !url.includes('i.imgur.com') && 
-                                !url.includes('i.ibb.co')) {
-                                if (!confirm("⚠️ La URL no parece ser una imagen válida. ¿Deseas guardarla igual?")) return;
-                            }
-                            
-                            try {
-                                await db.collection("products").doc(productId).set({
-                                    imageUrl: url,
-                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                                }, { merge: true });
-                                
-                                alert(`✅ Imagen guardada para "${cleanName}"`);
-                                loadCatalog();
-                            } catch (error) {
-                                console.error("Error saving image:", error);
-                                alert("Error al guardar la imagen: " + error.message);
-                            }
-                        };
-                    }
-                    
-                    if (deleteImageBtn) {
-                        deleteImageBtn.onclick = async () => {
-                            if (!confirm(`¿Eliminar la imagen de "${cleanName}"?`)) return;
-                            
-                            try {
-                                await db.collection("products").doc(productId).update({
-                                    imageUrl: firebase.firestore.FieldValue.delete(),
-                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                                });
-                                
-                                alert(`✅ Imagen eliminada para "${cleanName}"`);
-                                loadCatalog();
-                            } catch (error) {
-                                console.error("Error deleting image:", error);
-                                alert("Error al eliminar la imagen: " + error.message);
-                            }
-                        };
-                    }
-                    
-                    // Price handlers
-                    if (savePriceBtn) {
-                        savePriceBtn.onclick = async () => {
-                            const price = priceInput.value.trim();
-                            if (!price) {
-                                alert("Por favor ingresa un precio válido");
-                                return;
-                            }
-                            
-                            // Validate price format
-                            if (!/^\d+$/.test(price.replace(/[^0-9]/g, ""))) {
-                                alert("El precio debe contener solo números");
-                                return;
-                            }
-                            
-                            try {
-                                await db.collection("products").doc(productId).set({
-                                    customPrice: price,
-                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                                }, { merge: true });
-                                
-                                alert(`✅ Precio guardado para "${cleanName}"`);
-                                loadCatalog();
-                            } catch (error) {
-                                console.error("Error saving price:", error);
-                                alert("Error al guardar el precio: " + error.message);
-                            }
-                        };
-                    }
-                    
-                    if (deletePriceBtn) {
-                        deletePriceBtn.onclick = async () => {
-                            if (!confirm(`¿Restaurar el precio original de "${cleanName}"?`)) return;
-                            
-                            try {
-                                await db.collection("products").doc(productId).update({
-                                    customPrice: firebase.firestore.FieldValue.delete(),
-                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                                });
-                                
-                                alert(`✅ Precio restaurado para "${cleanName}"`);
-                                loadCatalog();
-                            } catch (error) {
-                                console.error("Error deleting price:", error);
-                                alert("Error al restaurar el precio: " + error.message);
-                            }
-                        };
-                    }
-                }
-                
-                cont.appendChild(prodEl);
-            });
-        }
-        
-        // Initialize the app when page loads
-        window.addEventListener("DOMContentLoaded", init);
-    </script>
+        productos[idx].basePrecio = val;
+        // Mostrar confirmación visual
+        e.target.textContent = "✅ Guardado";
+        e.target.style.background = "linear-gradient(135deg, var(--success), #00aa30)";
+        setTimeout(() => {
+            e.target.textContent = "✅ Aplicar";
+            e.target.style.background = "";
+        }, 1500);
+        renderProductos(document.getElementById("buscadorProductos").value);
+    }
+});
+
+// Cargar catálogo al iniciar
+window.addEventListener("DOMContentLoaded", cargarCatalogo);
+</script>
+
 </body>
 </html>
 
-
-
-              <script>
-                              // ✅ USAR ÍNDICE DE FILA COMO ID ESTABLE (NUNCA CAMBIA)
-const productId = `row-${rowIndex}`;
-
-
-              </script>
-                        </body>
-                        </html>
-                    
