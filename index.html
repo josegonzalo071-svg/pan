@@ -1,4 +1,19 @@
-<!DOCTYPE html>
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                body {
+                  background-color: white; /* Ensure the iframe has a white background */
+                }
+
+                
+              </style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -264,18 +279,6 @@
             box-shadow: 0 0 15px rgba(255, 75, 106, 0.4);
         }
         
-        .btn-test {
-            flex: 1;
-            min-width: 100px;
-            background: linear-gradient(90deg, #4da6ff, #0077ff);
-            color: white;
-        }
-        
-        .btn-test:hover {
-            background: linear-gradient(90deg, #5db5ff, #0088ff);
-            box-shadow: 0 0 15px rgba(77, 166, 255, 0.4);
-        }
-        
         .modal {
             position: fixed;
             inset: 0;
@@ -448,15 +451,6 @@
             font-size: 0.9rem;
         }
         
-        .drive-instructions ol {
-            margin-left: 20px;
-            margin-top: 8px;
-        }
-        
-        .drive-instructions li {
-            margin-bottom: 5px;
-        }
-        
         footer {
             text-align: center;
             padding: 25px;
@@ -495,7 +489,7 @@
             .admin-section {
                 margin-top: 0;
                 margin-left: 20px;
-                width: 320px;
+                width: 300px;
                 flex-shrink: 0;
             }
         }
@@ -572,14 +566,12 @@
             <input type="password" id="adminPassword" name="password" class="login-input" placeholder="Contraseña" autocomplete="current-password" required>
             <button id="submitLogin" class="btn btn-login">Iniciar Sesión</button>
             <div class="drive-instructions" style="margin-top: 20px; background: rgba(40, 30, 20, 0.7); border-left-color: #ffb703;">
-                <strong>ℹ️ Instrucciones para imágenes de Imgur:</strong>
-                <ol>
-                    <li>Ve a <a href="https://imgur.com/upload" target="_blank" style="color:#4da6ff">imgur.com/upload</a></li>
-                    <li>Sube tu imagen</li>
-                    <li>Haz clic derecho en la imagen → "Copiar dirección de la imagen"</li>
-                    <li>Pega el enlace directo (termina en .jpg, .png, etc.)</li>
-                    <li>Si es un álbum, usa el formato: <code>https://i.imgur.com/ID.jpg</code></li>
-                </ol>
+                <strong>ℹ️ Instrucciones para imágenes:</strong>
+                <p style="margin-top:8px">Pega el link directo de Imgur, ImgBB o Google Drive</p>
+                <p style="margin-top:8px;font-size:0.85rem">
+                    <strong>Ejemplo ImgBB:</strong><br>
+                    <code>https://i.ibb.co/XXXX/tu-imagen.jpg</code>
+                </p>
             </div>
         </div>
     </div>
@@ -594,7 +586,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
-    <!-- PapaParse for CSV parsing -->
+    <!-- PapaParse -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     
     <script>
@@ -628,39 +620,6 @@
         
         let isAdmin = false;
         let productImages = {};
-        let sheetData = [];
-        
-        // ✅ FUNCIÓN CORREGIDA: Convertir URLs de Imgur
-        function convertImgurUrl(url) {
-            if (!url) return url;
-            
-            // Si ya es un enlace directo, devolver tal cual
-            if (url.includes('i.imgur.com')) {
-                return url;
-            }
-            
-            // Convertir álbumes a enlaces directos
-            if (url.includes('imgur.com/a/') || url.includes('imgur.com/gallery/')) {
-                // Extraer el ID del álbum
-                const match = url.match(/\/(a|gallery)\/([^\/?]+)/);
-                if (match && match[2]) {
-                    // Devolver enlace directo a la primera imagen
-                    return `https://i.imgur.com/${match[2]}.jpg`;
-                }
-            }
-            
-            // Para otros enlaces de imgur.com, intentar convertir a directo
-            if (url.includes('imgur.com') && !url.includes('i.imgur.com')) {
-                // Extraer el ID de la imagen (última parte del path)
-                const parts = url.split('/');
-                const id = parts[parts.length - 1].split('?')[0].split('#')[0];
-                if (id) {
-                    return `https://i.imgur.com/${id}.jpg`;
-                }
-            }
-            
-            return url;
-        }
         
         // Initialize the application
         function init() {
@@ -715,7 +674,7 @@
                         message += "Usuario no encontrado.";
                     } else {
                         message += error.message;
- }
+                    }
                     alert(message);
                 });
         }
@@ -723,15 +682,6 @@
         // Clean text (remove emojis and trim)
         function limpiarEmojis(txt) {
             return txt.replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
-        }
-        
-        // Generate product ID from name
-        function generateProductId(name) {
-            return limpiarEmojis(name)
-                .toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/(^-|-$)/g, "");
         }
         
         // Check if row is a category
@@ -765,19 +715,10 @@
                     db.collection("products").get()
                 ]);
                 
-                // Process Firestore data - ✅ CONVERTIR URLs al cargar
+                // Process Firestore data
                 productImages = {};
                 productsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.imageUrl) {
-                        // Convertir URL de Imgur si es necesario
-                        productImages[doc.id] = {
-                            ...data,
-                            imageUrl: convertImgurUrl(data.imageUrl)
-                        };
-                    } else {
-                        productImages[doc.id] = data;
-                    }
+                    productImages[doc.id] = doc.data();
                 });
                 
                 // Process CSV data
@@ -786,10 +727,8 @@
                     skipEmptyLines: true
                 });
                 
-                sheetData = results.data;
-                
                 // Render catalog
-                renderCatalog();
+                renderCatalog(results.data);
                 
             } catch (error) {
                 console.error("Error loading catalog:", error);
@@ -802,11 +741,11 @@
             }
         }
         
-        // Render catalog from CSV data
-        function renderCatalog() {
+        // Render catalog from CSV data - USANDO ÍNDICE DE FILA COMO ID ESTABLE
+        function renderCatalog(rows) {
             cont.innerHTML = "";
             
-            sheetData.forEach((row, index) => {
+            rows.forEach((row, rowIndex) => {
                 const A = (row[0] || "").trim();
                 const C = (row[2] || "").trim(); // Product name/model
                 const D = (row[3] || "").trim(); // Price
@@ -824,20 +763,21 @@
                 // Skip "TRÁNSITO" items and invalid rows
                 if (D.toUpperCase().includes("TRANSITO") || !C || !D) return;
                 
-                // Clean product name and generate ID
+                // Clean product name
                 const cleanName = limpiarEmojis(C);
-                const productId = generateProductId(cleanName);
                 
-                // Get product data if exists - ✅ USAR URL CONVERTIDA
+                // ✅ USAR ÍNDICE DE FILA COMO ID ESTABLE (NUNCA CAMBIA)
+                const productId = `row-${rowIndex}`;
+                
+                // Get product data if exists
                 const productData = productImages[productId] || {};
-                const imageUrl = productData.imageUrl ? convertImgurUrl(productData.imageUrl) : "";
+                const imageUrl = productData.imageUrl || "";
                 const customPrice = productData.customPrice || D;
                 
                 // Create product element
                 const prodEl = document.createElement("div");
                 prodEl.className = "producto";
                 prodEl.dataset.productId = productId;
-                prodEl.dataset.rowIndex = index;
                 
                 // Product content
                 let productHTML = `
@@ -847,7 +787,7 @@
                     </div>
                 `;
                 
-                // Add image if exists - ✅ CON referrerpolicy y manejo de errores
+                // Add image if exists
                 if (imageUrl) {
                     productHTML += `
                     <div class="producto-img-container">
@@ -856,7 +796,7 @@
                             alt="${cleanName}" 
                             class="producto-img"
                             referrerpolicy="no-referrer"
-                            onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\\'img-error\\'>⚠️ Imagen no disponible<br>Verifica URL y permisos en Imgur</div>'"
+                            onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\\'img-error\\'>⚠️ Imagen no disponible</div>'"
                         >
                     </div>
                     `;
@@ -871,22 +811,12 @@
                             type="text" 
                             class="admin-input image-url" 
                             name="image-url" 
-                            placeholder="Pega URL de Imgur (formato i.imgur.com/ID.jpg)" 
+                            placeholder="Pega URL directa de imagen" 
                             value="${imageUrl}"
                         >
                         <div class="admin-actions">
                             <button class="btn btn-save save-image">💾 Guardar</button>
                             ${imageUrl ? `<button class="btn btn-delete delete-image">🗑️ Eliminar</button>` : ''}
-                            <button class="btn btn-test test-image">👁️ Probar URL</button>
-                        </div>
-                        <div class="drive-instructions">
-                            <strong>Formato CORRECTO para Imgur:</strong>
-                            <ol>
-                                <li>Sube imagen a <a href="https://imgur.com/upload" target="_blank" style="color:#4da6ff">imgur.com/upload</a></li>
-                                <li>Haz clic derecho → "Copiar dirección de la imagen"</li>
-                                <li>Pega el enlace directo (termina en .jpg, .png, etc.)</li>
-                                <li>Para álbumes: <code>https://i.imgur.com/ID.jpg</code></li>
-                            </ol>
                         </div>
                         <h4 style="margin-top: 15px">💰 Precio Personalizado</h4>
                         <input 
@@ -920,27 +850,26 @@
                 if (isAdmin) {
                     const saveImageBtn = prodEl.querySelector(".save-image");
                     const deleteImageBtn = prodEl.querySelector(".delete-image");
-                    const testImageBtn = prodEl.querySelector(".test-image");
                     const imageUrlInput = prodEl.querySelector(".image-url");
                     
                     const savePriceBtn = prodEl.querySelector(".save-price");
                     const deletePriceBtn = prodEl.querySelector(".delete-price");
                     const priceInput = prodEl.querySelector(".custom-price");
                     
-                    // Image handlers - ✅ CONVERTIR URL ANTES DE GUARDAR
+                    // Image handlers
                     if (saveImageBtn) {
                         saveImageBtn.onclick = async () => {
-                            let url = imageUrlInput.value.trim();
+                            const url = imageUrlInput.value.trim();
                             if (!url) {
                                 alert("Por favor ingresa una URL válida");
                                 return;
                             }
                             
-                            // ✅ CONVERTIR URL DE IMGUR AUTOMÁTICAMENTE
-                            url = convertImgurUrl(url);
-                            
-                            // Validar que sea una URL de imagen
-                            if (!url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)$/i) && !url.includes('i.imgur.com')) {
+                            // Validate URL format
+                            if (!url.match(/\.(jpeg|jpg|gif|png|webp|bmp|svg)(\?|$)/i) && 
+                                !url.includes('drive.google.com/uc') && 
+                                !url.includes('i.imgur.com') && 
+                                !url.includes('i.ibb.co')) {
                                 if (!confirm("⚠️ La URL no parece ser una imagen válida. ¿Deseas guardarla igual?")) return;
                             }
                             
@@ -950,7 +879,7 @@
                                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                                 }, { merge: true });
                                 
-                                showStatus(`✅ Imagen guardada para "${cleanName}"`, true);
+                                alert(`✅ Imagen guardada para "${cleanName}"`);
                                 loadCatalog();
                             } catch (error) {
                                 console.error("Error saving image:", error);
@@ -969,29 +898,12 @@
                                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                                 });
                                 
-                                showStatus(`✅ Imagen eliminada para "${cleanName}"`, true);
+                                alert(`✅ Imagen eliminada para "${cleanName}"`);
                                 loadCatalog();
                             } catch (error) {
                                 console.error("Error deleting image:", error);
                                 alert("Error al eliminar la imagen: " + error.message);
                             }
-                        };
-                    }
-                    
-                    // ✅ NUEVO: Botón para probar la URL en una nueva pestaña
-                    if (testImageBtn) {
-                        testImageBtn.onclick = () => {
-                            let url = imageUrlInput.value.trim();
-                            if (!url) {
-                                alert("Ingresa una URL primero");
-                                return;
-                            }
-                            
-                            // Convertir URL para prueba
-                            url = convertImgurUrl(url);
-                            
-                            // Abrir en nueva pestaña
-                            window.open(url, '_blank');
                         };
                     }
                     
@@ -1016,7 +928,7 @@
                                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                                 }, { merge: true });
                                 
-                                showStatus(`✅ Precio guardado para "${cleanName}"`, true);
+                                alert(`✅ Precio guardado para "${cleanName}"`);
                                 loadCatalog();
                             } catch (error) {
                                 console.error("Error saving price:", error);
@@ -1035,7 +947,7 @@
                                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                                 });
                                 
-                                showStatus(`✅ Precio restaurado para "${cleanName}"`, true);
+                                alert(`✅ Precio restaurado para "${cleanName}"`);
                                 loadCatalog();
                             } catch (error) {
                                 console.error("Error deleting price:", error);
@@ -1049,27 +961,20 @@
             });
         }
         
-        // Show status message
-        function showStatus(message, isSuccess) {
-            // Remove existing messages
-            const existing = document.querySelector(".status-message");
-            if (existing) existing.remove();
-            
-            // Create new message
-            const msg = document.createElement("div");
-            msg.className = `status-message ${isSuccess ? 'status-success' : 'status-error'}`;
-            msg.innerHTML = message;
-            cont.insertBefore(msg, cont.firstChild);
-            
-            // Auto-hide after 3 seconds
-            setTimeout(() => {
-                if (msg.parentNode) msg.parentNode.removeChild(msg);
-            }, 3000);
-        }
-        
         // Initialize the app when page loads
         window.addEventListener("DOMContentLoaded", init);
     </script>
 </body>
 </html>
 
+
+
+              <script>
+                              // ✅ USAR ÍNDICE DE FILA COMO ID ESTABLE (NUNCA CAMBIA)
+const productId = `row-${rowIndex}`;
+
+
+              </script>
+                        </body>
+                        </html>
+                    
