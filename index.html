@@ -114,13 +114,13 @@ button{
 }
 
 .categoria{
-    margin:26px 0 10px;
-    padding:12px 16px;
-    background:linear-gradient(135deg,rgba(0,194,255,.35),rgba(0,194,255,.1));
-    border-left:5px solid var(--accent);
-    border-radius:12px;
-    font-weight:800;
-    letter-spacing:.14em;
+    margin:28px 0 10px;
+    padding:14px 18px;
+    background:linear-gradient(135deg,rgba(0,194,255,.4),rgba(0,194,255,.1));
+    border-left:6px solid var(--accent);
+    border-radius:14px;
+    font-weight:900;
+    letter-spacing:.16em;
     text-transform:uppercase;
     color:var(--accent);
 }
@@ -158,16 +158,6 @@ button{
     text-shadow:0 0 6px rgba(255,193,75,.45);
 }
 
-.editor-precio{
-    margin-top:6px;
-    display:flex;
-    gap:6px;
-}
-
-.editor-precio input{
-    width:90px;
-}
-
 #mensajeVacio{
     text-align:center;
     color:var(--muted);
@@ -193,12 +183,6 @@ button{
         <div class="panel-title">Buscar artículos</div>
         <input id="buscadorProductos" placeholder="Buscar producto…">
     </div>
-
-    <div class="panel">
-        <div class="panel-title">Acceso</div>
-        <button id="btnLogin">Entrar</button>
-        <button id="btnLogout" style="display:none;">Salir</button>
-    </div>
 </div>
 
 <div class="catalogo-wrapper">
@@ -209,18 +193,21 @@ button{
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <script>
-const ADMIN_USER = "TELEFONO";
-const ADMIN_PASS = "1234";
 const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 
-const CATEGORIA_REGEX = /^[A-Z0-9\- \/]+$/;
-
 let productos = [];
-let esAdmin = false;
 
 function formatearPrecio(n){
     return "$" + n.toLocaleString("es-DO");
+}
+
+// 🔥 DETECTOR REAL DE CATEGORÍAS
+function esCategoria(descripcion, precio){
+    if(!descripcion) return false;
+    if(precio && /\d/.test(precio)) return false; // si tiene números, no es categoría
+    if(descripcion.length > 30) return false;     // muy largo = producto
+    return descripcion === descripcion.toUpperCase();
 }
 
 function cargarLista(data){
@@ -228,17 +215,22 @@ function cargarLista(data){
 
     data.forEach(fila=>{
         const desc = (fila[2]||"").trim();
-        const precio = (fila[3]||"").trim();
+        const precioRaw = (fila[3]||"").trim();
 
         if(!desc) return;
 
-        if(!precio && CATEGORIA_REGEX.test(desc)){
-            productos.push({tipo:"categoria", descripcion:desc});
+        // 🔵 FILA TIPO (ANTES AZUL)
+        if(esCategoria(desc, precioRaw)){
+            productos.push({
+                tipo:"categoria",
+                descripcion:desc
+            });
             return;
         }
 
-        let esTransito = precio.toUpperCase().includes("TRANSITO");
-        let base = esTransito ? null : parseFloat(precio.replace(/\D/g,"")) || null;
+        // 🟢 PRODUCTO NORMAL
+        let esTransito = precioRaw.toUpperCase().includes("TRANSITO");
+        let base = esTransito ? null : parseFloat(precioRaw.replace(/\D/g,"")) || null;
 
         productos.push({
             tipo:"producto",
@@ -259,7 +251,7 @@ function renderProductos(filtro=""){
 
     vacio.style.display = lista.length ? "none" : "block";
 
-    lista.forEach((p,idx)=>{
+    lista.forEach(p=>{
         if(p.tipo==="categoria"){
             const d=document.createElement("div");
             d.className="categoria";
@@ -280,11 +272,6 @@ function renderProductos(filtro=""){
             <div class="descripcion">${p.descripcion}</div>
             <div class="producto-right">
                 <div class="precio ${clase}">${texto}</div>
-                ${esAdmin && !p.esTransito ? `
-                <div class="editor-precio">
-                    <input type="number" value="${p.basePrecio||""}" data-idx="${idx}">
-                    <button class="btn-aplicar" data-idx="${idx}">OK</button>
-                </div>` : ""}
             </div>`;
         cont.appendChild(card);
     });
@@ -293,46 +280,20 @@ function renderProductos(filtro=""){
 async function cargarCatalogo(){
     const r=await fetch(CSV_URL);
     const t=await r.text();
-    Papa.parse(t,{complete:r=>{
-        cargarLista(r.data);
-        renderProductos();
-    }});
+    Papa.parse(t,{
+        skipEmptyLines:true,
+        complete:r=>{
+            cargarLista(r.data);
+            renderProductos();
+        }
+    });
 }
 
 document.getElementById("buscadorProductos")
 .addEventListener("input",e=>renderProductos(e.target.value));
-
-document.getElementById("btnLogin").onclick=()=>{
-    const u=prompt("Usuario");
-    const p=prompt("Contraseña");
-    if(u===ADMIN_USER && p===ADMIN_PASS){
-        esAdmin=true;
-        btnLogout.style.display="inline-block";
-        alert("Modo edición activado");
-        renderProductos(buscadorProductos.value);
-    }
-};
-
-document.getElementById("btnLogout").onclick=()=>{
-    esAdmin=false;
-    btnLogout.style.display="none";
-    renderProductos(buscadorProductos.value);
-};
-
-document.getElementById("catalogo").addEventListener("click",e=>{
-    if(e.target.classList.contains("btn-aplicar")){
-        const i=e.target.dataset.idx;
-        const v=parseFloat(e.target.previousElementSibling.value);
-        if(v){
-            productos[i].basePrecio=v;
-            renderProductos(buscadorProductos.value);
-        }
-    }
-});
 
 cargarCatalogo();
 </script>
 
 </body>
 </html>
-
