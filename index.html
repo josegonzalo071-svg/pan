@@ -22,12 +22,12 @@ header{
     padding:0 16px;
 }
 .categoria{
-    margin:26px 0 14px;
+    margin:28px 0 16px;
     padding:14px 18px;
-    background:rgba(0,194,255,.25);
+    background:rgba(0,194,255,.22);
     border-left:6px solid #00c2ff;
     font-weight:800;
-    letter-spacing:.18em;
+    letter-spacing:.15em;
     text-transform:uppercase;
 }
 .producto{
@@ -66,20 +66,8 @@ const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 const cont = document.getElementById("catalogo");
 
-function soloUnaColumnaConTexto(row){
-    return row.filter(c => (c||"").trim()).length === 1;
-}
-
-function esCategoria(row){
-    if(!soloUnaColumnaConTexto(row)) return false;
-
-    const texto = row.find(c => (c||"").trim()).trim();
-
-    if(/\d/.test(texto)) return false;
-    if(texto.length > 15) return false;
-    if(texto.toUpperCase().includes("TRANSITO")) return false;
-
-    return true;
+function tienePrecioNumerico(txt){
+    return /\d/.test(txt);
 }
 
 function formatearPrecio(n){
@@ -92,40 +80,46 @@ fetch(CSV_URL)
     Papa.parse(csv,{
         skipEmptyLines:true,
         complete:(res)=>{
+            const rows = res.data;
             cont.innerHTML = "";
 
-            res.data.forEach(row=>{
-                const A = (row[0]||"").trim();
-                const B = (row[1]||"").trim();
-                const C = (row[2]||"").trim();
-                const D = (row[3]||"").trim();
+            rows.forEach((row, i)=>{
+                const modelo = (row[2]||"").trim();
+                const precio = (row[3]||"").trim();
 
-                // 🔵 CATEGORÍA (celda combinada en CSV)
-                if(esCategoria(row)){
-                    const texto = row.find(c => (c||"").trim()).trim();
+                if(!modelo) return;
+
+                const siguiente = rows[i+1] || [];
+                const nextModelo = (siguiente[2]||"").trim();
+                const nextPrecio = (siguiente[3]||"").trim();
+
+                const siguienteEsProducto =
+                    nextModelo &&
+                    (tienePrecioNumerico(nextPrecio) || nextPrecio.toUpperCase().includes("TRANSITO"));
+
+                // 🔵 CATEGORÍA CONTEXTUAL
+                if(!precio && siguienteEsProducto){
                     const cat = document.createElement("div");
                     cat.className = "categoria";
-                    cat.textContent = texto;
+                    cat.textContent = modelo;
                     cont.appendChild(cat);
                     return;
                 }
 
-                // 🚫 TRÁNSITO
-                if(D.toUpperCase().includes("TRANSITO")) return;
+                // 🚫 TRANSITO NO SE MUESTRA
+                if(precio.toUpperCase().includes("TRANSITO")) return;
 
-                // 🟢 PRODUCTO
-                if(!C || !D) return;
-
-                const num = D.replace(/[^0-9]/g,"");
-                if(!num) return;
-
-                const prod = document.createElement("div");
-                prod.className = "producto";
-                prod.innerHTML = `
-                    <div class="descripcion">${A ? A + " " : ""}${C}</div>
-                    <div class="precio">${formatearPrecio(num)}</div>
-                `;
-                cont.appendChild(prod);
+                // 🟢 PRODUCTO CON PRECIO
+                if(tienePrecioNumerico(precio)){
+                    const num = precio.replace(/[^0-9]/g,"");
+                    const prod = document.createElement("div");
+                    prod.className = "producto";
+                    prod.innerHTML = `
+                        <div class="descripcion">${modelo}</div>
+                        <div class="precio">${formatearPrecio(num)}</div>
+                    `;
+                    cont.appendChild(prod);
+                }
             });
         }
     });
