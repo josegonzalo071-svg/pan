@@ -4,141 +4,262 @@
 <meta charset="UTF-8">
 <title>Trifusion Technologies — Catálogo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
-body{
-    margin:0;
-    font-family:system-ui, Arial, sans-serif;
-    background:#0b0f19;
-    color:#e6ecff;
+body{margin:0;font-family:system-ui;background:#0b0f19;color:#e6ecff}
+header{background:#000;padding:16px;display:flex;justify-content:space-between;align-items:center}
+.catalogo{max-width:1100px;margin:20px auto;padding:0 16px}
+.categoria{margin:24px 0 10px;padding:12px;background:#00394d;font-weight:800;text-transform:uppercase;border-left:4px solid #00c2ff}
+.producto{background:#101624;border-radius:10px;padding:15px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px}
+@media (min-width:768px){
+.producto{flex-direction:row;align-items:center}
+.descripcion{flex:1}
 }
-header{
-    padding:18px;
-    background:#000;
-}
-.catalogo{
-    max-width:1100px;
-    margin:30px auto;
-    padding:0 16px;
-}
-.categoria{
-    margin:26px 0 14px;
-    padding:14px 18px;
-    background:rgba(0,194,255,.25);
-    border-left:6px solid #00c2ff;
-    font-weight:800;
-    letter-spacing:.18em;
-    text-transform:uppercase;
-}
-.producto{
-    background:#101624;
-    border:1px solid #1f2940;
-    border-radius:12px;
-    padding:14px;
-    margin-bottom:10px;
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-}
-.descripcion{
-    color:#00c2ff;
-    font-weight:600;
-}
-.precio{
-    color:#ff4b6a;
-    font-weight:700;
-    white-space:nowrap;
-}
+.descripcion{color:#00c2ff;font-weight:600;font-size:1.1rem}
+.precio{color:#ff4b6a;font-weight:800;font-size:1.3rem;white-space:nowrap}
+.btn{border:none;padding:8px 15px;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.95rem}
+.admin-btn{background:#ffb703;color:#000;box-shadow:0 2px 5px rgba(0,0,0,0.3)}
+.img-btn{background:#00c2ff;color:#000}
+.modal,.login{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal img{max-width:90%;max-height:85vh;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+.login-box{background:#101624;padding:25px;border-radius:15px;width:90%;max-width:400px;box-shadow:0 5px 25px rgba(0,0,0,0.4)}
+.login-box input{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:1px solid #1f2940;background:#0a0e17;color:white;font-size:1rem}
+.login-box h3{margin-top:0;color:#00c2ff;text-align:center}
+.status{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:8px;font-weight:700;z-index:2000;animation:slideIn 0.3s, fadeOut 0.5s 2.5s forwards}
+@keyframes slideIn{from{transform:translateX(150%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeOut{to{opacity:0;transform:translateX(150%)}}
+.success{background:#00c853;color:white}
+.error{background:#ff5252;color:white}
+img.product-image{max-width:100%;max-height:150px;object-fit:contain;border-radius:8px;margin:8px 0;background:#020617;border:1px solid #1f2940}
+.admin-section{background:rgba(30,25,50,0.7);padding:12px;border-radius:8px;margin-top:10px;border:1px solid #4a3b8c}
 </style>
 </head>
-
 <body>
-
 <header>
-    <h1>Trifusion Technologies</h1>
+<h2 style="margin:0;font-weight:800;background:linear-gradient(90deg,#00c2ff,#7b3fe4);-webkit-background-clip:text;background-clip:text;color:transparent">Trifusion Technologies</h2>
+<button id="adminBtn" class="btn admin-btn">🔐 ADMIN</button>
 </header>
-
 <div id="catalogo" class="catalogo"></div>
+<div id="status"></div>
 
+<!-- MODALES -->
+<div id="imgModal" class="modal" onclick="this.style.display='none'">
+<img id="imgView" style="max-width:90%;max-height:90vh">
+</div>
+
+<div id="login" class="login">
+<div class="login-box">
+<h3>🔐 Acceso de Administrador</h3>
+<input id="email" placeholder="Correo electrónico" autocomplete="email">
+<input id="password" type="password" placeholder="Contraseña" autocomplete="current-password">
+<button class="btn admin-btn" style="margin-top:15px;width:100%;padding:12px;font-size:1.1rem" onclick="login()">Iniciar Sesión</button>
+<p style="margin-top:15px;font-size:0.85rem;color:#888;text-align:center">Solo administradores autorizados</p>
+</div>
+</div>
+
+<!-- LIBRERÍAS -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
 <script>
+// CONFIGURACIÓN
 const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 const cont = document.getElementById("catalogo");
+const statusDiv = document.getElementById("status");
+let isAdmin = false;
+let productImages = {};
 
-// elimina emojis SOLO para mostrar
-function limpiarEmojis(txt){
-    return txt.replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
+// CONVERTIR LINKS DE GOOGLE DRIVE AUTOMÁTICAMENTE
+function convertDriveUrl(url) {
+if (!url) return url;
+// Detectar link de Google Drive y convertir
+if (url.includes('drive.google.com') && url.includes('/file/d/')) {
+const match = url.match(/\/d\/([^\/?]+)/);
+if (match && match[1]) {
+return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+}
+}
+// También convertir links con /open?id=
+if (url.includes('drive.google.com') && url.includes('open?id=')) {
+const match = url.match(/open\?id=([^&]+)/);
+if (match && match[1]) {
+return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+}
+}
+return url;
 }
 
-function soloUnaColumnaConTexto(row){
-    return row.filter(c => (c||"").trim()).length === 1;
+// MOSTRAR MENSAJES
+function showStatus(message, isSuccess) {
+statusDiv.textContent = message;
+statusDiv.className = isSuccess ? 'status success' : 'status error';
+setTimeout(() => statusDiv.className = '', 3000);
 }
 
-function esCategoria(row){
-    if(!soloUnaColumnaConTexto(row)) return false;
-
-    const texto = row.find(c => (c||"").trim()).trim();
-
-    if(/\d/.test(texto)) return false;
-    if(texto.length > 15) return false;
-    if(texto.toUpperCase().includes("TRANSITO")) return false;
-
-    return true;
+// AUTENTICACIÓN
+document.getElementById("adminBtn").onclick = () => login.style.display = "flex";
+function login() {
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value.trim();
+if (!email || !password) return showStatus("Completa ambos campos", false);
+auth.signInWithEmailAndPassword(email, password)
+.then(() => login.style.display = "none")
+.catch(e => showStatus("Error: " + (e.message.includes("password") ? "Contraseña incorrecta" : "Usuario no encontrado"), false));
 }
-
-function formatearPrecio(n){
-    return "$" + Number(n).toLocaleString("es-DO");
+auth.onAuthStateChanged(user => {
+isAdmin = !!user;
+document.getElementById("adminBtn").textContent = isAdmin ? "👋 SALIR" : "🔐 ADMIN";
+if (isAdmin) {
+document.getElementById("adminBtn").onclick = () => auth.signOut();
+login.style.display = "none";
+} else {
+document.getElementById("adminBtn").onclick = () => login.style.display = "flex";
 }
-
-fetch(CSV_URL)
-.then(r=>r.text())
-.then(csv=>{
-    Papa.parse(csv,{
-        skipEmptyLines:true,
-        complete:(res)=>{
-            cont.innerHTML = "";
-
-            res.data.forEach(row=>{
-                const A = (row[0]||"").trim();
-                const C = (row[2]||"").trim();
-                const D = (row[3]||"").trim();
-
-                // 🔵 CATEGORÍA
-                if(esCategoria(row)){
-                    const texto = limpiarEmojis(
-                        row.find(c => (c||"").trim()).trim()
-                    );
-                    const cat = document.createElement("div");
-                    cat.className = "categoria";
-                    cat.textContent = texto;
-                    cont.appendChild(cat);
-                    return;
-                }
-
-                // 🚫 TRÁNSITO
-                if(D.toUpperCase().includes("TRANSITO")) return;
-
-                // 🟢 PRODUCTO
-                if(!C || !D) return;
-
-                const num = D.replace(/[^0-9]/g,"");
-                if(!num) return;
-
-                const prod = document.createElement("div");
-                prod.className = "producto";
-                prod.innerHTML = `
-                    <div class="descripcion">
-                        ${limpiarEmojis(A ? A + " " : "")}${C}
-                    </div>
-                    <div class="precio">${formatearPrecio(num)}</div>
-                `;
-                cont.appendChild(prod);
-            });
-        }
-    });
+cargarCatalogo();
 });
-</script>
 
+// FUNCIONES AUXILIARES
+const limpiar = t => t.replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
+const generarId = t => limpiar(t).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const formatearPrecio = n => "$" + Number(n).toLocaleString("es-DO");
+
+// CARGAR IMÁGENES DE FIRESTORE
+async function cargarImagenes() {
+try {
+const snapshot = await db.collection("products").get();
+productImages = {};
+snapshot.forEach(doc => {
+const data = doc.data();
+if (data.imageUrl) {
+// Convertir URL si es de Drive
+productImages[doc.id] = convertDriveUrl(data.imageUrl);
+}
+});
+} catch (e) {
+console.error("Error cargando imágenes:", e);
+}
+}
+
+// CARGAR CATÁLOGO
+async function cargarCatalogo() {
+try {
+await cargarImagenes();
+const res = await fetch(CSV_URL);
+const csv = await res.text();
+cont.innerHTML = '<div style="text-align:center;padding:30px;color:#00c2ff">Cargando productos...</div>';
+Papa.parse(csv, {
+skipEmptyLines: true,
+complete: (results) => {
+cont.innerHTML = "";
+results.data.forEach(row => {
+const A = (row[0] || "").trim();
+const C = (row[2] || "").trim(); // Nombre
+const D = (row[3] || "").trim(); // Precio
+
+// Categoría
+if (row.filter(c => (c || "").trim()).length === 1 && !/\d/.test(row.join("")) && row.join("").length < 16) {
+const cat = document.createElement("div");
+cat.className = "categoria";
+cat.textContent = limpiar(row.join(""));
+cont.appendChild(cat);
+return;
+}
+
+// Saltar TRÁNSITO o filas inválidas
+if (!C || !D || D.toUpperCase().includes("TRANSITO")) return;
+const num = D.replace(/\D/g, "");
+if (!num) return;
+
+const nombreLimpio = limpiar(A ? A + " " : "") + C;
+const id = generarId(nombreLimpio);
+const imgUrl = productImages[id] || "";
+
+// Crear producto
+const prod = document.createElement("div");
+prod.className = "producto";
+prod.innerHTML = `
+<div class="descripcion">${nombreLimpio}</div>
+${imgUrl ? `<img src="${imgUrl}" class="product-image" onclick="verImagen('${imgUrl}')" title="Ver imagen">` : ''}
+<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+<div class="precio">${formatearPrecio(num)}</div>
+${isAdmin ? `
+<div class="admin-section">
+<input type="text" class="image-input" placeholder="Pega link de imagen (Drive, Imgur, etc.)" value="${imgUrl}">
+<div style="display:flex;gap:8px;margin-top:8px">
+<button class="btn img-btn save-btn" data-id="${id}">💾 Guardar</button>
+${imgUrl ? `<button class="btn admin-btn del-btn" data-id="${id}">🗑️ Eliminar</button>` : ''}
+</div>
+</div>
+` : ''}
+</div>
+`;
+cont.appendChild(prod);
+
+// Eventos admin
+if (isAdmin) {
+const saveBtn = prod.querySelector(".save-btn");
+const delBtn = prod.querySelector(".del-btn");
+const input = prod.querySelector(".image-input");
+
+if (saveBtn) {
+saveBtn.onclick = async () => {
+let url = input.value.trim();
+if (!url) return showStatus("Ingresa un link válido", false);
+// Convertir automáticamente si es Drive
+url = convertDriveUrl(url);
+try {
+await db.collection("products").doc(id).set({
+imageUrl: url,
+updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+}, { merge: true });
+showStatus(`✅ Imagen guardada para ${nombreLimpio}`, true);
+cargarCatalogo();
+} catch (e) {
+showStatus("Error al guardar: " + e.message, false);
+}
+};
+}
+
+if (delBtn) {
+delBtn.onclick = async () => {
+if (!confirm(`¿Eliminar imagen de "${nombreLimpio}"?`)) return;
+try {
+await db.collection("products").doc(id).update({
+imageUrl: firebase.firestore.FieldValue.delete(),
+updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+});
+showStatus(`✅ Imagen eliminada`, true);
+cargarCatalogo();
+} catch (e) {
+showStatus("Error al eliminar: " + e.message, false);
+}
+};
+}
+}
+});
+}
+});
+} catch (e) {
+cont.innerHTML = `<div class="status error" style="margin:20px;text-align:center">❌ Error cargando catálogo: ${e.message}</div>`;
+console.error(e);
+}
+}
+
+// MODAL DE IMAGEN
+function verImagen(src) {
+document.getElementById("imgView").src = src;
+document.getElementById("imgModal").style.display = "flex";
+}
+document.getElementById("imgModal").onclick = (e) => {
+if (e.target === document.getElementById("imgModal")) e.target.style.display = "none";
+};
+
+// INICIAR
+cargarCatalogo();
+</script>
 </body>
 </html>
+
