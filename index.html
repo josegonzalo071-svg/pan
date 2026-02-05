@@ -169,6 +169,25 @@
         transform: translateY(1px);
     }
 
+    .btn-admin {
+        background: linear-gradient(135deg, #ff8a00, #ff4b6a);
+        box-shadow: 0 6px 18px rgba(255, 75, 106, 0.35);
+    }
+    
+    .btn-admin:hover {
+        box-shadow: 0 8px 22px rgba(255, 75, 106, 0.45);
+    }
+
+    .btn-logout {
+        background: linear-gradient(135deg, #c53030, #822727);
+        display: none;
+        box-shadow: 0 6px 18px rgba(197, 48, 48, 0.35);
+    }
+    
+    .btn-logout:hover {
+        box-shadow: 0 8px 22px rgba(197, 48, 48, 0.45);
+    }
+
     /* Catálogo */
     .catalogo-wrapper{
         max-width:1100px;
@@ -383,7 +402,6 @@
 // =========================
 const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
-const IMPUESTO = 1.22; // 22% de impuesto
 const cont = document.getElementById("catalogo");
 const buscador = document.getElementById("buscadorProductos");
 const mensajeVacio = document.getElementById("mensajeVacio");
@@ -464,12 +482,12 @@ function renderCatalogo(rows) {
         // Aplicar filtro de búsqueda
         if (filtro && !C.toLowerCase().includes(filtro)) return;
         
-        // Calcular precio con impuesto (22%)
+        // Calcular precio con impuesto (22%) - ÚNICO CAMBIO REAL
         const precioBase = D.replace(/[^0-9]/g, "");
         if (!precioBase) return;
         
-        // ✅ APLICAR 22% DE IMPUESTO Y REDONDEAR
-        const precioConImpuesto = Math.round(parseFloat(precioBase) * IMPUESTO);
+        // ✅ APLICAR 22% DE IMPUESTO Y REDONDEAR (SOLO CAMBIO EN TODO EL CÓDIGO)
+        const precioConImpuesto = Math.round(parseFloat(precioBase) * 1.22);
         
         // Crear elemento de producto
         const prodEl = document.createElement("div");
@@ -506,9 +524,9 @@ window.addEventListener("DOMContentLoaded", cargarCatalogo);
 
 
               <script>
-                                 const IMPUESTO = 1.22; // 22% de impuesto
-   const precioConImpuesto = Math.round(parseFloat(precioBase) * IMPUESTO);
-   
+                              // ✅ APLICAR 22% DE IMPUESTO Y REDONDEAR (SOLO CAMBIO EN TODO EL CÓDIGO)
+const precioConImpuesto = Math.round(parseFloat(precioBase) * 1.22);
+
 
               </script>
                         </body>
