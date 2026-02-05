@@ -448,6 +448,11 @@
             font-size: 0.9rem;
         }
         
+        .drive-instructions h4 {
+            margin-top: 0;
+            color: #ffb703;
+        }
+        
         .drive-instructions ol {
             margin-left: 20px;
             margin-top: 8px;
@@ -457,33 +462,13 @@
             margin-bottom: 5px;
         }
         
-        .instructions-tabs {
-            display: flex;
-            margin-bottom: 10px;
-            border-bottom: 2px solid rgba(100, 120, 180, 0.6);
-        }
-        
-        .tab-btn {
-            padding: 8px 15px;
-            background: none;
-            border: none;
-            color: #aaa;
-            cursor: pointer;
-            font-weight: 600;
-            border-bottom: 3px solid transparent;
-        }
-        
-        .tab-btn.active {
-            color: #4da6ff;
-            border-bottom: 3px solid #4da6ff;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
+        .imgur-example {
+            background: rgba(40, 30, 60, 0.7);
+            border-left: 4px solid #ff4b6a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.9rem;
         }
         
         footer {
@@ -600,9 +585,23 @@
             <input type="email" id="adminEmail" name="email" class="login-input" placeholder="Correo electrónico" autocomplete="email" required>
             <input type="password" id="adminPassword" name="password" class="login-input" placeholder="Contraseña" autocomplete="current-password" required>
             <button id="submitLogin" class="btn btn-login">Iniciar Sesión</button>
-            <div class="drive-instructions" style="margin-top: 20px; background: rgba(40, 30, 20, 0.7); border-left-color: #ffb703;">
-                <strong>ℹ️ Instrucciones para imágenes:</strong>
-                <p style="margin-top:8px">Puedes usar enlaces directos de Imgur o Google Drive</p>
+            <div class="drive-instructions" style="margin-top: 20px;">
+                <h4>✅ Cómo subir imágenes (elige una opción):</h4>
+                <p><strong>Opción 1: Imgur (Recomendado - Más fácil)</strong></p>
+                <ol>
+                    <li>Ve a <a href="https://imgur.com/upload" target="_blank" style="color:#4da6ff">imgur.com/upload</a></li>
+                    <li>Sube tu imagen</li>
+                    <li>Haz clic derecho en la imagen → "Copiar dirección de la imagen"</li>
+                    <li>Pega el enlace directo (termina en .jpg, .png, etc.)</li>
+                </ol>
+                <p style="margin-top:10px"><strong>Opción 2: Google Drive</strong></p>
+                <ol>
+                    <li>Sube imagen a Google Drive</li>
+                    <li>Haz clic derecho → "Compartir"</li>
+                    <li>Cambia a: "Cualquiera con el enlace"</li>
+                    <li>Permisos: "Lector"</li>
+                    <li>Copia el enlace y pégalo aquí</li>
+                </ol>
             </div>
         </div>
     </div>
@@ -653,58 +652,71 @@
         let productImages = {};
         let sheetData = [];
         
-        // ✅ FUNCIÓN UNIVERSAL: Convierte URLs de Google Drive y valida enlaces de Imgur
+        // ✅ FUNCIÓN UNIVERSAL: Convierte URLs de Google Drive E Imgur
         function convertImageUrl(url) {
             if (!url) return url;
             
-            // Eliminar espacios al inicio y final
             url = url.trim();
             
-            // Si es un enlace de álbum de Imgur (contiene /a/ o /gallery/), convertir a enlace directo
-            if (url.includes('imgur.com') && (url.includes('/a/') || url.includes('/gallery/'))) {
-                // Extraer el ID del álbum
-                const albumMatch = url.match(/imgur\.com\/(?:a|gallery)\/([a-zA-Z0-9]+)/);
-                if (albumMatch && albumMatch[1]) {
-                    // Usar el ID para crear un enlace directo (Imgur usa el mismo ID para la primera imagen)
-                    return `https://i.imgur.com/${albumMatch[1]}.jpg`;
+            // ✅ MANEJAR ENLACES DE IMGUR (ÁLBUMES Y GALLERÍAS)
+            if (url.includes('imgur.com')) {
+                // Convertir enlaces de álbum: https://imgur.com/a/ID → https://i.imgur.com/ID.jpg
+                if (url.includes('/a/') || url.includes('/gallery/')) {
+                    // Extraer el ID del álbum
+                    const match = url.match(/\/(a|gallery)\/([^\/?#]+)/);
+                    if (match && match[2]) {
+                        return `https://i.imgur.com/${match[2]}.jpg`;
+                    }
                 }
-            }
-            
-            // Si ya es un enlace directo de Imgur (i.imgur.com), devolver tal cual
-            if (url.includes('i.imgur.com')) {
-                return url;
-            }
-            
-            // Procesar enlaces de Google Drive
-            if (url.includes('drive.google.com')) {
-                // Eliminar parámetros existentes
-                url = url.split('?')[0];
                 
-                // Si ya está en formato uc, asegurar que tenga export=view y confirm=t
-                if (url.includes('drive.google.com/uc')) {
-                    if (!url.includes('export=view')) {
-                        url = url.replace('export=download', 'export=view');
-                    }
-                    if (!url.includes('confirm=')) {
-                        url += (url.includes('?') ? '&' : '?') + 'confirm=t';
-                    }
+                // Si ya es un enlace directo de i.imgur.com, devolver tal cual
+                if (url.includes('i.imgur.com')) {
                     return url;
                 }
                 
+                // Para otros enlaces de imgur.com, intentar convertir a directo
+                if (url.includes('imgur.com') && !url.includes('i.imgur.com')) {
+                    // Extraer el ID de la imagen (última parte del path)
+                    const parts = url.split('/');
+                    const id = parts[parts.length - 1].split('?')[0].split('#')[0];
+                    if (id) {
+                        return `https://i.imgur.com/${id}.jpg`;
+                    }
+                }
+            }
+            
+            // ✅ MANEJAR ENLACES DE GOOGLE DRIVE
+            if (url.includes('drive.google.com')) {
+                // Eliminar parámetros para procesar
+                const cleanUrl = url.split('?')[0];
+                
+                // Si ya es formato uc, asegurar que tenga export=view y agregar confirm=t
+                if (cleanUrl.includes('drive.google.com/uc')) {
+                    let newUrl = cleanUrl;
+                    if (!newUrl.includes('export=view')) {
+                        newUrl = newUrl.replace('export=download', 'export=view');
+                    }
+                    // Agregar confirm=t si no está presente
+                    if (!newUrl.includes('confirm=')) {
+                        newUrl += (newUrl.includes('?') ? '&' : '?') + 'confirm=t';
+                    }
+                    return newUrl;
+                }
+                
                 // Extraer ID de /file/d/ID/view
-                const fileMatch = url.match(/\/file\/d\/([^\/?]+)/);
+                const fileMatch = cleanUrl.match(/\/file\/d\/([^\/?]+)/);
                 if (fileMatch && fileMatch[1]) {
                     return `https://drive.google.com/uc?export=view&id=${fileMatch[1]}&confirm=t`;
                 }
                 
                 // Extraer ID de /open?id=ID
-                const openMatch = url.match(/open\?id=([^&]+)/);
+                const openMatch = cleanUrl.match(/open\?id=([^&]+)/);
                 if (openMatch && openMatch[1]) {
                     return `https://drive.google.com/uc?export=view&id=${openMatch[1]}&confirm=t`;
                 }
             }
             
-            // Para cualquier otra URL, devolver tal cual (podría ser un enlace directo de otra fuente)
+            // Para cualquier otra URL, devolver tal cual
             return url;
         }
         
@@ -908,43 +920,17 @@
                             ${imageUrl ? `<button class="btn btn-delete delete-image">🗑️ Eliminar</button>` : ''}
                             <button class="btn btn-test test-image">👁️ Probar URL</button>
                         </div>
-                        
-                        <div class="instructions-tabs">
-                            <button class="tab-btn active" data-tab="imgur">Imgur</button>
-                            <button class="tab-btn" data-tab="drive">Google Drive</button>
+                        <div class="drive-instructions">
+                            <h4>Imgur (Recomendado)</h4>
+                            <p>Pega enlace directo o de álbum:<br>
+                            <code>https://i.imgur.com/ID.jpg</code><br>
+                            <code>https://imgur.com/a/ID</code></p>
                         </div>
-                        
-                        <div class="tab-content active" id="imgur-tab">
-                            <div class="drive-instructions">
-                                <strong>✅ Para Imgur:</strong>
-                                <ol>
-                                    <li>Sube tu imagen a <a href="https://imgur.com/upload" target="_blank" style="color:#4da6ff;text-decoration:underline">Imgur</a></li>
-                                    <li>Haz clic derecho en la imagen subida</li>
-                                    <li>"Copiar dirección de la imagen"</li>
-                                    <li>Pega el enlace aquí (ej: <code>https://i.imgur.com/XXXXXX.jpg</code>)</li>
-                                </ol>
-                                <p style="margin-top:8px;font-size:0.85rem;background:rgba(30,40,60,0.5);padding:8px;border-radius:6px">
-                                    <strong>⚠️ Importante:</strong> Usa enlaces que empiecen con <code>https://i.imgur.com/</code>
-                                </p>
-                            </div>
+                        <div class="imgur-example">
+                            <h4>Google Drive</h4>
+                            <p>Formato automático:<br>
+                            <code>https://drive.google.com/uc?export=view&id=ID&confirm=t</code></p>
                         </div>
-                        
-                        <div class="tab-content" id="drive-tab">
-                            <div class="drive-instructions">
-                                <strong>✅ Para Google Drive:</strong>
-                                <ol>
-                                    <li>Sube tu imagen a Google Drive</li>
-                                    <li>Haz clic derecho → "Compartir"</li>
-                                    <li><strong>"Cualquiera con el enlace"</strong></li>
-                                    <li><strong>Permisos: "Lector"</strong></li>
-                                    <li>Copia el enlace y pégalo aquí</li>
-                                </ol>
-                                <p style="margin-top:8px;font-size:0.85rem;background:rgba(30,40,60,0.5);padding:8px;border-radius:6px">
-                                    <strong>💡 Consejo:</strong> También puedes pegar el enlace normal de Drive y lo convertiremos automáticamente
-                                </p>
-                            </div>
-                        </div>
-                        
                         <h4 style="margin-top: 15px">💰 Precio Personalizado</h4>
                         <input 
                             type="text" 
@@ -963,28 +949,13 @@
                 
                 prodEl.innerHTML = productHTML;
                 
-                // Configurar tabs de instrucciones
-                if (isAdmin) {
-                    const tabBtns = prodEl.querySelectorAll('.tab-btn');
-                    tabBtns.forEach(btn => {
-                        btn.onclick = () => {
-                            // Remover clase active de todos los botones y contenidos
-                            tabBtns.forEach(b => b.classList.remove('active'));
-                            prodEl.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                            
-                            // Agregar clase active al botón clicado y su contenido
-                            btn.classList.add('active');
-                            prodEl.querySelector(`#${btn.dataset.tab}-tab`).classList.add('active');
-                        };
-                    });
-                }
-                
                 // Image click handler
                 if (imageUrl) {
                     const imgEl = prodEl.querySelector(".producto-img");
                     imgEl.onclick = (e) => {
                         e.stopPropagation();
                         modalImage.src = imageUrl;
+                        modalImage.setAttribute("referrerpolicy", "no-referrer");
                         imageModal.classList.add("active");
                     };
                 }
@@ -1012,8 +983,8 @@
                             url = convertImageUrl(url);
                             
                             // Validar que sea una URL de imagen
-                            if (!url.match(/\.(jpe?g|png|gif|bmp|webp|svg)$/i)) {
-                                if (!confirm("⚠️ La URL no parece ser una imagen válida. ¿Deseas guardarla igual?")) return;
+                            if (!url.match(/\.(jpe?g|png|gif|bmp|webp|svg)$/i) && !url.includes('drive.google.com') && !url.includes('imgur.com')) {
+                                if (!confirm("⚠️ URL no parece ser de imagen. ¿Guardar igual?")) return;
                             }
                             
                             try {
@@ -1127,7 +1098,7 @@
         function handleImageError(img, productName) {
             console.error(`Imagen fallida para ${productName}:`, img.src);
             img.onerror = null;
-            img.parentElement.innerHTML = `<div class='img-error'>⚠️ Imagen no disponible<br>Verifica URL y permisos</div>`;
+            img.parentElement.innerHTML = `<div class='img-error'>⚠️ Imagen no disponible<br>Verifica la URL o permisos</div>`;
         }
         
         window.addEventListener("DOMContentLoaded", init);
