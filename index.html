@@ -22,9 +22,9 @@ header{
     padding:0 16px;
 }
 .categoria{
-    margin:28px 0 14px;
+    margin:26px 0 14px;
     padding:14px 18px;
-    background:rgba(0,194,255,.18);
+    background:rgba(0,194,255,.25);
     border-left:6px solid #00c2ff;
     font-weight:800;
     letter-spacing:.18em;
@@ -38,6 +38,7 @@ header{
     margin-bottom:10px;
     display:flex;
     justify-content:space-between;
+    gap:12px;
 }
 .descripcion{
     color:#00c2ff;
@@ -46,6 +47,7 @@ header{
 .precio{
     color:#ff4b6a;
     font-weight:700;
+    white-space:nowrap;
 }
 </style>
 </head>
@@ -64,13 +66,20 @@ const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 const cont = document.getElementById("catalogo");
 
-function esCategoria(row){
-    const a = (row[0]||"").trim();
-    const b = (row[1]||"").trim();
-    const c = (row[2]||"").trim();
-    const d = (row[3]||"").trim();
+function soloUnaColumnaConTexto(row){
+    return row.filter(c => (c||"").trim()).length === 1;
+}
 
-    return a && a === b && b === c && c === d;
+function esCategoria(row){
+    if(!soloUnaColumnaConTexto(row)) return false;
+
+    const texto = row.find(c => (c||"").trim()).trim();
+
+    if(/\d/.test(texto)) return false;
+    if(texto.length > 15) return false;
+    if(texto.toUpperCase().includes("TRANSITO")) return false;
+
+    return true;
 }
 
 function formatearPrecio(n){
@@ -79,38 +88,41 @@ function formatearPrecio(n){
 
 fetch(CSV_URL)
 .then(r=>r.text())
-.then(t=>{
-    Papa.parse(t,{
+.then(csv=>{
+    Papa.parse(csv,{
         skipEmptyLines:true,
         complete:(res)=>{
             cont.innerHTML = "";
 
             res.data.forEach(row=>{
-                const desc = (row[2]||"").trim();
-                const precioRaw = (row[3]||"").trim();
+                const A = (row[0]||"").trim();
+                const B = (row[1]||"").trim();
+                const C = (row[2]||"").trim();
+                const D = (row[3]||"").trim();
 
-                if(!desc) return;
-
-                // 🔵 CATEGORÍA
+                // 🔵 CATEGORÍA (celda combinada en CSV)
                 if(esCategoria(row)){
+                    const texto = row.find(c => (c||"").trim()).trim();
                     const cat = document.createElement("div");
                     cat.className = "categoria";
-                    cat.textContent = desc;
+                    cat.textContent = texto;
                     cont.appendChild(cat);
                     return;
                 }
 
-                // 🚫 TRANSITO
-                if(precioRaw.toUpperCase().includes("TRANSITO")) return;
+                // 🚫 TRÁNSITO
+                if(D.toUpperCase().includes("TRANSITO")) return;
 
                 // 🟢 PRODUCTO
-                const num = precioRaw.replace(/[^0-9]/g,"");
+                if(!C || !D) return;
+
+                const num = D.replace(/[^0-9]/g,"");
                 if(!num) return;
 
                 const prod = document.createElement("div");
                 prod.className = "producto";
                 prod.innerHTML = `
-                    <div class="descripcion">${desc}</div>
+                    <div class="descripcion">${A ? A + " " : ""}${C}</div>
                     <div class="precio">${formatearPrecio(num)}</div>
                 `;
                 cont.appendChild(prod);
