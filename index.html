@@ -24,7 +24,7 @@ header{
 .categoria{
     margin:28px 0 16px;
     padding:14px 18px;
-    background:rgba(0,194,255,.22);
+    background:rgba(0,194,255,.25);
     border-left:6px solid #00c2ff;
     font-weight:800;
     letter-spacing:.15em;
@@ -66,12 +66,13 @@ const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 const cont = document.getElementById("catalogo");
 
-function tienePrecioNumerico(txt){
-    return /\d/.test(txt);
-}
-
 function formatearPrecio(n){
     return "$" + Number(n).toLocaleString("es-DO");
+}
+
+// detecta si hay emoji (columna A)
+function tieneEmoji(txt){
+    return /[\u{1F300}-\u{1FAFF}]/u.test(txt);
 }
 
 fetch(CSV_URL)
@@ -80,25 +81,17 @@ fetch(CSV_URL)
     Papa.parse(csv,{
         skipEmptyLines:true,
         complete:(res)=>{
-            const rows = res.data;
             cont.innerHTML = "";
 
-            rows.forEach((row, i)=>{
-                const modelo = (row[2]||"").trim();
-                const precio = (row[3]||"").trim();
+            res.data.forEach(row=>{
+                const colA = (row[0] || "").trim(); // emoji
+                const modelo = (row[2] || "").trim();
+                const precio = (row[3] || "").trim();
 
                 if(!modelo) return;
 
-                const siguiente = rows[i+1] || [];
-                const nextModelo = (siguiente[2]||"").trim();
-                const nextPrecio = (siguiente[3]||"").trim();
-
-                const siguienteEsProducto =
-                    nextModelo &&
-                    (tienePrecioNumerico(nextPrecio) || nextPrecio.toUpperCase().includes("TRANSITO"));
-
-                // 🔵 CATEGORÍA CONTEXTUAL
-                if(!precio && siguienteEsProducto){
+                // 🔵 CATEGORÍA (NO emoji, NO precio)
+                if(!tieneEmoji(colA) && !precio){
                     const cat = document.createElement("div");
                     cat.className = "categoria";
                     cat.textContent = modelo;
@@ -106,12 +99,14 @@ fetch(CSV_URL)
                     return;
                 }
 
-                // 🚫 TRANSITO NO SE MUESTRA
+                // 🚫 TRANSITO
                 if(precio.toUpperCase().includes("TRANSITO")) return;
 
-                // 🟢 PRODUCTO CON PRECIO
-                if(tienePrecioNumerico(precio)){
+                // 🟢 PRODUCTO (emoji solo para detectar)
+                if(tieneEmoji(colA)){
                     const num = precio.replace(/[^0-9]/g,"");
+                    if(!num) return;
+
                     const prod = document.createElement("div");
                     prod.className = "producto";
                     prod.innerHTML = `
