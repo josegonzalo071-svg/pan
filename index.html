@@ -11,7 +11,6 @@
     --card:#101624;
     --card-border:#1f2940;
     --accent:#00c2ff;
-    --accent-soft:rgba(0,194,255,0.15);
     --text:#e6ecff;
     --muted:#9aa4c6;
     --danger:#ff4b6a;
@@ -42,10 +41,7 @@ header{
     align-items:center;
 }
 
-.header-inner h1{
-    margin:0;
-    font-size:22px;
-}
+h1{margin:0;font-size:22px}
 
 .header-contact{
     font-size:12px;
@@ -53,89 +49,33 @@ header{
     text-align:right;
 }
 
-.toolbar{
-    max-width:1100px;
-    margin:18px auto 0;
-    padding:0 16px;
-    display:grid;
-    grid-template-columns:2fr 1fr;
-    gap:12px;
-}
-
-@media(max-width:800px){
-    .toolbar{grid-template-columns:1fr;}
-}
-
-.panel{
-    background:rgba(8,12,26,0.9);
-    border:1px solid rgba(255,255,255,0.05);
-    border-radius:14px;
-    padding:10px;
-}
-
-.panel-title{
-    font-size:12px;
-    color:var(--muted);
-    letter-spacing:.12em;
-    margin-bottom:6px;
-}
-
-input{
-    width:100%;
-    padding:8px 10px;
-    border-radius:10px;
-    background:#050815;
-    border:1px solid rgba(255,255,255,0.08);
-    color:var(--text);
-    outline:none;
-}
-
-button{
-    border:none;
-    border-radius:10px;
-    padding:8px 16px;
-    font-weight:600;
-    cursor:pointer;
-    background:linear-gradient(135deg,var(--accent),#5de0ff);
-    color:#02030a;
-    box-shadow:0 6px 18px rgba(0,194,255,0.35);
-}
-
 .catalogo-wrapper{
     max-width:1100px;
-    margin:20px auto 40px;
+    margin:30px auto 40px;
     padding:0 16px;
 }
 
-.catalogo{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-}
-
-/* 🔷 CATEGORÍA */
 .categoria{
-    margin:26px 0 10px;
-    padding:12px 16px;
-    background:linear-gradient(135deg,rgba(0,194,255,.35),rgba(0,194,255,.1));
+    margin:26px 0 12px;
+    padding:10px 16px;
     border-left:5px solid var(--accent);
-    border-radius:12px;
+    background:rgba(0,194,255,.12);
     font-weight:800;
     letter-spacing:.14em;
     text-transform:uppercase;
     color:var(--accent);
+    border-radius:10px;
 }
 
-/* 🟢 PRODUCTO */
 .producto{
     background:var(--card);
     border:1px solid var(--card-border);
     border-radius:14px;
     padding:14px;
+    margin-bottom:12px;
     display:flex;
     justify-content:space-between;
     gap:14px;
-    box-shadow:0 14px 30px rgba(0,0,0,0.35);
 }
 
 .descripcion{
@@ -144,36 +84,10 @@ button{
     flex:1;
 }
 
-.producto-right{
-    text-align:right;
-    min-width:150px;
-}
-
 .precio{
     font-size:20px;
     font-weight:700;
     color:var(--danger);
-}
-
-.precio.transito{
-    color:#ffc14b;
-    text-shadow:0 0 6px rgba(255,193,75,.45);
-}
-
-.editor-precio{
-    margin-top:6px;
-    display:flex;
-    gap:6px;
-}
-
-.editor-precio input{
-    width:90px;
-}
-
-#mensajeVacio{
-    text-align:center;
-    color:var(--muted);
-    margin-top:20px;
 }
 </style>
 </head>
@@ -190,166 +104,72 @@ button{
     </div>
 </header>
 
-<div class="toolbar">
-    <div class="panel">
-        <div class="panel-title">Buscar artículos</div>
-        <input id="buscadorProductos" placeholder="Buscar producto…">
-    </div>
-
-    <div class="panel">
-        <div class="panel-title">Acceso</div>
-        <button id="btnLogin">Entrar</button>
-        <button id="btnLogout" style="display:none;">Salir</button>
-    </div>
-</div>
-
-<div class="catalogo-wrapper">
-    <div id="catalogo" class="catalogo"></div>
-    <div id="mensajeVacio" style="display:none;">No se encontraron productos.</div>
-</div>
+<div class="catalogo-wrapper" id="catalogo"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <script>
-const ADMIN_USER = "TELEFONO";
-const ADMIN_PASS = "1234";
 const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 
-let productos = [];
-let esAdmin = false;
+const catalogo = document.getElementById("catalogo");
 
 function formatearPrecio(n){
     return "$" + n.toLocaleString("es-DO");
 }
 
 /* ===============================
-   🔥 DETECCIÓN INTELIGENTE REAL
-   A–D llenas = CATEGORÍA
+   🧠 DETECTOR INTELIGENTE REAL
 ================================ */
-function cargarLista(data){
-    productos = [];
+function procesarFilas(data){
+    catalogo.innerHTML = "";
 
     data.forEach(fila=>{
-        const colA = (fila[0]||"").trim();
-        const colB = (fila[1]||"").trim();
-        const colC = (fila[2]||"").trim();
-        const colD = (fila[3]||"").trim();
+        const texto = (fila[2] || "").trim();
+        const precioRaw = (fila[3] || "").trim();
 
-        // 🔷 DIVISOR / CATEGORÍA
-        if(colA && colB && colC && colD){
-            productos.push({
-                tipo: "categoria",
-                descripcion: colC
-            });
+        if(!texto) return;
+
+        const esTransito = precioRaw.toUpperCase().includes("TRANSITO");
+
+        // 🔷 CATEGORÍA
+        if(
+            !precioRaw &&
+            !esTransito &&
+            texto.split(" ").length === 1 &&
+            texto.length <= 9
+        ){
+            const cat = document.createElement("div");
+            cat.className = "categoria";
+            cat.textContent = texto;
+            catalogo.appendChild(cat);
             return;
         }
 
-        // 🟢 PRODUCTO
-        if(!colC) return;
+        // 🟢 PRODUCTO (solo si tiene precio numérico)
+        const num = precioRaw.replace(/[^0-9]/g,"");
+        if(!num || esTransito) return;
 
-        let esTransito = colD.toUpperCase().includes("TRANSITO");
-        let base = null;
-
-        if(!esTransito){
-            const num = colD.replace(/[^0-9]/g,"");
-            base = num ? parseFloat(num) : null;
-        }
-
-        productos.push({
-            tipo:"producto",
-            descripcion: colC,
-            basePrecio: base,
-            esTransito
-        });
+        const card = document.createElement("div");
+        card.className = "producto";
+        card.innerHTML = `
+            <div class="descripcion">${texto}</div>
+            <div class="precio">${formatearPrecio(parseInt(num))}</div>
+        `;
+        catalogo.appendChild(card);
     });
 }
 
-function renderProductos(filtro=""){
-    const cont = document.getElementById("catalogo");
-    const vacio = document.getElementById("mensajeVacio");
-    cont.innerHTML = "";
-
-    const f = filtro.toLowerCase();
-    const lista = productos.filter(p=>!f || p.descripcion.toLowerCase().includes(f));
-
-    vacio.style.display = lista.length ? "none" : "block";
-
-    lista.forEach((p,idx)=>{
-        if(p.tipo==="categoria"){
-            const d=document.createElement("div");
-            d.className="categoria";
-            d.textContent=p.descripcion;
-            cont.appendChild(d);
-            return;
-        }
-
-        let texto = p.esTransito ? "TRÁNSITO" :
-                    p.basePrecio ? formatearPrecio(Math.round(p.basePrecio*1.20)) :
-                    "SIN PRECIO";
-
-        let clase = p.esTransito || !p.basePrecio ? "transito" : "";
-
-        const card=document.createElement("div");
-        card.className="producto";
-        card.innerHTML=`
-            <div class="descripcion">${p.descripcion}</div>
-            <div class="producto-right">
-                <div class="precio ${clase}">${texto}</div>
-                ${esAdmin && !p.esTransito ? `
-                <div class="editor-precio">
-                    <input type="number" value="${p.basePrecio||""}" data-idx="${idx}">
-                    <button class="btn-aplicar" data-idx="${idx}">OK</button>
-                </div>` : ""}
-            </div>`;
-        cont.appendChild(card);
-    });
-}
-
-async function cargarCatalogo(){
-    const r=await fetch(CSV_URL);
-    const t=await r.text();
+async function cargar(){
+    const r = await fetch(CSV_URL);
+    const t = await r.text();
     Papa.parse(t,{
         skipEmptyLines:true,
-        complete:r=>{
-            cargarLista(r.data);
-            renderProductos();
-        }
+        complete:res=>procesarFilas(res.data)
     });
 }
 
-document.getElementById("buscadorProductos")
-.addEventListener("input",e=>renderProductos(e.target.value));
-
-document.getElementById("btnLogin").onclick=()=>{
-    const u=prompt("Usuario");
-    const p=prompt("Contraseña");
-    if(u===ADMIN_USER && p===ADMIN_PASS){
-        esAdmin=true;
-        btnLogout.style.display="inline-block";
-        alert("Modo edición activado");
-        renderProductos(buscadorProductos.value);
-    }
-};
-
-document.getElementById("btnLogout").onclick=()=>{
-    esAdmin=false;
-    btnLogout.style.display="none";
-    renderProductos(buscadorProductos.value);
-};
-
-document.getElementById("catalogo").addEventListener("click",e=>{
-    if(e.target.classList.contains("btn-aplicar")){
-        const i=e.target.dataset.idx;
-        const v=parseFloat(e.target.previousElementSibling.value);
-        if(v){
-            productos[i].basePrecio=v;
-            renderProductos(buscadorProductos.value);
-        }
-    }
-});
-
-cargarCatalogo();
+cargar();
 </script>
 
 </body>
