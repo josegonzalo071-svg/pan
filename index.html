@@ -448,11 +448,6 @@
             font-size: 0.9rem;
         }
         
-        .drive-instructions h4 {
-            margin-top: 0;
-            color: #ffb703;
-        }
-        
         .drive-instructions ol {
             margin-left: 20px;
             margin-top: 8px;
@@ -460,15 +455,6 @@
         
         .drive-instructions li {
             margin-bottom: 5px;
-        }
-        
-        .imgur-example {
-            background: rgba(40, 30, 60, 0.7);
-            border-left: 4px solid #ff4b6a;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-size: 0.9rem;
         }
         
         footer {
@@ -585,22 +571,14 @@
             <input type="email" id="adminEmail" name="email" class="login-input" placeholder="Correo electrónico" autocomplete="email" required>
             <input type="password" id="adminPassword" name="password" class="login-input" placeholder="Contraseña" autocomplete="current-password" required>
             <button id="submitLogin" class="btn btn-login">Iniciar Sesión</button>
-            <div class="drive-instructions" style="margin-top: 20px;">
-                <h4>✅ Cómo subir imágenes (elige una opción):</h4>
-                <p><strong>Opción 1: Imgur (Recomendado - Más fácil)</strong></p>
+            <div class="drive-instructions" style="margin-top: 20px; background: rgba(40, 30, 20, 0.7); border-left-color: #ffb703;">
+                <strong>ℹ️ Instrucciones para imágenes de Imgur:</strong>
                 <ol>
                     <li>Ve a <a href="https://imgur.com/upload" target="_blank" style="color:#4da6ff">imgur.com/upload</a></li>
                     <li>Sube tu imagen</li>
                     <li>Haz clic derecho en la imagen → "Copiar dirección de la imagen"</li>
                     <li>Pega el enlace directo (termina en .jpg, .png, etc.)</li>
-                </ol>
-                <p style="margin-top:10px"><strong>Opción 2: Google Drive</strong></p>
-                <ol>
-                    <li>Sube imagen a Google Drive</li>
-                    <li>Haz clic derecho → "Compartir"</li>
-                    <li>Cambia a: "Cualquiera con el enlace"</li>
-                    <li>Permisos: "Lector"</li>
-                    <li>Copia el enlace y pégalo aquí</li>
+                    <li>Si es un álbum, usa el formato: <code>https://i.imgur.com/ID.jpg</code></li>
                 </ol>
             </div>
         </div>
@@ -611,12 +589,12 @@
         <p style="margin-top: 8px; font-size: 0.85rem; opacity: 0.7;">Catálogo actualizado en tiempo real desde Google Sheets</p>
     </footer>
 
-    <!-- Firebase SDK - SIN ESPACIOS -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
-    <!-- PapaParse - SIN ESPACIOS -->
+    <!-- PapaParse for CSV parsing -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     
     <script>
@@ -652,76 +630,41 @@
         let productImages = {};
         let sheetData = [];
         
-        // ✅ FUNCIÓN UNIVERSAL: Convierte URLs de Google Drive E Imgur
-        function convertImageUrl(url) {
+        // ✅ FUNCIÓN CORREGIDA: Convertir URLs de Imgur
+        function convertImgurUrl(url) {
             if (!url) return url;
             
-            url = url.trim();
+            // Si ya es un enlace directo, devolver tal cual
+            if (url.includes('i.imgur.com')) {
+                return url;
+            }
             
-            // ✅ MANEJAR ENLACES DE IMGUR (ÁLBUMES Y GALLERÍAS)
-            if (url.includes('imgur.com')) {
-                // Convertir enlaces de álbum: https://imgur.com/a/ID → https://i.imgur.com/ID.jpg
-                if (url.includes('/a/') || url.includes('/gallery/')) {
-                    // Extraer el ID del álbum
-                    const match = url.match(/\/(a|gallery)\/([^\/?#]+)/);
-                    if (match && match[2]) {
-                        return `https://i.imgur.com/${match[2]}.jpg`;
-                    }
-                }
-                
-                // Si ya es un enlace directo de i.imgur.com, devolver tal cual
-                if (url.includes('i.imgur.com')) {
-                    return url;
-                }
-                
-                // Para otros enlaces de imgur.com, intentar convertir a directo
-                if (url.includes('imgur.com') && !url.includes('i.imgur.com')) {
-                    // Extraer el ID de la imagen (última parte del path)
-                    const parts = url.split('/');
-                    const id = parts[parts.length - 1].split('?')[0].split('#')[0];
-                    if (id) {
-                        return `https://i.imgur.com/${id}.jpg`;
-                    }
+            // Convertir álbumes a enlaces directos
+            if (url.includes('imgur.com/a/') || url.includes('imgur.com/gallery/')) {
+                // Extraer el ID del álbum
+                const match = url.match(/\/(a|gallery)\/([^\/?]+)/);
+                if (match && match[2]) {
+                    // Devolver enlace directo a la primera imagen
+                    return `https://i.imgur.com/${match[2]}.jpg`;
                 }
             }
             
-            // ✅ MANEJAR ENLACES DE GOOGLE DRIVE
-            if (url.includes('drive.google.com')) {
-                // Eliminar parámetros para procesar
-                const cleanUrl = url.split('?')[0];
-                
-                // Si ya es formato uc, asegurar que tenga export=view y agregar confirm=t
-                if (cleanUrl.includes('drive.google.com/uc')) {
-                    let newUrl = cleanUrl;
-                    if (!newUrl.includes('export=view')) {
-                        newUrl = newUrl.replace('export=download', 'export=view');
-                    }
-                    // Agregar confirm=t si no está presente
-                    if (!newUrl.includes('confirm=')) {
-                        newUrl += (newUrl.includes('?') ? '&' : '?') + 'confirm=t';
-                    }
-                    return newUrl;
-                }
-                
-                // Extraer ID de /file/d/ID/view
-                const fileMatch = cleanUrl.match(/\/file\/d\/([^\/?]+)/);
-                if (fileMatch && fileMatch[1]) {
-                    return `https://drive.google.com/uc?export=view&id=${fileMatch[1]}&confirm=t`;
-                }
-                
-                // Extraer ID de /open?id=ID
-                const openMatch = cleanUrl.match(/open\?id=([^&]+)/);
-                if (openMatch && openMatch[1]) {
-                    return `https://drive.google.com/uc?export=view&id=${openMatch[1]}&confirm=t`;
+            // Para otros enlaces de imgur.com, intentar convertir a directo
+            if (url.includes('imgur.com') && !url.includes('i.imgur.com')) {
+                // Extraer el ID de la imagen (última parte del path)
+                const parts = url.split('/');
+                const id = parts[parts.length - 1].split('?')[0].split('#')[0];
+                if (id) {
+                    return `https://i.imgur.com/${id}.jpg`;
                 }
             }
             
-            // Para cualquier otra URL, devolver tal cual
             return url;
         }
         
         // Initialize the application
         function init() {
+            // Set up auth state observer
             auth.onAuthStateChanged(user => {
                 isAdmin = !!user;
                 loginBtn.style.display = isAdmin ? "none" : "inline-flex";
@@ -729,6 +672,7 @@
                 loadCatalog();
             });
             
+            // Set up button event listeners
             loginBtn.onclick = () => loginModal.classList.add("active");
             logoutBtn.onclick = () => auth.signOut();
             submitLogin.onclick = handleLogin;
@@ -738,15 +682,19 @@
                     imageModal.classList.remove("active");
                 }
             };
+            
+            // Close login modal when clicking outside
             loginModal.onclick = (e) => {
                 if (e.target === loginModal) {
                     loginModal.classList.remove("active");
                 }
             };
             
+            // Load catalog initially
             loadCatalog();
         }
         
+        // Handle login
         function handleLogin() {
             const email = document.getElementById("adminEmail").value.trim();
             const password = document.getElementById("adminPassword").value.trim();
@@ -767,15 +715,17 @@
                         message += "Usuario no encontrado.";
                     } else {
                         message += error.message;
-                    }
+ }
                     alert(message);
                 });
         }
         
+        // Clean text (remove emojis and trim)
         function limpiarEmojis(txt) {
             return txt.replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
         }
         
+        // Generate product ID from name
         function generateProductId(name) {
             return limpiarEmojis(name)
                 .toLowerCase()
@@ -784,75 +734,84 @@
                 .replace(/(^-|-$)/g, "");
         }
         
+        // Check if row is a category
         function esCategoria(row) {
             const nonEmptyCells = row.filter(cell => (cell || "").trim() !== "");
             if (nonEmptyCells.length !== 1) return false;
             
             const text = nonEmptyCells[0].trim();
-            if (/\d/.test(text)) return false;
-            if (text.length > 15) return false;
+            if (/\d/.test(text)) return false; // Contains numbers
+            if (text.length > 15) return false; // Too long
             if (text.toUpperCase().includes("TRANSITO")) return false;
             
             return true;
         }
         
+        // Format price
         function formatearPrecio(precioStr) {
             const num = precioStr.replace(/[^0-9]/g, "");
             if (!num) return "";
             return "$" + Number(num).toLocaleString("es-DO");
         }
         
+        // Load catalog data
         async function loadCatalog() {
             try {
                 cont.innerHTML = '<div class="loading">Cargando productos...</div>';
                 
+                // Fetch CSV and Firestore data in parallel
                 const [csvResponse, productsSnapshot] = await Promise.all([
                     fetch(CSV_URL),
                     db.collection("products").get()
                 ]);
                 
+                // Process Firestore data - ✅ CONVERTIR URLs al cargar
                 productImages = {};
                 productsSnapshot.forEach(doc => {
                     const data = doc.data();
                     if (data.imageUrl) {
-                        // Convertir URL al cargar
+                        // Convertir URL de Imgur si es necesario
                         productImages[doc.id] = {
                             ...data,
-                            imageUrl: convertImageUrl(data.imageUrl)
+                            imageUrl: convertImgurUrl(data.imageUrl)
                         };
                     } else {
                         productImages[doc.id] = data;
                     }
                 });
                 
+                // Process CSV data
                 const csvText = await csvResponse.text();
                 const results = Papa.parse(csvText, {
                     skipEmptyLines: true
                 });
                 
                 sheetData = results.data;
+                
+                // Render catalog
                 renderCatalog();
                 
             } catch (error) {
                 console.error("Error loading catalog:", error);
                 cont.innerHTML = `
                     <div class="status-message status-error">
-                        ❌ Error al cargar el catálogo.<br>
-                        <small>${error.message}</small>
+                        ❌ Error al cargar el catálogo. Por favor, recarga la página.<br>
+                        <small style="display:block;margin-top:8px">${error.message}</small>
                     </div>
                 `;
             }
         }
         
+        // Render catalog from CSV data
         function renderCatalog() {
             cont.innerHTML = "";
             
             sheetData.forEach((row, index) => {
                 const A = (row[0] || "").trim();
-                const C = (row[2] || "").trim();
-                const D = (row[3] || "").trim();
+                const C = (row[2] || "").trim(); // Product name/model
+                const D = (row[3] || "").trim(); // Price
                 
-                // Render category
+                // Render category row
                 if (esCategoria(row)) {
                     const categoryText = limpiarEmojis(row.find(cell => (cell || "").trim()) || "");
                     const catEl = document.createElement("div");
@@ -862,25 +821,25 @@
                     return;
                 }
                 
-                // Skip invalid rows
+                // Skip "TRÁNSITO" items and invalid rows
                 if (D.toUpperCase().includes("TRANSITO") || !C || !D) return;
                 
+                // Clean product name and generate ID
                 const cleanName = limpiarEmojis(C);
                 const productId = generateProductId(cleanName);
+                
+                // Get product data if exists - ✅ USAR URL CONVERTIDA
                 const productData = productImages[productId] || {};
-                
-                // ✅ CONVERTIR URL ANTES DE USARLA
-                let imageUrl = productData.imageUrl || "";
-                if (imageUrl) {
-                    imageUrl = convertImageUrl(imageUrl);
-                }
-                
+                const imageUrl = productData.imageUrl ? convertImgurUrl(productData.imageUrl) : "";
                 const customPrice = productData.customPrice || D;
                 
+                // Create product element
                 const prodEl = document.createElement("div");
                 prodEl.className = "producto";
                 prodEl.dataset.productId = productId;
+                prodEl.dataset.rowIndex = index;
                 
+                // Product content
                 let productHTML = `
                     <div class="producto-content">
                         <div class="descripcion">${cleanName}</div>
@@ -888,7 +847,7 @@
                     </div>
                 `;
                 
-                // ✅ IMAGEN CON referrerpolicy Y MANEJO DE ERRORES
+                // Add image if exists - ✅ CON referrerpolicy y manejo de errores
                 if (imageUrl) {
                     productHTML += `
                     <div class="producto-img-container">
@@ -897,13 +856,13 @@
                             alt="${cleanName}" 
                             class="producto-img"
                             referrerpolicy="no-referrer"
-                            onerror="handleImageError(this, '${cleanName}')"
+                            onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\\'img-error\\'>⚠️ Imagen no disponible<br>Verifica URL y permisos en Imgur</div>'"
                         >
                     </div>
                     `;
                 }
                 
-                // Admin section
+                // Add admin section if admin
                 if (isAdmin) {
                     productHTML += `
                     <div class="admin-section active">
@@ -912,7 +871,7 @@
                             type="text" 
                             class="admin-input image-url" 
                             name="image-url" 
-                            placeholder="Pega URL de Imgur o Google Drive" 
+                            placeholder="Pega URL de Imgur (formato i.imgur.com/ID.jpg)" 
                             value="${imageUrl}"
                         >
                         <div class="admin-actions">
@@ -921,15 +880,13 @@
                             <button class="btn btn-test test-image">👁️ Probar URL</button>
                         </div>
                         <div class="drive-instructions">
-                            <h4>Imgur (Recomendado)</h4>
-                            <p>Pega enlace directo o de álbum:<br>
-                            <code>https://i.imgur.com/ID.jpg</code><br>
-                            <code>https://imgur.com/a/ID</code></p>
-                        </div>
-                        <div class="imgur-example">
-                            <h4>Google Drive</h4>
-                            <p>Formato automático:<br>
-                            <code>https://drive.google.com/uc?export=view&id=ID&confirm=t</code></p>
+                            <strong>Formato CORRECTO para Imgur:</strong>
+                            <ol>
+                                <li>Sube imagen a <a href="https://imgur.com/upload" target="_blank" style="color:#4da6ff">imgur.com/upload</a></li>
+                                <li>Haz clic derecho → "Copiar dirección de la imagen"</li>
+                                <li>Pega el enlace directo (termina en .jpg, .png, etc.)</li>
+                                <li>Para álbumes: <code>https://i.imgur.com/ID.jpg</code></li>
+                            </ol>
                         </div>
                         <h4 style="margin-top: 15px">💰 Precio Personalizado</h4>
                         <input 
@@ -949,18 +906,17 @@
                 
                 prodEl.innerHTML = productHTML;
                 
-                // Image click handler
+                // Add image click handler if image exists
                 if (imageUrl) {
                     const imgEl = prodEl.querySelector(".producto-img");
                     imgEl.onclick = (e) => {
                         e.stopPropagation();
                         modalImage.src = imageUrl;
-                        modalImage.setAttribute("referrerpolicy", "no-referrer");
                         imageModal.classList.add("active");
                     };
                 }
                 
-                // Admin event listeners
+                // Add admin event listeners if in admin mode
                 if (isAdmin) {
                     const saveImageBtn = prodEl.querySelector(".save-image");
                     const deleteImageBtn = prodEl.querySelector(".delete-image");
@@ -971,20 +927,21 @@
                     const deletePriceBtn = prodEl.querySelector(".delete-price");
                     const priceInput = prodEl.querySelector(".custom-price");
                     
+                    // Image handlers - ✅ CONVERTIR URL ANTES DE GUARDAR
                     if (saveImageBtn) {
                         saveImageBtn.onclick = async () => {
                             let url = imageUrlInput.value.trim();
                             if (!url) {
-                                alert("Ingresa una URL válida");
+                                alert("Por favor ingresa una URL válida");
                                 return;
                             }
                             
-                            // ✅ CONVERTIR SIEMPRE ANTES DE GUARDAR
-                            url = convertImageUrl(url);
+                            // ✅ CONVERTIR URL DE IMGUR AUTOMÁTICAMENTE
+                            url = convertImgurUrl(url);
                             
                             // Validar que sea una URL de imagen
-                            if (!url.match(/\.(jpe?g|png|gif|bmp|webp|svg)$/i) && !url.includes('drive.google.com') && !url.includes('imgur.com')) {
-                                if (!confirm("⚠️ URL no parece ser de imagen. ¿Guardar igual?")) return;
+                            if (!url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)$/i) && !url.includes('i.imgur.com')) {
+                                if (!confirm("⚠️ La URL no parece ser una imagen válida. ¿Deseas guardarla igual?")) return;
                             }
                             
                             try {
@@ -993,18 +950,18 @@
                                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                                 }, { merge: true });
                                 
-                                alert(`✅ Imagen guardada para "${cleanName}"\n\nURL usada:\n${url}`);
+                                showStatus(`✅ Imagen guardada para "${cleanName}"`, true);
                                 loadCatalog();
                             } catch (error) {
                                 console.error("Error saving image:", error);
-                                alert("Error: " + error.message);
+                                alert("Error al guardar la imagen: " + error.message);
                             }
                         };
                     }
                     
                     if (deleteImageBtn) {
                         deleteImageBtn.onclick = async () => {
-                            if (!confirm(`¿Eliminar imagen de "${cleanName}"?`)) return;
+                            if (!confirm(`¿Eliminar la imagen de "${cleanName}"?`)) return;
                             
                             try {
                                 await db.collection("products").doc(productId).update({
@@ -1012,16 +969,16 @@
                                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                                 });
                                 
-                                alert(`✅ Imagen eliminada`);
+                                showStatus(`✅ Imagen eliminada para "${cleanName}"`, true);
                                 loadCatalog();
                             } catch (error) {
                                 console.error("Error deleting image:", error);
-                                alert("Error: " + error.message);
+                                alert("Error al eliminar la imagen: " + error.message);
                             }
                         };
                     }
                     
-                    // ✅ BOTÓN DE PRUEBA QUE MUESTRA LA URL CONVERTIDA
+                    // ✅ NUEVO: Botón para probar la URL en una nueva pestaña
                     if (testImageBtn) {
                         testImageBtn.onclick = () => {
                             let url = imageUrlInput.value.trim();
@@ -1030,14 +987,11 @@
                                 return;
                             }
                             
-                            // Convertir para prueba
-                            const convertedUrl = convertImageUrl(url);
-                            
-                            // Mostrar URL convertida
-                            alert(`URL convertida:\n${convertedUrl}\n\nSe abrirá en nueva pestaña para verificar.`);
+                            // Convertir URL para prueba
+                            url = convertImgurUrl(url);
                             
                             // Abrir en nueva pestaña
-                            window.open(convertedUrl, '_blank');
+                            window.open(url, '_blank');
                         };
                     }
                     
@@ -1046,10 +1000,11 @@
                         savePriceBtn.onclick = async () => {
                             const price = priceInput.value.trim();
                             if (!price) {
-                                alert("Ingresa un precio válido");
+                                alert("Por favor ingresa un precio válido");
                                 return;
                             }
                             
+                            // Validate price format
                             if (!/^\d+$/.test(price.replace(/[^0-9]/g, ""))) {
                                 alert("El precio debe contener solo números");
                                 return;
@@ -1061,18 +1016,18 @@
                                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                                 }, { merge: true });
                                 
-                                alert(`✅ Precio guardado para "${cleanName}"`);
+                                showStatus(`✅ Precio guardado para "${cleanName}"`, true);
                                 loadCatalog();
                             } catch (error) {
                                 console.error("Error saving price:", error);
-                                alert("Error: " + error.message);
+                                alert("Error al guardar el precio: " + error.message);
                             }
                         };
                     }
                     
                     if (deletePriceBtn) {
                         deletePriceBtn.onclick = async () => {
-                            if (!confirm(`¿Restaurar precio original de "${cleanName}"?`)) return;
+                            if (!confirm(`¿Restaurar el precio original de "${cleanName}"?`)) return;
                             
                             try {
                                 await db.collection("products").doc(productId).update({
@@ -1080,11 +1035,11 @@
                                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                                 });
                                 
-                                alert(`✅ Precio restaurado`);
+                                showStatus(`✅ Precio restaurado para "${cleanName}"`, true);
                                 loadCatalog();
                             } catch (error) {
                                 console.error("Error deleting price:", error);
-                                alert("Error: " + error.message);
+                                alert("Error al restaurar el precio: " + error.message);
                             }
                         };
                     }
@@ -1094,13 +1049,25 @@
             });
         }
         
-        // ✅ MANEJADOR DE ERRORES MEJORADO
-        function handleImageError(img, productName) {
-            console.error(`Imagen fallida para ${productName}:`, img.src);
-            img.onerror = null;
-            img.parentElement.innerHTML = `<div class='img-error'>⚠️ Imagen no disponible<br>Verifica la URL o permisos</div>`;
+        // Show status message
+        function showStatus(message, isSuccess) {
+            // Remove existing messages
+            const existing = document.querySelector(".status-message");
+            if (existing) existing.remove();
+            
+            // Create new message
+            const msg = document.createElement("div");
+            msg.className = `status-message ${isSuccess ? 'status-success' : 'status-error'}`;
+            msg.innerHTML = message;
+            cont.insertBefore(msg, cont.firstChild);
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                if (msg.parentNode) msg.parentNode.removeChild(msg);
+            }, 3000);
         }
         
+        // Initialize the app when page loads
         window.addEventListener("DOMContentLoaded", init);
     </script>
 </body>
