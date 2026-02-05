@@ -1,19 +1,4 @@
-
-                        <!DOCTYPE html>
-                        <html lang="en">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                body {
-                  background-color: white; /* Ensure the iframe has a white background */
-                }
-
-                
-              </style>
-                        </head>
-                        <body>
-                            <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -821,7 +806,7 @@
                             alt="${cleanName}" 
                             class="producto-img"
                             referrerpolicy="no-referrer"
-                            onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'img-error\'>⚠️ Imagen no disponible<br>Verifica la URL o permisos de acceso</div>'"
+                            onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\\'img-error\\'>⚠️ Imagen no disponible<br>Verifica la URL o permisos de acceso</div>'"
                         >
                     </div>
                     `;
@@ -1012,45 +997,3 @@
 </body>
 </html>
 
-<img 
-  src="${imageUrl}" 
-  alt="${cleanName}" 
-  class="producto-img"
-  referrerpolicy="no-referrer"
-  onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'img-error\'>⚠️ Imagen no disponible<br>Verifica la URL o permisos de acceso</div>'"
->
-
-<img id="modalImage" class="modal-img" src="" alt="Imagen del producto" referrerpolicy="no-referrer">
-
-<!-- Login modal -->
-<input type="email" id="adminEmail" name="email" ...>
-<input type="password" id="adminPassword" name="password" ...>
-
-<!-- Admin section -->
-<input type="text" class="admin-input image-url" name="image-url" ...>
-<input type="text" class="admin-input custom-price" name="custom-price" ...>
-
-
-
-              <script>
-                              function convertDriveUrl(url) {
-    if (!url) return url;
-    
-    // Eliminar parámetros innecesarios primero
-    url = url.split('?')[0];
-    
-    // Convertir formato /file/d/ID/view
-    if (url.includes('drive.google.com') && url.includes('/file/d/')) {
-        const match = url.match(/\/d\/([^\/]+)/); // ✅ Corregido: sin ? en el regex
-        if (match && match[1]) {
-            return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-        }
-    }
-    // ... resto de la función
-}
-
-
-              </script>
-                        </body>
-                        </html>
-                    
