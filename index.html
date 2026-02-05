@@ -186,6 +186,7 @@
             display: block;
             margin: 10px auto;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            referrerpolicy: no-referrer;
         }
         
         .producto-img:hover {
@@ -310,6 +311,7 @@
             display: block;
             border-radius: 14px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            referrerpolicy: no-referrer;
         }
         
         .close-modal {
@@ -549,8 +551,8 @@
     <header>
         <h1>Trifusion Technologies</h1>
         <div class="admin-controls">
-            <button id="loginBtn" class="btn btn-admin">🔐 Modo Admin</button>
-            <button id="logoutBtn" class="btn btn-logout">👋 Salir</button>
+            <button id="loginBtn" class="btn btn-admin">🔐 ADMIN</button>
+            <button id="logoutBtn" class="btn btn-logout">👋 SALIR</button>
         </div>
     </header>
     
@@ -571,6 +573,16 @@
             <input type="email" id="adminEmail" name="email" class="login-input" placeholder="Correo electrónico" autocomplete="email" required>
             <input type="password" id="adminPassword" name="password" class="login-input" placeholder="Contraseña" autocomplete="current-password" required>
             <button id="submitLogin" class="btn btn-login">Iniciar Sesión</button>
+            <div class="drive-instructions" style="margin-top: 20px; background: rgba(40, 30, 20, 0.7); border-left-color: #ffb703;">
+                <strong>ℹ️ Instrucciones para imágenes de Google Drive:</strong>
+                <ol>
+                    <li>Sube tu imagen a Google Drive</li>
+                    <li>Haz clic derecho → "Obtener enlace"</li>
+                    <li>Cambia a: "Cualquiera con el enlace" → "Lector"</li>
+                    <li>Copia el ID (entre /d/ y /view)</li>
+                    <li>Usa este formato: <code>https://drive.google.com/uc?export=view&id=TU_ID</code></li>
+                </ol>
+            </div>
         </div>
     </div>
     
@@ -579,12 +591,12 @@
         <p style="margin-top: 8px; font-size: 0.85rem; opacity: 0.7;">Catálogo actualizado en tiempo real desde Google Sheets</p>
     </footer>
 
-    <!-- Firebase SDK - CORREGIDO: SIN ESPACIOS EN URLs -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
-    <!-- PapaParse for CSV parsing - CORREGIDO: SIN ESPACIOS -->
+    <!-- PapaParse for CSV parsing -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     
     <script>
@@ -606,7 +618,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         const SHEET_ID = "1EtOwxNRGq0WFgGaRXtJgibUqzxIgcAUeRkJlr1wPsLc";
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`; // CORREGIDO: SIN ESPACIOS
+        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
         const cont = document.getElementById("catalogo");
         const loginBtn = document.getElementById("loginBtn");
         const logoutBtn = document.getElementById("logoutBtn");
@@ -631,7 +643,7 @@
             if (url.includes('drive.google.com') && url.includes('/file/d/')) {
                 const match = url.match(/\/d\/([^\/]+)/);
                 if (match && match[1]) {
-                    return `https://drive.google.com/uc?export=view&id=${match[1]}`; // ✅ SIN ESPACIOS
+                    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
                 }
             }
             
@@ -639,7 +651,7 @@
             if (url.includes('drive.google.com') && url.includes('open?id=')) {
                 const match = url.match(/open\?id=([^&]+)/);
                 if (match && match[1]) {
-                    return `https://drive.google.com/uc?export=view&id=${match[1]}`; // ✅ SIN ESPACIOS
+                    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
                 }
             }
             
@@ -872,8 +884,8 @@
                             <strong>ℹ️ Para que funcione:</strong>
                             <ol>
                                 <li>Compartir con "Cualquiera con el enlace"</li>
-                                <li>Permisos: "Solo ver"</li>
-                                <li>Pegar link normal de Drive</li>
+                                <li>Permisos: "Lector"</li>
+                                <li>Pegar link en formato: <code>https://drive.google.com/uc?export=view&id=ID</code></li>
                             </ol>
                         </div>
                         <h4 style="margin-top: 15px">💰 Precio Personalizado</h4>
