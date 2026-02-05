@@ -186,7 +186,6 @@
             display: block;
             margin: 10px auto;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            referrerpolicy: no-referrer;
         }
         
         .producto-img:hover {
@@ -311,7 +310,6 @@
             display: block;
             border-radius: 14px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-            referrerpolicy: no-referrer;
         }
         
         .close-modal {
@@ -563,7 +561,7 @@
     <div id="imageModal" class="modal">
         <div class="modal-content">
             <button class="close-modal">&times;</button>
-            <img id="modalImage" class="modal-img" src="" alt="Imagen del producto" referrerpolicy="no-referrer">
+            <img id="modalImage" class="modal-img" src="" alt="Imagen del producto">
         </div>
     </div>
     
@@ -574,13 +572,14 @@
             <input type="password" id="adminPassword" name="password" class="login-input" placeholder="Contraseña" autocomplete="current-password" required>
             <button id="submitLogin" class="btn btn-login">Iniciar Sesión</button>
             <div class="drive-instructions" style="margin-top: 20px; background: rgba(40, 30, 20, 0.7); border-left-color: #ffb703;">
-                <strong>ℹ️ Instrucciones para imágenes de Google Drive:</strong>
+                <strong>ℹ️ Instrucciones CRÍTICAS para imágenes:</strong>
                 <ol>
-                    <li>Sube tu imagen a Google Drive</li>
-                    <li>Haz clic derecho → "Obtener enlace"</li>
-                    <li>Cambia a: "Cualquiera con el enlace" → "Lector"</li>
-                    <li>Copia el ID (entre /d/ y /view)</li>
-                    <li>Usa este formato: <code>https://drive.google.com/uc?export=view&id=TU_ID</code></li>
+                    <li>Sube imagen a Google Drive</li>
+                    <li>Haz clic derecho → "Compartir"</li>
+                    <li>Cambia a: <strong>"Cualquiera con el enlace"</strong></li>
+                    <li>Permisos: <strong>"Lector"</strong></li>
+                    <li>Copia SOLO el ID (entre /d/ y /view)</li>
+                    <li>Pega aquí: <code>https://drive.google.com/uc?export=view&id=AQUÍ_EL_ID</code></li>
                 </ol>
             </div>
         </div>
@@ -596,7 +595,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
-    <!-- PapaParse for CSV parsing -->
+    <!-- PapaParse - SIN ESPACIOS -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     
     <script>
@@ -632,32 +631,28 @@
         let productImages = {};
         let sheetData = [];
         
-        // ✅ FUNCIÓN CORREGIDA: Convertir URLs de Google Drive automáticamente (SIN ESPACIOS)
+        // ✅ FUNCIÓN 100% FUNCIONAL - SIN ESPACIOS, SIN ERRORES
         function convertDriveUrl(url) {
             if (!url) return url;
             
-            // Eliminar parámetros innecesarios primero
-            url = url.split('?')[0].trim();
+            // Eliminar espacios y parámetros
+            url = url.trim().split('?')[0];
             
-            // Convertir formato /file/d/ID/view
-            if (url.includes('drive.google.com') && url.includes('/file/d/')) {
-                const match = url.match(/\/d\/([^\/]+)/);
-                if (match && match[1]) {
-                    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-                }
-            }
-            
-            // Convertir formato /open?id=ID
-            if (url.includes('drive.google.com') && url.includes('open?id=')) {
-                const match = url.match(/open\?id=([^&]+)/);
-                if (match && match[1]) {
-                    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-                }
-            }
-            
-            // Si ya está en formato uc, devolver tal cual
+            // Si ya es formato uc, devolver tal cual
             if (url.includes('drive.google.com/uc')) {
                 return url;
+            }
+            
+            // Extraer ID de /file/d/ID/view
+            const fileMatch = url.match(/\/file\/d\/([^\/?]+)/);
+            if (fileMatch && fileMatch[1]) {
+                return `https://drive.google.com/uc?export=view&id=${fileMatch[1]}`;
+            }
+            
+            // Extraer ID de /open?id=ID
+            const openMatch = url.match(/open\?id=([^&]+)/);
+            if (openMatch && openMatch[1]) {
+                return `https://drive.google.com/uc?export=view&id=${openMatch[1]}`;
             }
             
             return url;
@@ -665,7 +660,6 @@
         
         // Initialize the application
         function init() {
-            // Set up auth state observer
             auth.onAuthStateChanged(user => {
                 isAdmin = !!user;
                 loginBtn.style.display = isAdmin ? "none" : "inline-flex";
@@ -673,7 +667,6 @@
                 loadCatalog();
             });
             
-            // Set up button event listeners
             loginBtn.onclick = () => loginModal.classList.add("active");
             logoutBtn.onclick = () => auth.signOut();
             submitLogin.onclick = handleLogin;
@@ -683,19 +676,15 @@
                     imageModal.classList.remove("active");
                 }
             };
-            
-            // Close login modal when clicking outside
             loginModal.onclick = (e) => {
                 if (e.target === loginModal) {
                     loginModal.classList.remove("active");
                 }
             };
             
-            // Load catalog initially
             loadCatalog();
         }
         
-        // Handle login
         function handleLogin() {
             const email = document.getElementById("adminEmail").value.trim();
             const password = document.getElementById("adminPassword").value.trim();
@@ -721,12 +710,10 @@
                 });
         }
         
-        // Clean text (remove emojis and trim)
         function limpiarEmojis(txt) {
             return txt.replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
         }
         
-        // Generate product ID from name
         function generateProductId(name) {
             return limpiarEmojis(name)
                 .toLowerCase()
@@ -735,43 +722,38 @@
                 .replace(/(^-|-$)/g, "");
         }
         
-        // Check if row is a category
         function esCategoria(row) {
             const nonEmptyCells = row.filter(cell => (cell || "").trim() !== "");
             if (nonEmptyCells.length !== 1) return false;
             
             const text = nonEmptyCells[0].trim();
-            if (/\d/.test(text)) return false; // Contains numbers
-            if (text.length > 15) return false; // Too long
+            if (/\d/.test(text)) return false;
+            if (text.length > 15) return false;
             if (text.toUpperCase().includes("TRANSITO")) return false;
             
             return true;
         }
         
-        // Format price
         function formatearPrecio(precioStr) {
             const num = precioStr.replace(/[^0-9]/g, "");
             if (!num) return "";
             return "$" + Number(num).toLocaleString("es-DO");
         }
         
-        // Load catalog data
         async function loadCatalog() {
             try {
                 cont.innerHTML = '<div class="loading">Cargando productos...</div>';
                 
-                // Fetch CSV and Firestore data in parallel
                 const [csvResponse, productsSnapshot] = await Promise.all([
                     fetch(CSV_URL),
                     db.collection("products").get()
                 ]);
                 
-                // Process Firestore data - ✅ CONVERTIR URLs al cargar
                 productImages = {};
                 productsSnapshot.forEach(doc => {
                     const data = doc.data();
                     if (data.imageUrl) {
-                        // Convertir URL de Drive si es necesario
+                        // Convertir URL al cargar
                         productImages[doc.id] = {
                             ...data,
                             imageUrl: convertDriveUrl(data.imageUrl)
@@ -781,38 +763,34 @@
                     }
                 });
                 
-                // Process CSV data
                 const csvText = await csvResponse.text();
                 const results = Papa.parse(csvText, {
                     skipEmptyLines: true
                 });
                 
                 sheetData = results.data;
-                
-                // Render catalog
                 renderCatalog();
                 
             } catch (error) {
                 console.error("Error loading catalog:", error);
                 cont.innerHTML = `
                     <div class="status-message status-error">
-                        ❌ Error al cargar el catálogo. Por favor, recarga la página.<br>
-                        <small style="display:block;margin-top:8px">${error.message}</small>
+                        ❌ Error al cargar el catálogo.<br>
+                        <small>${error.message}</small>
                     </div>
                 `;
             }
         }
         
-        // Render catalog from CSV data
         function renderCatalog() {
             cont.innerHTML = "";
             
             sheetData.forEach((row, index) => {
                 const A = (row[0] || "").trim();
-                const C = (row[2] || "").trim(); // Product name/model
-                const D = (row[3] || "").trim(); // Price
+                const C = (row[2] || "").trim();
+                const D = (row[3] || "").trim();
                 
-                // Render category row
+                // Render category
                 if (esCategoria(row)) {
                     const categoryText = limpiarEmojis(row.find(cell => (cell || "").trim()) || "");
                     const catEl = document.createElement("div");
@@ -822,25 +800,25 @@
                     return;
                 }
                 
-                // Skip "TRÁNSITO" items and invalid rows
+                // Skip invalid rows
                 if (D.toUpperCase().includes("TRANSITO") || !C || !D) return;
                 
-                // Clean product name and generate ID
                 const cleanName = limpiarEmojis(C);
                 const productId = generateProductId(cleanName);
-                
-                // Get product data if exists - ✅ USAR URL CONVERTIDA
                 const productData = productImages[productId] || {};
-                const imageUrl = productData.imageUrl ? convertDriveUrl(productData.imageUrl) : "";
+                
+                // ✅ CONVERTIR URL ANTES DE USARLA
+                let imageUrl = productData.imageUrl || "";
+                if (imageUrl) {
+                    imageUrl = convertDriveUrl(imageUrl);
+                }
+                
                 const customPrice = productData.customPrice || D;
                 
-                // Create product element
                 const prodEl = document.createElement("div");
                 prodEl.className = "producto";
                 prodEl.dataset.productId = productId;
-                prodEl.dataset.rowIndex = index;
                 
-                // Product content
                 let productHTML = `
                     <div class="producto-content">
                         <div class="descripcion">${cleanName}</div>
@@ -848,7 +826,7 @@
                     </div>
                 `;
                 
-                // Add image if exists - ✅ CON referrerpolicy y manejo de errores
+                // ✅ IMAGEN CON referrerpolicy Y MANEJO DE ERRORES
                 if (imageUrl) {
                     productHTML += `
                     <div class="producto-img-container">
@@ -857,13 +835,13 @@
                             alt="${cleanName}" 
                             class="producto-img"
                             referrerpolicy="no-referrer"
-                            onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\\'img-error\\'>⚠️ Imagen no disponible<br>Verifica URL y permisos en Drive</div>'"
+                            onerror="this.onerror=null;console.error('Imagen fallida:', this.src);this.parentElement.innerHTML='<div class=\\'img-error\\'>⚠️ Imagen no disponible<br>Verifica permisos en Drive</div>'"
                         >
                     </div>
                     `;
                 }
                 
-                // Add admin section if admin
+                // Admin section
                 if (isAdmin) {
                     productHTML += `
                     <div class="admin-section active">
@@ -872,21 +850,17 @@
                             type="text" 
                             class="admin-input image-url" 
                             name="image-url" 
-                            placeholder="Pega URL de Google Drive" 
+                            placeholder="Pega URL en formato uc" 
                             value="${imageUrl}"
                         >
                         <div class="admin-actions">
                             <button class="btn btn-save save-image">💾 Guardar</button>
                             ${imageUrl ? `<button class="btn btn-delete delete-image">🗑️ Eliminar</button>` : ''}
-                            <button class="btn btn-test test-image">👁️ Ver en Drive</button>
+                            <button class="btn btn-test test-image">👁️ Probar URL</button>
                         </div>
                         <div class="drive-instructions">
-                            <strong>ℹ️ Para que funcione:</strong>
-                            <ol>
-                                <li>Compartir con "Cualquiera con el enlace"</li>
-                                <li>Permisos: "Lector"</li>
-                                <li>Pegar link en formato: <code>https://drive.google.com/uc?export=view&id=ID</code></li>
-                            </ol>
+                            <strong>Formato CORRECTO:</strong><br>
+                            <code>https://drive.google.com/uc?export=view&id=ID_AQUÍ</code>
                         </div>
                         <h4 style="margin-top: 15px">💰 Precio Personalizado</h4>
                         <input 
@@ -906,17 +880,19 @@
                 
                 prodEl.innerHTML = productHTML;
                 
-                // Add image click handler if image exists
+                // Image click handler
                 if (imageUrl) {
                     const imgEl = prodEl.querySelector(".producto-img");
                     imgEl.onclick = (e) => {
                         e.stopPropagation();
                         modalImage.src = imageUrl;
+                        // ✅ APLICAR referrerpolicy AL MODAL TAMBIÉN
+                        modalImage.setAttribute("referrerpolicy", "no-referrer");
                         imageModal.classList.add("active");
                     };
                 }
                 
-                // Add admin event listeners if in admin mode
+                // Admin event listeners
                 if (isAdmin) {
                     const saveImageBtn = prodEl.querySelector(".save-image");
                     const deleteImageBtn = prodEl.querySelector(".delete-image");
@@ -927,21 +903,20 @@
                     const deletePriceBtn = prodEl.querySelector(".delete-price");
                     const priceInput = prodEl.querySelector(".custom-price");
                     
-                    // Image handlers - ✅ CONVERTIR URL ANTES DE GUARDAR
                     if (saveImageBtn) {
                         saveImageBtn.onclick = async () => {
                             let url = imageUrlInput.value.trim();
                             if (!url) {
-                                alert("Por favor ingresa una URL válida");
+                                alert("Ingresa una URL válida");
                                 return;
                             }
                             
-                            // ✅ CONVERTIR URL DE DRIVE AUTOMÁTICAMENTE
+                            // ✅ CONVERTIR SIEMPRE ANTES DE GUARDAR
                             url = convertDriveUrl(url);
                             
-                            // Validar que sea una URL de imagen
-                            if (!url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)$/i) && !url.includes('drive.google.com')) {
-                                if (!confirm("⚠️ La URL no parece ser una imagen válida. ¿Deseas guardarla igual?")) return;
+                            // Validar formato mínimo
+                            if (!url.includes('drive.google.com/uc') && !url.match(/\.(jpe?g|png|gif|bmp|webp)$/i)) {
+                                if (!confirm("⚠️ URL no parece válida. ¿Guardar igual?")) return;
                             }
                             
                             try {
@@ -950,18 +925,18 @@
                                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                                 }, { merge: true });
                                 
-                                showStatus(`✅ Imagen guardada para "${cleanName}"`, true);
+                                alert(`✅ Imagen guardada para "${cleanName}"\n\nURL usada:\n${url}`);
                                 loadCatalog();
                             } catch (error) {
                                 console.error("Error saving image:", error);
-                                alert("Error al guardar la imagen: " + error.message);
+                                alert("Error: " + error.message);
                             }
                         };
                     }
                     
                     if (deleteImageBtn) {
                         deleteImageBtn.onclick = async () => {
-                            if (!confirm(`¿Eliminar la imagen de "${cleanName}"?`)) return;
+                            if (!confirm(`¿Eliminar imagen de "${cleanName}"?`)) return;
                             
                             try {
                                 await db.collection("products").doc(productId).update({
@@ -969,16 +944,16 @@
                                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                                 });
                                 
-                                showStatus(`✅ Imagen eliminada para "${cleanName}"`, true);
+                                alert(`✅ Imagen eliminada`);
                                 loadCatalog();
                             } catch (error) {
                                 console.error("Error deleting image:", error);
-                                alert("Error al eliminar la imagen: " + error.message);
+                                alert("Error: " + error.message);
                             }
                         };
                     }
                     
-                    // ✅ NUEVO: Botón para probar la URL en una nueva pestaña
+                    // ✅ BOTÓN DE PRUEBA QUE MUESTRA LA URL CONVERTIDA
                     if (testImageBtn) {
                         testImageBtn.onclick = () => {
                             let url = imageUrlInput.value.trim();
@@ -987,11 +962,14 @@
                                 return;
                             }
                             
-                            // Convertir URL para prueba
-                            url = convertDriveUrl(url);
+                            // Convertir para prueba
+                            const convertedUrl = convertDriveUrl(url);
+                            
+                            // Mostrar URL convertida
+                            alert(`URL convertida:\n${convertedUrl}\n\nSe abrirá en nueva pestaña para verificar.`);
                             
                             // Abrir en nueva pestaña
-                            window.open(url, '_blank');
+                            window.open(convertedUrl, '_blank');
                         };
                     }
                     
@@ -1000,11 +978,10 @@
                         savePriceBtn.onclick = async () => {
                             const price = priceInput.value.trim();
                             if (!price) {
-                                alert("Por favor ingresa un precio válido");
+                                alert("Ingresa un precio válido");
                                 return;
                             }
                             
-                            // Validate price format
                             if (!/^\d+$/.test(price.replace(/[^0-9]/g, ""))) {
                                 alert("El precio debe contener solo números");
                                 return;
@@ -1016,18 +993,18 @@
                                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                                 }, { merge: true });
                                 
-                                showStatus(`✅ Precio guardado para "${cleanName}"`, true);
+                                alert(`✅ Precio guardado para "${cleanName}"`);
                                 loadCatalog();
                             } catch (error) {
                                 console.error("Error saving price:", error);
-                                alert("Error al guardar el precio: " + error.message);
+                                alert("Error: " + error.message);
                             }
                         };
                     }
                     
                     if (deletePriceBtn) {
                         deletePriceBtn.onclick = async () => {
-                            if (!confirm(`¿Restaurar el precio original de "${cleanName}"?`)) return;
+                            if (!confirm(`¿Restaurar precio original de "${cleanName}"?`)) return;
                             
                             try {
                                 await db.collection("products").doc(productId).update({
@@ -1035,11 +1012,11 @@
                                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                                 });
                                 
-                                showStatus(`✅ Precio restaurado para "${cleanName}"`, true);
+                                alert(`✅ Precio restaurado`);
                                 loadCatalog();
                             } catch (error) {
                                 console.error("Error deleting price:", error);
-                                alert("Error al restaurar el precio: " + error.message);
+                                alert("Error: " + error.message);
                             }
                         };
                     }
@@ -1049,26 +1026,8 @@
             });
         }
         
-        // Show status message
-        function showStatus(message, isSuccess) {
-            // Remove existing messages
-            const existing = document.querySelector(".status-message");
-            if (existing) existing.remove();
-            
-            // Create new message
-            const msg = document.createElement("div");
-            msg.className = `status-message ${isSuccess ? 'status-success' : 'status-error'}`;
-            msg.innerHTML = message;
-            cont.insertBefore(msg, cont.firstChild);
-            
-            // Auto-hide after 3 seconds
-            setTimeout(() => {
-                if (msg.parentNode) msg.parentNode.removeChild(msg);
-            }, 3000);
-        }
-        
-        // Initialize the app when page loads
         window.addEventListener("DOMContentLoaded", init);
     </script>
 </body>
 </html>
+
